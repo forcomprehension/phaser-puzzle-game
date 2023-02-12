@@ -9,7 +9,8 @@ import { setWorldCollision } from "../../physics/matter";
  * @param key
  * @param scale
  */
-function createBall(scene: Phaser.Scene, x: number, y: number, key: string, scale: number, bounce: number) {
+function createBall(
+    scene: Phaser.Scene, x: number, y: number, key: string, scale: number, bounce: number) {
     const ball = scene.matter.add.image(x, y, key);
 
     ball.setScale(scale);
@@ -33,22 +34,35 @@ export function createBouncyBall(scene: Phaser.Scene, x: number, y: number) {
     // @todo: must be const
     const { height, width } = scene.sys.game.canvas;
     // @TODO: const, mass, atmosphere
-    const maxVelocity = new Phaser.Math.Vector2(height / 2, width / 2);
-    maxVelocity.setAngle(0);
+    const maxVelocity = new Phaser.Math.Vector2(width / 2, height / 2);
+    const maxMagnitude = maxVelocity.setAngle(0)
+        .multiply({ x: 0.03, y: 0.03 }) // @TODO: magic numbers
+        .length();
 
     const ball = createBall(scene, x, y, 'ball-124', .5, 1);
+//     scene.events.on(Phaser.Scenes.Events.UPDATE, function UpdateBouncyBall(_: number, deltaTime: number) {
+//         const body = castBody(ball);
+//         const velocityVec = new Phaser.Math.Vector2(body.velocity);
+//         const currentLength = velocityVec.length();
+//         const interpolated = Phaser.Math.Linear(currentLength, maxMagnitude, .005);
+// console.log(interpolated);
+//         velocityVec.setLength(interpolated);
+//         // ball.setVelocity(velocityVec.x, velocityVec.y);
+//     });
+    // castBody(ball).gravityScale ={ x: 5, y: 5 };
+
     // This ball must jumps out of screen
     ball.setOnCollide(function BouncyBallCollideListener(this: MatterJS.BodyType) {
-        const newVec = maxVelocity.clone()
-            .divide({ x: 0.1, y: 0.1 })
-            .multiply({ x: this.mass, y: this.mass });
-        // @todo: doom wall problem
-        // @todo: mass problem
-        // ball.applyForce(newVec);
-        // this.positionImpulse
-        // ball.thrust(500);
-        ball.applyForce(newVec);
-        console.log(newVec);
+        const currentVelocity = new Phaser.Math.Vector2(ball.body.velocity);
+        const dist = maxMagnitude - currentVelocity.length();
+        if (dist < 1) {
+            return;
+        }
+
+        currentVelocity.setLength(maxMagnitude);
+        // currentVelocity.rotate(Math.random() * 360)
+
+        ball.setVelocity(currentVelocity.x * -1, currentVelocity.y * -1);
     });
 
     return ball;
@@ -105,4 +119,3 @@ export function createBowlingBall(scene: Phaser.Scene, x: number, y: number) {
 export function createEightBall(scene: Phaser.Scene, x: number, y: number) {
     return createBall(scene, x, y, 'eight-ball', .25, .275);
 }
-
