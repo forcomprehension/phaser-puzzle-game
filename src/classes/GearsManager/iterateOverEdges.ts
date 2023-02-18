@@ -1,5 +1,5 @@
 import type { Edge, Graph } from 'graphlib'
-import type { GraphKey } from '../GearGraph'
+import type { GraphKey } from './GearGraph'
 
 export const DEFAULT_EDGE_NAME = "\x00";
 export const EDGE_KEY_DELIM = "\x01";

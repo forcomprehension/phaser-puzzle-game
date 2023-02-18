@@ -1,6 +1,6 @@
-import { createBasketballBall, createBouncyBall, createBowlingBall, createEightBall, createFootballBall } from "@GameObjects/balls";
-import { castBody } from "src/physics/matter";
-import { testLevelBalls } from "../debug/levels";
+import { Gear12 } from "@GameObjects/gears/Gear12";
+import { Gear6 } from "@GameObjects/gears/Gear6";
+import { GearsManager } from "src/classes/GearsManager";
 
 function setDraggable(...objects: Phaser.GameObjects.GameObject[]) {
     objects.forEach((object) => {
@@ -34,25 +34,20 @@ function CheckTween(this:MatterJS.BodyType, event: Phaser.Types.Physics.Matter.M
  * Game objects tests scene
  */
 export class GameObjectsScene extends Phaser.Scene {
+    protected readonly gearsManager = new GearsManager();
     constructor() {
         super("GameObjects.test");
     }
 
     public create() {
-        const gear12 = this.matter.add.image(99, 100, 'gear-12');
-        gear12.setScale(.4);
-        gear12.setCircle(gear12.displayHeight / 2 * .99);
-        gear12.setIgnoreGravity(true);
+        const gear12 = new Gear12(this, 99, 100);
 
-        const gear6 = this.matter.add.image(100, 190, 'gear-6');
-        gear6.setScale(.2);
-        gear6.setCircle(gear6.displayHeight / 2 * 0.6);
-        gear6.setIgnoreGravity(true);
+        const gear6 = new Gear6(this, 100, 190);
+        const gear6_2 = new Gear6(this, 250, 190);
 
-        const gear6_2 = this.matter.add.image(250, 190, 'gear-6');
-        gear6_2.setScale(.2);
-        gear6_2.setCircle(gear6.displayHeight / 2 * 0.6);
-        gear6_2.setIgnoreGravity(true);
+        this.gearsManager.registerGear(gear12);
+        this.gearsManager.registerGear(gear6);
+        this.gearsManager.registerGear(gear6_2);
 
         this.tweens.add({
             duration: 4000,

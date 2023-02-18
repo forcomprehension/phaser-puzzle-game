@@ -1,9 +1,6 @@
-import { SequentialIdGenerator } from "@utils/sequentialIdGenerator";
-import { GEAR_ROTATION_DIRECTION } from "./gearTypes";
 import { GearGraph } from './GearGraph'
 import { GearStatesUpdater } from "./GearStatesUpdater";
-
-const seq = new SequentialIdGenerator();
+import { AbstractGear } from "@GameObjects/gears/AbstractGear";
 
 /**
  * Manager for all gears in current scene
@@ -13,26 +10,30 @@ export class GearsManager {
     protected readonly gearsStateUpdater: GearStatesUpdater = new GearStatesUpdater(this.graph);
 
     /**
-     * @param motorDirection - if undefined - this is not a motor
+     * Adds gear to graph
+     *
+     * @param gear
      */
-    public addGear(motorDirection: GEAR_ROTATION_DIRECTION|undefined) {
-        // @TODO: connect with gameplay object
-        this.graph.addGear(seq.next(), motorDirection);
+    public registerGear(gear: AbstractGear) {
+        this.graph.addGear(gear.serialID, gear.getRotationDirection());
         this.updateGearStates();
     }
 
     /**
-     * Removes current gear
+     * Removes gear from graph
      */
-    public removeGear() {
-        const key = ''; // @TODO: GET GEAR KEY
-        this.graph.removeGear(key);
+    public unregisterGear(gear: AbstractGear) {
+        this.graph.removeGear(gear.serialID);
         this.updateGearStates();
     }
 
-    public toggleMotor(motorDirection: GEAR_ROTATION_DIRECTION|undefined) {
-        const key = ''; // @TODO: GET GEAR KEY
-        this.graph.toggleMotor(key);
+    /**
+     * Toggle gear rotation in graph
+     *
+     * @param gear
+     */
+    public updateRotation(gear: AbstractGear) {
+        this.graph.toggleMotor(gear.serialID, gear.getRotationDirection());
         this.updateGearStates();
     }
 

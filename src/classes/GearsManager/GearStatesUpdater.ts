@@ -1,5 +1,4 @@
-import { GearNode } from "./gearTypes";
-import { GraphKey, GearGraph } from './GearGraph'
+import { GraphKey, GearGraph, GearNode } from './GearGraph'
 import { iterateOverEdges } from './iterateOverEdges';
 import { checkGearsRotationsAreCompatible, getOppositeDirection } from './utils';
 

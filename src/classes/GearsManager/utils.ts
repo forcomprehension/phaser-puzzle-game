@@ -1,4 +1,6 @@
-import { GearNode, GEAR_ROTATION_DIRECTION } from "./GearGraph";
+import { ROTATION_DIRECTION } from "@utils/types";
+import { GearNode } from "./GearGraph";
+
 
 export type DirectionFromGearNode = Pick<GearNode, 'direction'>
 
@@ -19,16 +21,16 @@ export function checkGearsRotationsAreCompatible(
  */
 export function getOppositeDirection(vData: DirectionFromGearNode) {
     switch (vData.direction) {
-        case GEAR_ROTATION_DIRECTION.CCW: {
-            return GEAR_ROTATION_DIRECTION.CW;
+        case ROTATION_DIRECTION.CCW: {
+            return ROTATION_DIRECTION.CW;
         }
 
-        case GEAR_ROTATION_DIRECTION.CW: {
-            return GEAR_ROTATION_DIRECTION.CCW;
+        case ROTATION_DIRECTION.CW: {
+            return ROTATION_DIRECTION.CCW;
         }
 
         default: {
-            return GEAR_ROTATION_DIRECTION.IDLE;
+            return ROTATION_DIRECTION.IDLE;
         }
     }
 }

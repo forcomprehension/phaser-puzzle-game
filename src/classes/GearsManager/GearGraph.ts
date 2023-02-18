@@ -1,10 +1,19 @@
+import { ROTATION_DIRECTION } from '@utils/types';
 import { Graph } from 'graphlib'
-import { GEAR_ROTATION_DIRECTION, GearNode } from './gearTypes'
 
 /**
  * Graph key type
  */
 export type GraphKey = string;
+
+/**
+ * Gear info
+ */
+export interface GearNode {
+    isJammed: boolean,
+    isMotor: boolean,
+    direction: ROTATION_DIRECTION
+};
 
 /**
  * Graph for gears control
@@ -17,38 +26,64 @@ export class GearGraph extends Graph {
 
         this.setDefaultNodeLabel(() => ({
             isMotor: false,
-            direction: GEAR_ROTATION_DIRECTION.IDLE,
+            direction: ROTATION_DIRECTION.IDLE,
             isJammed: false,
         } as GearNode));
     }
 
-    public addGear(key: GraphKey, motorDirection?: GEAR_ROTATION_DIRECTION) {
-        const isMotor = Boolean(motorDirection);
+    /**
+     * Adds a gear to graph
+     *
+     * @param key
+     * @param motorDirection 
+     */
+    public addGear(key: GraphKey, motorDirection?: ROTATION_DIRECTION) {
+        const isMotor = Boolean(motorDirection) && motorDirection !== ROTATION_DIRECTION.IDLE;
         this.updateMotorsIndex(key, isMotor);
 
         const nodeData: GearNode = {
             isJammed: false,
             isMotor,
-            direction: motorDirection || GEAR_ROTATION_DIRECTION.IDLE,
+            direction: motorDirection || ROTATION_DIRECTION.IDLE,
         };
 
-        return this.setNode(key, nodeData);
+        this.setNode(key, nodeData);
     }
 
+    /**
+     * Removes gear from graph
+     *
+     * @param key
+     */
     public removeGear(key: GraphKey) {
-        this.motorIndex.delete(key);
+        this.updateMotorsIndex(key, false);
         this.removeNode(key);
     }
 
-    public toggleMotor(key: GraphKey, motorDirection?: GEAR_ROTATION_DIRECTION) {
+    /**
+     * Toggle gear direction
+     *
+     * @param key
+     * @param motorDirection
+     */
+    public toggleMotor(key: GraphKey, motorDirection?: ROTATION_DIRECTION) {
         const nodeData = this.getNodeData(key);
 
         if (nodeData) {
-            nodeData.isMotor = Boolean(motorDirection);
-            nodeData.direction = motorDirection || GEAR_ROTATION_DIRECTION.IDLE;
+            nodeData.isMotor = Boolean(motorDirection) && motorDirection !== ROTATION_DIRECTION.IDLE;
+            nodeData.direction = motorDirection || ROTATION_DIRECTION.IDLE;
+
+            this.updateMotorsIndex(key, nodeData.isMotor);
         }
     }
 
+    /**
+     * Suitable node data getter
+     *
+     * @param key
+     *
+     * @returns
+     */
     public getNodeData(key: GraphKey): GearNode {
       const nodeData = this.node(key);
 
@@ -67,6 +102,8 @@ export class GearGraph extends Graph {
     }
 
     /**
+     * Update motor index by key and flag
+     *
      * @param key
      * @param isMotor
      *
