@@ -2,8 +2,14 @@ import { GraphKey, GearGraph, GearNode } from './GearGraph'
 import { iterateOverEdges } from './iterateOverEdges';
 import { checkGearsRotationsAreCompatible, getOppositeDirection } from './utils';
 
+/**
+ * Split graph to subgraphs, starting from motor nodes, and update its jamming and rotations state
+ */
 export class GearStatesUpdater {
-    protected readonly visitedNodes = new Set<GraphKey>();
+    /**
+     * Visited nodes for current subgraph
+     */
+    protected readonly subgraphVisitedNodes = new Set<GraphKey>();
 
     /**
      * Does current subgraph is jammed?
@@ -29,13 +35,13 @@ export class GearStatesUpdater {
         for (const motorKey of motorsIndexCopy) {
             // Reset visited nodes on each iteration.
             // Because we remove all connected motors, and we get few unconnected graphs
-            this.visitedNodes.clear();
+            this.subgraphVisitedNodes.clear();
             this.currentSubgraphIsJammed = false;
 
             iterateOverEdges(this.graph, motorKey, ({ v, w }) => {
                 // There is no situation, when nodes both nodes was visited
-                const vVisited = this.visitedNodes.has(v);
-                const wVisited = this.visitedNodes.has(w);
+                const vVisited = this.subgraphVisitedNodes.has(v);
+                const wVisited = this.subgraphVisitedNodes.has(w);
 
                 const vData = this.graph.getNodeData(v);
                 const wData = this.graph.getNodeData(w);
@@ -78,8 +84,8 @@ export class GearStatesUpdater {
                     }
                 }
 
-                this.visitedNodes.add(v);
-                this.visitedNodes.add(w);
+                this.subgraphVisitedNodes.add(v);
+                this.subgraphVisitedNodes.add(w);
             });
         }
     }
@@ -95,7 +101,7 @@ export class GearStatesUpdater {
         this.currentSubgraphIsJammed = true;
 
         // All visited nodes will be jammed too
-        this.visitedNodes.forEach((node) => {
+        this.subgraphVisitedNodes.forEach((node) => {
             const nodeData = this.graph.getNodeData(node);
             nodeData.isJammed = true;
         });

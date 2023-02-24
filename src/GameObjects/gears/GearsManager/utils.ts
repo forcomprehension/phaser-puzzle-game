@@ -34,3 +34,10 @@ export function getOppositeDirection(vData: DirectionFromGearNode) {
         }
     }
 }
+
+/**
+ * Check that rotation direction will rotate defined and non-idle {@see ROTATION_DIRECTION.IDLE}
+ */
+export function checkRotationDirectionIsRotated(direction: ROTATION_DIRECTION): direction is PickEnum<ROTATION_DIRECTION, ROTATION_DIRECTION.CCW | ROTATION_DIRECTION.CW> {
+    return direction && direction !== ROTATION_DIRECTION.IDLE;
+}

@@ -7,5 +7,5 @@ let currentIndex = 0x0;
  * @returns
  */
 export function nextString() {
-    return currentIndex.toString(16);
+    return (currentIndex++).toString(16);
 }

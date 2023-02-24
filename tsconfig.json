@@ -16,7 +16,8 @@
     "isolatedModules": true,
     "paths": {
       "@GameObjects/*": ["src/GameObjects/*"],
-      "@utils/*": ["src/utils/*"]
+      "@utils/*": ["src/utils/*"],
+      "@interfaces/*": ["src/interfaces/*"]
     }
   },
   "include": ["./src/**/*"]

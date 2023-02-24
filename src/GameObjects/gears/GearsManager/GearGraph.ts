@@ -24,31 +24,41 @@ export class GearGraph extends Graph {
     constructor(...args: any[]) {
         super(...args);
 
-        this.setDefaultNodeLabel(() => ({
-            isMotor: false,
-            direction: ROTATION_DIRECTION.IDLE,
-            isJammed: false,
-        } as GearNode));
+        this.setDefaultNodeLabel(() => {
+            throw new Error('Cannot create edge with empty label')
+        });
     }
 
     /**
      * Adds a gear to graph
      *
      * @param key
-     * @param motorDirection 
+     * @param motorDirection
      */
-    public addGear(key: GraphKey, motorDirection?: ROTATION_DIRECTION) {
-        const isMotor = Boolean(motorDirection) && motorDirection !== ROTATION_DIRECTION.IDLE;
-        this.updateMotorsIndex(key, isMotor);
-
-        const nodeData: GearNode = {
-            isJammed: false,
-            isMotor,
-            direction: motorDirection || ROTATION_DIRECTION.IDLE,
-        };
-
-        this.setNode(key, nodeData);
+    public addGear(key: GraphKey, gearNode: GearNode) {
+        this.updateMotorsIndex(key, gearNode.isMotor);
+        this.setNode(key, gearNode);
     }
+
+    /**
+     * Connects two gears
+     *
+     * @param lhs
+     * @param rhs
+     */
+    public connectGears(lhs: GraphKey, rhs: GraphKey) {
+        this.setEdge(lhs, rhs);
+    }
+
+     /**
+     * Disconnect two gears
+     *
+     * @param lhs
+     * @param rhs
+     */
+     public disconnectGears(lhs: GraphKey, rhs: GraphKey) {
+        this.removeEdge(lhs, rhs);
+     }
 
     /**
      * Removes gear from graph
@@ -70,10 +80,11 @@ export class GearGraph extends Graph {
         const nodeData = this.getNodeData(key);
 
         if (nodeData) {
-            nodeData.isMotor = Boolean(motorDirection) && motorDirection !== ROTATION_DIRECTION.IDLE;
+            const isMotor = Boolean(motorDirection) && motorDirection !== ROTATION_DIRECTION.IDLE;
+            nodeData.isMotor = isMotor;
             nodeData.direction = motorDirection || ROTATION_DIRECTION.IDLE;
 
-            this.updateMotorsIndex(key, nodeData.isMotor);
+            this.updateMotorsIndex(key, isMotor);
         }
     }
 

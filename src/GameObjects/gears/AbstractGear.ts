@@ -11,7 +11,7 @@ export abstract class AbstractGear extends Phaser.Physics.Matter.Image {
     /**
      * Rotation direction
      */
-    protected rotationDirection: ROTATION_DIRECTION | undefined = ROTATION_DIRECTION.IDLE;
+    protected rotationDirection: ROTATION_DIRECTION = ROTATION_DIRECTION.IDLE;
 
     /**
      * @inheritdoc
@@ -29,7 +29,7 @@ export abstract class AbstractGear extends Phaser.Physics.Matter.Image {
         this.setIgnoreGravity(true);
     }
 
-    public toggleMotor(rotation: ROTATION_DIRECTION | undefined) {
+    public setRotationDirection(rotation: ROTATION_DIRECTION) {
         this.rotationDirection = rotation;
     }
 

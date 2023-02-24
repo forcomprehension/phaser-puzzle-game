@@ -1,6 +1,7 @@
 import { Gear12 } from "@GameObjects/gears/Gear12";
 import { Gear6 } from "@GameObjects/gears/Gear6";
-import { GearsManager } from "src/classes/GearsManager";
+import { ROTATION_DIRECTION } from "@utils/types";
+import { GearsManager } from "@GameObjects/gears/GearsManager";
 
 function setDraggable(...objects: Phaser.GameObjects.GameObject[]) {
     objects.forEach((object) => {
@@ -34,26 +35,26 @@ function CheckTween(this:MatterJS.BodyType, event: Phaser.Types.Physics.Matter.M
  * Game objects tests scene
  */
 export class GameObjectsScene extends Phaser.Scene {
-    protected readonly gearsManager = new GearsManager();
+    protected gearsManager: GearsManager;
+
     constructor() {
         super("GameObjects.test");
     }
 
     public create() {
-        const gear12 = new Gear12(this, 99, 100);
+        this.gearsManager = new GearsManager(this);
 
+        const gear12 = new Gear12(this, 99, 100);
         const gear6 = new Gear6(this, 100, 190);
         const gear6_2 = new Gear6(this, 250, 190);
 
-        this.gearsManager.registerGear(gear12);
-        this.gearsManager.registerGear(gear6);
-        this.gearsManager.registerGear(gear6_2);
+        this.gearsManager.bulkUpdate(() => {
+            this.gearsManager.registerGear(gear12)
+                .registerGear(gear6)
+                .registerGear(gear6_2);
 
-        this.tweens.add({
-            duration: 4000,
-            loop: -1,
-            targets: [gear12],
-            rotation: Phaser.Math.DegToRad(360),
+            this.gearsManager.toggleMotor(gear6, ROTATION_DIRECTION.CCW)
+                .connectGears(gear12, gear6);
         });
 
         gear6.setOnCollide(CheckTween);
@@ -66,5 +67,15 @@ export class GameObjectsScene extends Phaser.Scene {
         // });
 
         setDraggable(gear12, gear6, gear6_2);
+
+        this.tweens.add({
+            targets: [this.gearsManager],
+            duration: 3000,
+            rotation: Phaser.Math.DegToRad(360),
+            loop: -1,
+            onUpdate: () => {
+                this.gearsManager.updateRotations();
+            }
+        });
     }
 }

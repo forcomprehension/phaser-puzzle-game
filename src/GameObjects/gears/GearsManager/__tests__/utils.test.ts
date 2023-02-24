@@ -1,5 +1,5 @@
 import { describe, test, expect } from '@jest/globals';
-import { ROTATION_DIRECTION } from '../../../utils/types';
+import { ROTATION_DIRECTION } from '../../../../utils/types';
 import { checkGearsRotationsAreCompatible } from '../utils';
 
 describe('Testing GearGraph utils', () => {
