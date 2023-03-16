@@ -44,7 +44,9 @@ function iterateOverEdgesCallback(
             visitedSet.add(edgeKey);
 
             iteratorBody(edge);
-            iterateOverEdgesCallback(graph, edge.w, visitedSet, iteratorBody);
+
+            const nextParent = parent === edge.v ? edge.w : edge.v;
+            iterateOverEdgesCallback(graph, nextParent, visitedSet, iteratorBody);
         });
     }
 }

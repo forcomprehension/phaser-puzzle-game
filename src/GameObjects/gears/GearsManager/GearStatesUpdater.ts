@@ -1,3 +1,4 @@
+import { ROTATION_DIRECTION } from '@utils/types';
 import { GraphKey, GearGraph, GearNode } from './GearGraph'
 import { iterateOverEdges } from './iterateOverEdges';
 import { checkGearsRotationsAreCompatible, getOppositeDirection } from './utils';
@@ -31,6 +32,8 @@ export class GearStatesUpdater {
     public update() {
         // Gets a motors copy
         const motorsIndexCopy = this.graph.getMotorsIndexCopy();
+        // Visited set for all subgraphs
+        const allVisitedSet = new Set<GraphKey>();
 
         for (const motorKey of motorsIndexCopy) {
             // Reset visited nodes on each iteration.
@@ -86,8 +89,23 @@ export class GearStatesUpdater {
 
                 this.subgraphVisitedNodes.add(v);
                 this.subgraphVisitedNodes.add(w);
+
+                allVisitedSet.add(v);
+                allVisitedSet.add(w);
             });
         }
+
+        this.graph.nodes().forEach((nodeKey: GraphKey) => {
+            // This node is disconnected, because it's not visited
+            if (!allVisitedSet.has(nodeKey)) {
+                const data = this.graph.getNodeData(nodeKey);
+                data.isJammed = false;
+
+                if (!data.isMotor) {
+                    data.direction = ROTATION_DIRECTION.IDLE;
+                }
+            }
+        });
     }
 
     /**

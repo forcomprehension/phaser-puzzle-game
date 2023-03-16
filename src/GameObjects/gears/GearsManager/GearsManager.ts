@@ -84,16 +84,25 @@ export class GearsManager extends GameObjects.GameObject implements ISimulated {
     }
 
     /**
-     * Disconnect gears
+     * Disconnects gear from all another gears
+     *
+     * @param gear
+     */
+    public disconnectGear(gear: AbstractGear) {
+        this.graph.disconnectGear(gear.serialID);
+
+        return this;
+    }
+
+    /**
+     * Gears has direct connection?
      *
      * @param lhs
      * @param rhs
+     * @returns
      */
-    public disconnectGears(lhs: AbstractGear, rhs: AbstractGear) {
-        this.graph.disconnectGears(lhs.serialID, rhs.serialID);
-        this.updateGearStates();
-
-        return this;
+    public hasConnection(lhs: AbstractGear, rhs: AbstractGear) {
+        return this.graph.hasConnection(lhs.serialID, rhs.serialID);
     }
 
     /**

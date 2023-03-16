@@ -3,6 +3,7 @@ import { Gear6 } from "@GameObjects/gears/Gear6";
 import { ROTATION_DIRECTION } from "@utils/types";
 import { GearsManager } from "@GameObjects/gears/GearsManager";
 import { castBody } from "../physics/matter";
+import { AbstractGear } from "@GameObjects/gears/AbstractGear";
 
 function setDraggable(...objects: Phaser.Physics.Matter.Image[]) {
     objects.forEach((object) => {
@@ -30,8 +31,46 @@ function setDraggable(...objects: Phaser.Physics.Matter.Image[]) {
         });
 
         object.on(Phaser.Input.Events.DRAG_END, () => {
+            const myBody = castBody(object);
             object.setPosition(nonIntersectedPosition.x, nonIntersectedPosition.y);
             object.setStatic(true);
+
+            // @TODO: move away. Subs after physic engine update?
+            if (object instanceof AbstractGear) {
+                object.scene.matter.body.scale(myBody, 1.1, 1.1);
+                const overlaps = object.scene.matter.intersectBody(myBody);
+                object.scene.matter.body.scale(myBody, 0.9, 0.9);
+
+                const countGears = overlaps.reduce((acc, overlap) => {
+                    // @ts-ignore
+                    if (overlap.gameObject instanceof AbstractGear) {
+                        acc++;
+                    }
+
+                    return acc;
+                }, 0);
+
+                const scene = object.scene;
+                if (scene instanceof GameObjectsScene) {
+                    scene.gearsManager.bulkUpdate(() => {
+                        // @todo zero condition first
+                        if (countGears > 0 && countGears === overlaps.length) {
+                            overlaps.forEach((overlap) => {
+                                // @ts-ignore
+                                const hasConnection = (scene as GameObjectsScene).gearsManager.hasConnection(overlap.gameObject, object);
+                                if (!hasConnection) {
+                                    // @ts-ignore
+                                    scene.gearsManager.connectGears(overlap.gameObject, object);
+                                }
+                            });
+                        } else if (countGears === 0) {
+                            scene.gearsManager.disconnectGear(object);
+                        } else { // countGears !== overlaps. May be blocked?
+                            // @TODO: SEND EXTERNAL_JAMMED?
+                        }
+                    });
+                }
+            }
         });
     });
 }
@@ -40,7 +79,7 @@ function setDraggable(...objects: Phaser.Physics.Matter.Image[]) {
  * Game objects tests scene
  */
 export class GameObjectsScene extends Phaser.Scene {
-    protected gearsManager: GearsManager;
+    public gearsManager: GearsManager;
 
     constructor() {
         super("GameObjects.test");

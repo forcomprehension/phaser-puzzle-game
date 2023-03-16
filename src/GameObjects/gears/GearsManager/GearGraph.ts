@@ -51,13 +51,27 @@ export class GearGraph extends Graph {
     }
 
      /**
-     * Disconnect two gears
-     *
-     * @param lhs
-     * @param rhs
-     */
-     public disconnectGears(lhs: GraphKey, rhs: GraphKey) {
-        this.removeEdge(lhs, rhs);
+      * Disconnect gear from graph
+      *
+      * @param gearId
+      */
+     public disconnectGear(gearId: GraphKey) {
+        const edges = this.nodeEdges(gearId);
+        if (edges) {
+            edges.forEach((edge) => {
+                this.removeEdge(edge);
+            });
+        }
+     }
+
+     /**
+      * Are these gears connected?
+      *
+      * @param lhs
+      * @param rhs
+      */
+     public hasConnection(lhs: GraphKey, rhs: GraphKey) {
+        return this.hasEdge(lhs, rhs);
      }
 
     /**
