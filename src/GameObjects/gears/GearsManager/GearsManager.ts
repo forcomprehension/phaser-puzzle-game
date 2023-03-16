@@ -162,4 +162,18 @@ export class GearsManager extends GameObjects.GameObject implements ISimulated {
         throw new Error('Method not implemented.');
     }
     // endregion
+
+    /**
+     * Dtor
+     *
+     * @param fromScene
+     */
+    public destroy(fromScene?: boolean | undefined): void {
+        super.destroy(fromScene);
+
+        // @ts-ignore
+        this.gearsStateUpdater = this.graph = null;
+        this.jammedSet.clear();
+        this.rotationSet.clear();
+    }
 }

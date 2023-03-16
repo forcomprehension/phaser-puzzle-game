@@ -14,10 +14,21 @@ export abstract class AbstractGear extends Phaser.Physics.Matter.Image {
     protected rotationDirection: ROTATION_DIRECTION = ROTATION_DIRECTION.IDLE;
 
     /**
+     * @TODO: remove then we not rely on display size
+     */
+    protected static get defaultPhysicsConfig() {
+        return {
+            isSensor: true,
+            isStatic: true,
+            ignoreGravity: true
+        } as Phaser.Types.Physics.Matter.MatterBodyConfig;
+    }
+
+    /**
      * @inheritdoc
      */
     constructor(scene: Phaser.Scene, x: number, y: number, texture: string | Phaser.Textures.Texture) {
-        super(scene.matter.world, x, y, texture);
+        super(scene.matter.world, x, y, texture, undefined, AbstractGear.defaultPhysicsConfig);
 
         this.serialID = nextString();
 
@@ -25,8 +36,7 @@ export abstract class AbstractGear extends Phaser.Physics.Matter.Image {
     }
 
     protected setPhysicsBoundsByCoefficient(coefficient: number) {
-        this.setCircle(coefficient);
-        this.setIgnoreGravity(true);
+        this.setCircle(coefficient, AbstractGear.defaultPhysicsConfig);
     }
 
     public setRotationDirection(rotation: ROTATION_DIRECTION) {

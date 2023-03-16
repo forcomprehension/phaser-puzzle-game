@@ -2,33 +2,38 @@ import { Gear12 } from "@GameObjects/gears/Gear12";
 import { Gear6 } from "@GameObjects/gears/Gear6";
 import { ROTATION_DIRECTION } from "@utils/types";
 import { GearsManager } from "@GameObjects/gears/GearsManager";
+import { castBody } from "../physics/matter";
 
-function setDraggable(...objects: Phaser.GameObjects.GameObject[]) {
+function setDraggable(...objects: Phaser.Physics.Matter.Image[]) {
     objects.forEach((object) => {
         object.setInteractive({
             draggable: true,
             useHandCursor: true
         });
+
+        let nonIntersectedPosition: Vector2Like = { x: 0, y:0 };
+        object.on(Phaser.Input.Events.DRAG_START, () => {
+            nonIntersectedPosition.x = object.body.position.x;
+            nonIntersectedPosition.y = object.body.position.y;
+
+            object.setStatic(false);
+        });
+
         object.on(Phaser.Input.Events.GAMEOBJECT_DRAG, function(_: any, x: number, y: number) {
-            // @ts-ignore
-            this.setPosition(x, y);
+            object.setPosition(x, y);
+
+            const bodies = object.scene.matter.intersectBody(castBody(object));
+            if (bodies.length === 0) {
+                nonIntersectedPosition.x = object.body.position.x;
+                nonIntersectedPosition.y = object.body.position.y;
+            }
+        });
+
+        object.on(Phaser.Input.Events.DRAG_END, () => {
+            object.setPosition(nonIntersectedPosition.x, nonIntersectedPosition.y);
+            object.setStatic(true);
         });
     });
-}
-
-function CheckTween(this:MatterJS.BodyType, event: Phaser.Types.Physics.Matter.MatterCollisionData) {
-    const scene = this.gameObject.scene;
-    const iAmTweening = scene.tweens.isTweening(this.gameObject);
-    const otherTweening = scene.tweens.isTweening(event.bodyA.gameObject);// @TODO: bodyA?  parent?
-
-    if (otherTweening && !iAmTweening) {
-        scene.tweens.add({
-            duration: 4000,
-            loop: -1,
-            targets: [this.gameObject],
-            rotation: Phaser.Math.DegToRad(-360),
-        });
-    }
 }
 
 /**
@@ -56,15 +61,6 @@ export class GameObjectsScene extends Phaser.Scene {
             this.gearsManager.toggleMotor(gear6, ROTATION_DIRECTION.CCW)
                 .connectGears(gear12, gear6);
         });
-
-        gear6.setOnCollide(CheckTween);
-        gear6_2.setOnCollide(CheckTween);
-
-        // gear6.setOnCollideEnd(function(this:MatterJS.BodyType, event: Phaser.Types.Physics.Matter.MatterCollisionData) {
-        //     console.log('collideend');
-        //     // const iAmTweening = scene.tweens.isTweening(gear6);
-        //     scene.tweens.killTweensOf(gear6);
-        // });
 
         setDraggable(gear12, gear6, gear6_2);
 
