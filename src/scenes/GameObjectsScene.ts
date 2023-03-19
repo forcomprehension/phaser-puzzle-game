@@ -104,6 +104,7 @@ export class GameObjectsScene extends Phaser.Scene {
         });
 
         setDraggable(gear12, gear6, gear6_2);
+        gear6_2.tint = 0xFF0000;
     }
 
     protected bootstrap() {

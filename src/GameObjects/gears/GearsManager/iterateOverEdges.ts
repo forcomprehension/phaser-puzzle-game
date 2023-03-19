@@ -55,10 +55,9 @@ function iterateOverEdgesCallback(
  * Graph iterator by edges. The a<===>b and b<===>a edges are equivalently.
  * There is no situation when we get same pair.
  *
- * @param graph
- * @param parent
- * @param iteratorBody
- * @param visitedSet
+ * @param graph         Current graph we will walk
+ * @param parent        Starting node key
+ * @param iteratorBody  Iterator body block
  */
 export function iterateOverEdges(
     graph: Graph,

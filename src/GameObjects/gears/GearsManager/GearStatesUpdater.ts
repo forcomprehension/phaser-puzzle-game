@@ -82,7 +82,7 @@ export class GearStatesUpdater {
 
                     if (!this.currentSubgraphIsJammed) {
                         // Unblock both, just in case, if current graph is not jammed
-                        wData.isJammed = false;
+                        vData.isJammed = false;
                         wData.isJammed = false;
                     }
                 }
