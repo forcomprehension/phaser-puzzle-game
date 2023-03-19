@@ -1,7 +1,7 @@
 import { Gear12 } from "@GameObjects/gears/Gear12";
 import { Gear6 } from "@GameObjects/gears/Gear6";
 import { ROTATION_DIRECTION } from "@utils/types";
-import { GearsManager } from "@GameObjects/gears/GearsManager";
+import { GearsManager, addGearsManagerTweens } from "@GameObjects/gears/GearsManager";
 import { castBody } from "../physics/matter";
 import { AbstractGear } from "@GameObjects/gears/AbstractGear";
 
@@ -12,7 +12,7 @@ function setDraggable(...objects: Phaser.Physics.Matter.Image[]) {
             useHandCursor: true
         });
 
-        let nonIntersectedPosition: Vector2Like = { x: 0, y:0 };
+        let nonIntersectedPosition: Vector2Like = { x: 0, y: 0 };
         object.on(Phaser.Input.Events.DRAG_START, () => {
             nonIntersectedPosition.x = object.body.position.x;
             nonIntersectedPosition.y = object.body.position.y;
@@ -53,18 +53,14 @@ function setDraggable(...objects: Phaser.Physics.Matter.Image[]) {
                 const scene = object.scene;
                 if (scene instanceof GameObjectsScene) {
                     scene.gearsManager.bulkUpdate(() => {
-                        // @todo zero condition first
-                        if (countGears > 0 && countGears === overlaps.length) {
+                        if (countGears === 0) {
+                            // @TODO: Check active connections?
+                            scene.gearsManager.disconnectGear(object);
+                        } else if (countGears === overlaps.length) {
                             overlaps.forEach((overlap) => {
                                 // @ts-ignore
-                                const hasConnection = (scene as GameObjectsScene).gearsManager.hasConnection(overlap.gameObject, object);
-                                if (!hasConnection) {
-                                    // @ts-ignore
-                                    scene.gearsManager.connectGears(overlap.gameObject, object);
-                                }
+                                scene.gearsManager.connectGears(overlap.gameObject, object);
                             });
-                        } else if (countGears === 0) {
-                            scene.gearsManager.disconnectGear(object);
                         } else { // countGears !== overlaps. May be blocked?
                             // @TODO: SEND EXTERNAL_JAMMED?
                         }
@@ -86,7 +82,7 @@ export class GameObjectsScene extends Phaser.Scene {
     }
 
     public create() {
-        this.gearsManager = new GearsManager(this);
+        this.bootstrap();
 
         const gear12 = new Gear12(this, 99, 100);
         const gear6 = new Gear6(this, 100, 190);
@@ -97,20 +93,21 @@ export class GameObjectsScene extends Phaser.Scene {
                 .registerGear(gear6)
                 .registerGear(gear6_2);
 
+            /**
+             * @TODO: In game we must check gears and autoconnect them.
+             */
             this.gearsManager.toggleMotor(gear6, ROTATION_DIRECTION.CCW)
                 .connectGears(gear12, gear6);
+
+            // Make subgraph jammed
+            this.gearsManager.toggleMotor(gear12, ROTATION_DIRECTION.CCW);
         });
 
         setDraggable(gear12, gear6, gear6_2);
+    }
 
-        this.tweens.add({
-            targets: [this.gearsManager],
-            duration: 3000,
-            rotation: Phaser.Math.DegToRad(360),
-            loop: -1,
-            onUpdate: () => {
-                this.gearsManager.updateRotations();
-            }
-        });
+    protected bootstrap() {
+        this.gearsManager = new GearsManager(this);
+        addGearsManagerTweens(this, this.gearsManager);
     }
 }

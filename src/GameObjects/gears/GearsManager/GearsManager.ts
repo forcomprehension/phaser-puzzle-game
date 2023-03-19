@@ -20,11 +20,16 @@ export class GearsManager extends GameObjects.GameObject implements ISimulated {
     protected bulkModeEnabled: boolean = false;
 
     /**
-     * Tweening handler
+     * Tweening handler for gears rotation
      *
      * It will be used by tweening
      */
     public rotation: number = 0;
+
+    /**
+     * Current jammed position
+     */
+    public jammedRotation: number = 0;
 
     /**
      * Ctor
@@ -95,17 +100,6 @@ export class GearsManager extends GameObjects.GameObject implements ISimulated {
     }
 
     /**
-     * Gears has direct connection?
-     *
-     * @param lhs
-     * @param rhs
-     * @returns
-     */
-    public hasConnection(lhs: AbstractGear, rhs: AbstractGear) {
-        return this.graph.hasConnection(lhs.serialID, rhs.serialID);
-    }
-
-    /**
      * After changing properties, we must update gears state
      */
     protected updateGearStates() {
@@ -131,13 +125,17 @@ export class GearsManager extends GameObjects.GameObject implements ISimulated {
     public updateRotations() {
         for (const gear of this.rotationSet) {
             const direction = gear.getRotationDirection();
-            if (checkRotationDirectionIsRotated(direction)) {
+            if (!this.jammedSet.has(gear) && checkRotationDirectionIsRotated(direction)) {
                 if (direction === ROTATION_DIRECTION.CW) {
                     gear.setRotation(this.rotation);
                 } else {
                     gear.setRotation(Phaser.Math.DEG_TO_RAD - this.rotation);
                 }
             }
+        }
+
+        for (const jammedGear of this.jammedSet) {
+            jammedGear.setRotation(this.jammedRotation);
         }
     }
 

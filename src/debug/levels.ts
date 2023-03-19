@@ -1,6 +1,7 @@
 import { createBasketballBall, createBouncyBall, createBowlingBall, createEightBall, createFootballBall } from "@GameObjects/balls";
+import { GameObjectsScene } from "src/scenes/GameObjectsScene";
 
-export function testLevelBalls(this: Phaser.Scene) {
+export function testLevelBalls(this: GameObjectsScene) {
     // Set all bounds, except top
     this.matter.world.setBounds(0, 0, undefined, undefined, undefined, true, true, false, true);
 
@@ -16,7 +17,7 @@ export function testLevelBalls(this: Phaser.Scene) {
     //this.matter.add.collider(bouncyBall, basketBallBall);
 }
 
-export function testLevelGears(this: Phaser.Scene) {
+export function testLevelGears(this: GameObjectsScene) {
 
 }
 

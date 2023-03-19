@@ -64,16 +64,6 @@ export class GearGraph extends Graph {
         }
      }
 
-     /**
-      * Are these gears connected?
-      *
-      * @param lhs
-      * @param rhs
-      */
-     public hasConnection(lhs: GraphKey, rhs: GraphKey) {
-        return this.hasEdge(lhs, rhs);
-     }
-
     /**
      * Removes gear from graph
      *

@@ -98,14 +98,21 @@ export class GearStatesUpdater {
         this.graph.nodes().forEach((nodeKey: GraphKey) => {
             // This node is disconnected, because it's not visited
             if (!allVisitedSet.has(nodeKey)) {
-                const data = this.graph.getNodeData(nodeKey);
-                data.isJammed = false;
-
-                if (!data.isMotor) {
-                    data.direction = ROTATION_DIRECTION.IDLE;
-                }
+                const nodeData = this.graph.getNodeData(nodeKey);
+                this.resetDisconnectedNode(nodeData);
             }
         });
+    }
+
+    /**
+     * Clear relations for disconnected node
+     */
+    protected resetDisconnectedNode(node: GearNode) {
+        node.isJammed = false;
+
+        if (!node.isMotor) {
+            node.direction = ROTATION_DIRECTION.IDLE;
+        }
     }
 
     /**
