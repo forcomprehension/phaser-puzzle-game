@@ -9,6 +9,13 @@ export abstract class AbstractGear extends Phaser.Physics.Matter.Image {
     public readonly serialID: string;
 
     /**
+     * Rotation ratio, based on gear teeth count.
+     * 
+     * Must be more than 1
+     */
+    public readonly rotationRatio: number = 1;
+
+    /**
      * Rotation direction
      */
     protected rotationDirection: ROTATION_DIRECTION = ROTATION_DIRECTION.IDLE;

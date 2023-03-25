@@ -4,6 +4,7 @@ import { LoadingScene } from './scenes/LoadingScene';
 
 new Phaser.Game({
     backgroundColor: 0x3333AA,
+    type: Phaser.WEBGL,
     scale: {
         width: 1920,
         height: 1080,

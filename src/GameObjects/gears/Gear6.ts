@@ -1,6 +1,8 @@
 import { AbstractGear } from "./AbstractGear";
 
 export class Gear6 extends AbstractGear {
+    public readonly rotationRatio: number = 2;
+
     constructor(scene: Phaser.Scene, x: number, y: number) {
         super(scene, x, y, 'gear-6');
 

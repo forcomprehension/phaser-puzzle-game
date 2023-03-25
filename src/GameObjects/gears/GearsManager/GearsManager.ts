@@ -127,13 +127,18 @@ export class GearsManager extends GameObjects.GameObject implements ISimulated {
             const direction = gear.getRotationDirection();
             if (!this.jammedSet.has(gear) && checkRotationDirectionIsRotated(direction)) {
                 if (direction === ROTATION_DIRECTION.CW) {
-                    gear.setRotation(this.rotation);
+                    gear.setRotation(this.rotation * gear.rotationRatio);
                 } else {
-                    gear.setRotation(Phaser.Math.DEG_TO_RAD - this.rotation);
+                    gear.setRotation(Phaser.Math.DEG_TO_RAD - this.rotation * gear.rotationRatio);
                 }
             }
         }
+    }
 
+    /**
+     * Update jammed gears rotations
+     */
+    public updateJammedRotations() {
         for (const jammedGear of this.jammedSet) {
             jammedGear.setRotation(this.jammedRotation);
         }

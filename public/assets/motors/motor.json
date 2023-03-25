@@ -1,0 +1,28 @@
+{"frames": [
+
+{
+	"filename": "motor-body.png",
+	"frame": {"x":0,"y":0,"w":160,"h":100},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":160,"h":100},
+	"sourceSize": {"w":160,"h":100}
+},
+{
+	"filename": "motor-wheel.png",
+	"frame": {"x":160,"y":0,"w":100,"h":100},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":100,"h":100},
+	"sourceSize": {"w":100,"h":100}
+}],
+"meta": {
+	"app": "https://www.codeandweb.com/texturepacker",
+	"version": "1.0",
+	"image": "motor.png",
+	"format": "RGBA8888",
+	"size": {"w":260,"h":100},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:3afc0afc433cc0f0319944d0a50ac2fa:be38ad64f5f041601c97b3740d9bd0e9:be470fbb328adaae907d9ac6328c0a2d$"
+}
+}

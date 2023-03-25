@@ -4,6 +4,8 @@ import { ROTATION_DIRECTION } from "@utils/types";
 import { GearsManager, addGearsManagerTweens } from "@GameObjects/gears/GearsManager";
 import { castBody } from "../physics/matter";
 import { AbstractGear } from "@GameObjects/gears/AbstractGear";
+import { Motor } from "@GameObjects/motors/Motor";
+import { RopeDrawerTool } from "@GameObjects/connectors/RopeDrawerTool";
 
 function setDraggable(...objects: Phaser.Physics.Matter.Image[]) {
     objects.forEach((object) => {
@@ -14,13 +16,26 @@ function setDraggable(...objects: Phaser.Physics.Matter.Image[]) {
 
         let nonIntersectedPosition: Vector2Like = { x: 0, y: 0 };
         object.on(Phaser.Input.Events.DRAG_START, () => {
+            // @ts-ignore
+            if (object.scene.ropeState.flag) {
+               return;
+            }
+
             nonIntersectedPosition.x = object.body.position.x;
             nonIntersectedPosition.y = object.body.position.y;
 
             object.setStatic(false);
+
+            if (object instanceof Motor) {
+                object.toggleRotationLock(true);
+            }
         });
 
         object.on(Phaser.Input.Events.GAMEOBJECT_DRAG, function(_: any, x: number, y: number) {
+            // @ts-ignore
+            if (object.scene.ropeState.flag) {
+                return;
+             }
             object.setPosition(x, y);
 
             const bodies = object.scene.matter.intersectBody(castBody(object));
@@ -31,8 +46,16 @@ function setDraggable(...objects: Phaser.Physics.Matter.Image[]) {
         });
 
         object.on(Phaser.Input.Events.DRAG_END, () => {
+            // @ts-ignore
+            if (object.scene.ropeState.flag) {
+                return;
+             }
+
             const myBody = castBody(object);
-            object.setPosition(nonIntersectedPosition.x, nonIntersectedPosition.y);
+            if (object instanceof AbstractGear) {
+                object.setPosition(nonIntersectedPosition.x, nonIntersectedPosition.y);
+            }
+
             object.setStatic(true);
 
             // @TODO: move away. Subs after physic engine update?
@@ -67,6 +90,10 @@ function setDraggable(...objects: Phaser.Physics.Matter.Image[]) {
                     });
                 }
             }
+
+            if (object instanceof Motor) {
+                object.toggleRotationLock(false);
+            }
         });
     });
 }
@@ -77,12 +104,16 @@ function setDraggable(...objects: Phaser.Physics.Matter.Image[]) {
 export class GameObjectsScene extends Phaser.Scene {
     public gearsManager: GearsManager;
 
+    public rope: Phaser.GameObjects.Graphics;
+
     constructor() {
         super("GameObjects.test");
     }
 
     public create() {
         this.bootstrap();
+
+        const motor = new Motor(this, 300, 400);
 
         const gear12 = new Gear12(this, 99, 100);
         const gear6 = new Gear6(this, 100, 190);
@@ -103,9 +134,160 @@ export class GameObjectsScene extends Phaser.Scene {
             this.gearsManager.toggleMotor(gear12, ROTATION_DIRECTION.CCW);
         });
 
-        setDraggable(gear12, gear6, gear6_2);
+        setDraggable(gear12, gear6, gear6_2, motor);
         gear6_2.tint = 0xFF0000;
+
+        this.createRope(this);
     }
+
+    protected createRope(scene: Phaser.Scene) {
+        // const POINTS_AT_TOP_EXCLUDE_CENTER_AT_ONE_SIDE = 10;
+        // const downPoint = { y: 740, x: 960 };
+        // const upPoint = { y: 340, x: 960 };
+        // const STEP_VERTICAL = 5;
+
+        // const debug = scene.add.graphics().fillStyle(0xffffff);
+        // const hsl = Phaser.Display.Color.HSVColorWheel();
+        // let colorIndex = 0;
+
+        // const colors: any[] = [];
+        // const points: Vector2Like[] = [
+        //     upPoint
+        // ];
+
+        // colors.push(upPoint)
+        // const prev = new Phaser.Math.Vector2();
+
+        // function pushcolor({x,y}: {x: number, y: number}) {
+        //     if (Phaser.Math.Distance.Between(x, y, prev.x, prev.y) > 5)
+        //         {
+        //             prev.x = x;
+        //             prev.y = y;
+    
+        //             points.push(new Phaser.Math.Vector2(x, y));
+        //             colors.push(hsl[colorIndex]);
+    
+        //             debug.fillStyle((hsl[colorIndex].r << 24) + (hsl[colorIndex].g  << 16) + (hsl[colorIndex].a << 8) + hsl[colorIndex].a);
+        //             debug.fillRect(x, y, 2, 2);
+
+        //             colorIndex = Phaser.Math.Wrap(colorIndex + 2, 0, 359);
+        //         }
+        // }
+
+        // // top right
+        // for (let t = 1; t != POINTS_AT_TOP_EXCLUDE_CENTER_AT_ONE_SIDE; t++) {
+        //     const nextPoint = {
+        //         y: upPoint.y + STEP_VERTICAL * t,
+        //         x: upPoint.x + STEP_VERTICAL * t
+        //     };
+
+        //     points.push(nextPoint);
+        //     colors.push(nextPoint);
+        // }
+
+        // // bottom right
+        // for (let t = POINTS_AT_TOP_EXCLUDE_CENTER_AT_ONE_SIDE - 1; t; t--) {
+        //     const nextPoint = {
+        //         y: downPoint.y - STEP_VERTICAL * t,
+        //         x: downPoint.x + STEP_VERTICAL * t
+        //     };
+
+        //     points.push(nextPoint);
+        //     colors.push(nextPoint);
+        // }
+
+        // points.push(downPoint);
+
+        // // bottom left
+        // for (let t = POINTS_AT_TOP_EXCLUDE_CENTER_AT_ONE_SIDE - 1; t; t--) {
+        //     const nextPoint = {
+        //         y: downPoint.y - STEP_VERTICAL * t,
+        //         x: downPoint.x - STEP_VERTICAL * t
+        //     };
+
+        //     points.push(nextPoint);
+        //     colors.push(nextPoint);
+        // }
+
+        // // top left
+        // for (let t = 1; t != POINTS_AT_TOP_EXCLUDE_CENTER_AT_ONE_SIDE; t++) {
+        //     const nextPoint = {
+        //         y: upPoint.y - STEP_VERTICAL * t,
+        //         x: upPoint.x - STEP_VERTICAL * t
+        //     };
+
+        //     points.push(nextPoint);
+        //     colors.push(nextPoint);
+        // }
+
+        // points.push(upPoint);
+        // colors.push(upPoint);
+
+        // const rope = scene.add.rope(0, 0, '6x6', undefined, points, true);
+
+       const ropeLine = this.rope = scene.add.graphics();
+       ropeLine.setDefaultStyles({
+        lineStyle: {
+            width: 10,
+            color: 0xff0000,
+            alpha: 1
+        }
+       });
+       // @ts-ignore
+    //    let active = this.active = { flag: false };
+    //    const start = { x: 0, y: 0 };
+    //    const current = { x: 0, y: 0 };
+       // @ts-ignore
+       const ropeState = this.ropeState = { flag: false };
+
+       // @ts-ignore
+    //    this.start = start; this.current = current;
+
+    //    scene.input.on(Phaser.Input.Events.POINTER_DOWN, (pointer: any) => {
+    //         start.x = pointer.x;
+    //         start.y = pointer.y;
+    //         active.flag = true;
+    //    });
+
+    //    scene.input.on(Phaser.Input.Events.POINTER_MOVE, (pointer: any) => {
+    //         current.x = pointer.x;
+    //         current.y = pointer.y;
+    //    });
+
+    //    scene.input.on(Phaser.Input.Events.POINTER_UP, (pointer: any) => {
+    //         active.flag = false;
+    //    });
+    //    scene.input.on(Phaser.Input.Events.POINTER_UP_OUTSIDE, (pointer: any) => {
+    //         active.flag = false;
+    //     });
+
+        const ropeDrawer = new RopeDrawerTool(this);
+        scene.add.existing(ropeDrawer);
+
+        const ropeStateIcon = scene.add.image(1700, 200, 'ropeIcon').setInteractive({
+            useHandCursor: true
+        }).on(Phaser.Input.Events.POINTER_UP, () => {
+            ropeState.flag = !ropeState.flag;
+            if (ropeState.flag) {
+                ropeDrawer.activateTool();
+                ropeStateIcon.tint = 0xFF3333;
+            } else {
+                ropeDrawer.deactivateTool();
+                ropeStateIcon.clearTint();
+            }
+        }).setScale(.5);
+    }
+
+    // update(time: number, delta: number): void {
+    //     this.rope.clear();
+    //     // @ts-ignores
+    //     if (this.active.flag && this.ropeState.flag) {
+    //         // @ts-ignore
+    //         // this.rope.lineStyle(10, 0xff0000, 1);
+    //         // @ts-ignore
+    //         this.rope.lineBetween(this.start.x, this.start.y, this.current.x, this.current.y);
+    //     }
+    // }
 
     protected bootstrap() {
         this.gearsManager = new GearsManager(this);
