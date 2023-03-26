@@ -1,5 +1,9 @@
 import { IActiveTool } from "@interfaces/IActiveTool";
+import { EVENT_ON_ACTIVATE_TOOL, EVENT_ON_DEACTIVATE_TOOL } from "@src/constants/tools";
 
+/**
+ * Tool for drawing supposed rope position
+ */
 export class RopeDrawerTool extends Phaser.GameObjects.Graphics implements IActiveTool {
 
     /**
@@ -18,11 +22,6 @@ export class RopeDrawerTool extends Phaser.GameObjects.Graphics implements IActi
     protected endPoint: Nullable<Vector2Like> = null;
 
     /**
-     * Called on {@see deactivateTool}
-     */
-    protected onDeactivateCallback: Nullable<Function> = null;
-
-    /**
      * Ctor
      */
     constructor(scene: Phaser.Scene) {
@@ -35,7 +34,16 @@ export class RopeDrawerTool extends Phaser.GameObjects.Graphics implements IActi
         });
     }
 
-    public activateTool(): void {
+    public onDeactivateTool(cb: Function): void {
+        this.on(EVENT_ON_DEACTIVATE_TOOL, cb);
+    }
+
+
+    public onActivateTool(cb: Function): void {
+       this.on(EVENT_ON_ACTIVATE_TOOL, cb);
+    }
+
+    public activateTool() {
         this.getDrawer().resume();
 
         this.scene.input
@@ -43,6 +51,8 @@ export class RopeDrawerTool extends Phaser.GameObjects.Graphics implements IActi
             .on(Phaser.Input.Events.POINTER_MOVE, this.handleMoveCursor, this)
             .on(Phaser.Input.Events.POINTER_UP, this.handleEndDrawing, this)
             .on(Phaser.Input.Events.POINTER_UP_OUTSIDE, this.handleEndDrawing, this);
+
+        this.emit(EVENT_ON_ACTIVATE_TOOL);
     }
 
     public deactivateTool(): void {
@@ -54,6 +64,8 @@ export class RopeDrawerTool extends Phaser.GameObjects.Graphics implements IActi
             .off(Phaser.Input.Events.POINTER_MOVE, this.handleMoveCursor)
             .off(Phaser.Input.Events.POINTER_UP, this.handleEndDrawing)
             .off(Phaser.Input.Events.POINTER_UP_OUTSIDE, this.handleEndDrawing);
+
+        this.emit(EVENT_ON_DEACTIVATE_TOOL);
     }
 
     /**
