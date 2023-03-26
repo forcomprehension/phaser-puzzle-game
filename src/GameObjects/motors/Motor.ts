@@ -1,11 +1,22 @@
+import { IConnectionSocket } from "@interfaces/IConnectionSocket";
+import { IConnectorObject } from "@interfaces/IConnectorObject";
+import { BodyLabel } from "@src/constants/collision";
 import { ROTATION_DIRECTION } from "@utils/types";
 import type { ConstraintType } from "matter";
-import { castBody } from "../../physics/matter";
+import { getMatterBody } from "../../physics/matter";
+import { MotorPulley } from "./MotorPulley";
 
 /**
  * Creates a motor game object
  */
-export class Motor extends Phaser.Physics.Matter.Image {
+export class Motor extends Phaser.Physics.Matter.Image implements IConnectionSocket, IConnectorObject {
+    /**
+     * Pulley offset
+     */
+    protected static readonly PULLEY_OFFSET: Readonly<Vector2Like> = Object.freeze({
+        x: -50,
+        y: -20,
+    });
 
     /**
      * Pulley subobject
@@ -25,7 +36,7 @@ export class Motor extends Phaser.Physics.Matter.Image {
     /**
      * If something already connected
      */
-    protected pulleyConnection: boolean = true;
+    protected pulleyConnection: boolean = false;
 
     /**
      * Ctor
@@ -38,19 +49,22 @@ export class Motor extends Phaser.Physics.Matter.Image {
         super(scene.matter.world, x, y, texture, frameNames[0], {
             ignoreGravity: true,
             isSensor: true,
+            label: BodyLabel.MOTOR
         });
 
         scene.add.existing(this);
 
-        const pulleyOffset: Vector2Like = { x: -50, y: -20 };
-        this.pulley = scene.matter.add.image(x + pulleyOffset.x, y + pulleyOffset.y, texture.key, frameNames[1], {
-            ignoreGravity: true,
-            isSensor: true,
-            circleRadius: pulleyFrame.radius * .75 // @TODO:
-        });
+        this.pulley = new MotorPulley(
+            this.scene.matter.world,
+            x + Motor.PULLEY_OFFSET.x,
+            y + Motor.PULLEY_OFFSET.y,
+            pulleyFrame,
+            this
+        );
 
-        this.pinJoint = scene.matter.add.constraint(castBody(this), castBody(this.pulley), 0, 1, {
-            pointA: pulleyOffset
+        this.pinJoint = scene.matter.add.constraint(getMatterBody(this), getMatterBody(this.pulley), 0, 1, {
+            pointA: Motor.PULLEY_OFFSET,
+            angularStiffness: 1
         });
 
         // @TODO: move
@@ -62,11 +76,43 @@ export class Motor extends Phaser.Physics.Matter.Image {
         });
     }
 
+    public getBodyLabel(): BodyLabel {
+        return BodyLabel.MOTOR;
+    }
+
+    public connectConnector(): void {
+        this.pulleyConnection = true;
+    }
+
+    public disconnectConnector(): void {
+        this.pulleyConnection = false;
+    }
+
+    public getConnectorObject(): IConnectorObject {
+        return this;
+    }
+
+    public getSocketPosition(): Readonly<Vector2Like> {
+        return this.getSocketLocation();
+    }
+
     /**
-     * Lock/unlock constraint rotation
+     * @inheritdoc
      */
-    public toggleRotationLock(lock: boolean) {
-        this.pinJoint.angularStiffness = Number(lock);
+    public getSocketLocation(): Vector2Like {
+        const { x, y } = this.body.position;
+
+        return {
+            x: x + Motor.PULLEY_OFFSET.x,
+            y: y + Motor.PULLEY_OFFSET.y
+        };
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public getSocketIsBusy(): boolean {
+        return this.pulleyConnection;
     }
 
     /**

@@ -4,3 +4,5 @@ type PickEnum<T, K extends T> = {
 };
 
 type Nullable<T> = T | null;
+
+type Optional<T> = T | undefined;

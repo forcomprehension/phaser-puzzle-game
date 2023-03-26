@@ -2,12 +2,11 @@ import { Gear12 } from "@GameObjects/gears/Gear12";
 import { Gear6 } from "@GameObjects/gears/Gear6";
 import { ROTATION_DIRECTION } from "@utils/types";
 import { GearsManager, addGearsManagerTweens } from "@GameObjects/gears/GearsManager";
-import { castBody } from "../physics/matter";
+import { getMatterBody } from "../physics/matter";
 import { AbstractGear } from "@GameObjects/gears/AbstractGear";
 import { Motor } from "@GameObjects/motors/Motor";
-import { RopeDrawerTool } from "@GameObjects/connectors/RopeDrawerTool";
+import { RopeDrawerTool } from "@GameObjects/connectors/Rope/RopeDrawerTool";
 import { BaseGameScene } from "./BaseGameScene";
-import { EVENT_ON_DEACTIVATE_TOOL } from "../constants/tools";
 import { RopeDashboardPresenter } from "@GameObjects/dashboardPresenters/RopeDashboardPresenter";
 
 function setDraggable(scene: BaseGameScene, ...objects: Phaser.Physics.Matter.Image[]) {
@@ -27,10 +26,6 @@ function setDraggable(scene: BaseGameScene, ...objects: Phaser.Physics.Matter.Im
             nonIntersectedPosition.y = object.body.position.y;
 
             object.setStatic(false);
-
-            if (object instanceof Motor) {
-                object.toggleRotationLock(true);
-            }
         });
 
         object.on(Phaser.Input.Events.GAMEOBJECT_DRAG, function(_: any, x: number, y: number) {
@@ -40,7 +35,7 @@ function setDraggable(scene: BaseGameScene, ...objects: Phaser.Physics.Matter.Im
 
             object.setPosition(x, y);
 
-            const bodies = scene.matter.intersectBody(castBody(object));
+            const bodies = scene.matter.intersectBody(getMatterBody(object));
             if (bodies.length === 0) {
                 nonIntersectedPosition.x = object.body.position.x;
                 nonIntersectedPosition.y = object.body.position.y;
@@ -52,7 +47,7 @@ function setDraggable(scene: BaseGameScene, ...objects: Phaser.Physics.Matter.Im
                 return;
             }
 
-            const myBody = castBody(object);
+            const myBody = getMatterBody(object);
             if (object instanceof AbstractGear) {
                 object.setPosition(nonIntersectedPosition.x, nonIntersectedPosition.y);
             }
@@ -89,10 +84,6 @@ function setDraggable(scene: BaseGameScene, ...objects: Phaser.Physics.Matter.Im
                         }
                     });
                 }
-            }
-
-            if (object instanceof Motor) {
-                object.toggleRotationLock(false);
             }
         });
     });
@@ -142,10 +133,12 @@ export class GameObjectsScene extends BaseGameScene {
 
     protected createRope(scene: Phaser.Scene) {
         const ropeDrawer = new RopeDrawerTool(this);
-        scene.add.existing(ropeDrawer);
-
         const ropePresenter = new RopeDashboardPresenter(this, ropeDrawer, 1700, 200);
+
+        ropeDrawer.setDashboardPresenter(ropePresenter);
+
         scene.add.existing(ropePresenter);
+        scene.add.existing(ropeDrawer);
     }
 
     protected bootstrap() {

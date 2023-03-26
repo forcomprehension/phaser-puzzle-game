@@ -15,11 +15,11 @@ export class BaseGameScene extends Phaser.Scene {
     protected currentActiveObject: Nullable<ActiveGameObject> = null;
 
     /**
-     * Switch to another acitve gameobject
+     * Switch to another active gameobject
      *
      * @param newGameObject
      */
-    public switchActiveGameObject(newGameObject: Nullable<ActiveGameObject>) {
+    public activateGameObject(newGameObject: Nullable<ActiveGameObject>) {
         if (this.currentActiveObject) {
             this.currentActiveObject.deactivateTool();
         }
@@ -28,6 +28,16 @@ export class BaseGameScene extends Phaser.Scene {
 
         if (this.currentActiveObject) {
             this.currentActiveObject.activateTool();
+        }
+    }
+
+    /**
+     * Will be deactivated if matches current object
+     */
+    public deactivateGameObject(targetObject: ActiveGameObject) {
+        if (this.currentActiveObject && targetObject === this.currentActiveObject) {
+            this.currentActiveObject.deactivateTool();
+            this.currentActiveObject = null;
         }
     }
 
