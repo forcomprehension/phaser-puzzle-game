@@ -1,3 +1,5 @@
+import { RopeDrawerTool } from "@GameObjects/connectors/Rope/RopeDrawerTool";
+import { RopeDashboardPresenter } from "@GameObjects/dashboardPresenters/RopeDashboardPresenter";
 import { IActiveTool } from "@interfaces/IActiveTool";
 
 /**
@@ -14,21 +16,30 @@ export class BaseGameScene extends Phaser.Scene {
      */
     protected currentActiveObject: Nullable<ActiveGameObject> = null;
 
+    public ropeDrawer: RopeDrawerTool;
+
+    public create() {
+        const ropeDrawer = this.ropeDrawer = new RopeDrawerTool(this);
+        const ropePresenter = new RopeDashboardPresenter(this, ropeDrawer, 1700, 200);
+
+        ropeDrawer.setDashboardPresenter(ropePresenter);
+
+        this.add.existing(ropePresenter);
+        this.add.existing(ropeDrawer);
+    }
+
     /**
      * Switch to another active gameobject
      *
      * @param newGameObject
      */
-    public activateGameObject(newGameObject: Nullable<ActiveGameObject>) {
+    public activateGameObject(newGameObject: ActiveGameObject) {
         if (this.currentActiveObject) {
             this.currentActiveObject.deactivateTool();
         }
 
         this.currentActiveObject = newGameObject;
-
-        if (this.currentActiveObject) {
-            this.currentActiveObject.activateTool();
-        }
+        this.currentActiveObject.activateTool();
     }
 
     /**

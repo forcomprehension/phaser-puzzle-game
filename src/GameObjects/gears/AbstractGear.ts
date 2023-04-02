@@ -1,5 +1,5 @@
 import { IConnectionSocket } from '@interfaces/IConnectionSocket';
-import { IConnectorObject } from '@interfaces/IConnectorObject';
+import { IConnectedObject } from '@interfaces/IConnectedObject';
 import { BodyLabel } from '@src/constants/collision';
 import { ROTATION_DIRECTION } from '@utils/types';
 import { nextString } from '../../utils/serialGenerator'
@@ -7,7 +7,7 @@ import { nextString } from '../../utils/serialGenerator'
 /**
  * Abstract class for gears representation
  */
-export abstract class AbstractGear extends Phaser.Physics.Matter.Image implements IConnectionSocket, IConnectorObject {
+export abstract class AbstractGear extends Phaser.Physics.Matter.Image implements IConnectionSocket, IConnectedObject {
 
     /**
      * Serial ID.
@@ -29,7 +29,7 @@ export abstract class AbstractGear extends Phaser.Physics.Matter.Image implement
     /**
      * Does socket is busy?
      */
-    protected rotationSocketIsBusy: boolean = false;
+    protected connectedObject: Nullable<IConnectedObject> = null;
 
     /**
      * @TODO: remove then we not rely on display size
@@ -58,20 +58,28 @@ export abstract class AbstractGear extends Phaser.Physics.Matter.Image implement
         return BodyLabel.GEAR;
     }
 
-    public connectConnector(): void {
-        this.rotationSocketIsBusy = true;
+    /**
+     * Connect other object to this object's socket
+     *
+     * @param target
+     */
+    public connectObject(target: IConnectedObject): void {
+        this.connectedObject = target;
     }
 
-    public disconnectConnector(): void {
-        this.rotationSocketIsBusy = false;
+    /**
+     * Disconnect object from socket
+     *
+     * @param target
+     */
+    public disconnectObject(target: IConnectedObject) {
+        if (this.connectedObject === target) {
+            this.connectedObject = null;
+        }
     }
 
-    public getConnectorObject(): IConnectorObject {
+    public getConnectorObject(): IConnectedObject {
         return this;
-    }
-
-    public getSocketPosition(): Readonly<Vector2Like> {
-        return this.body.position;
     }
 
     /**
@@ -88,7 +96,7 @@ export abstract class AbstractGear extends Phaser.Physics.Matter.Image implement
      * @inheritdoc
      */
     public getSocketIsBusy(): boolean {
-        return this.rotationSocketIsBusy;
+        return !!this.connectedObject;
     }
 
     protected setPhysicsBoundsByCoefficient(coefficient: number) {

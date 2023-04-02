@@ -1,7 +1,6 @@
 import { IConnectionSocket } from "@interfaces/IConnectionSocket";
-import { IConnectorObject } from "@interfaces/IConnectorObject";
+import { IConnectedObject } from "@interfaces/IConnectedObject";
 import { BodyLabel } from "@src/constants/collision";
-import { ROTATION_DIRECTION } from "@utils/types";
 import type { ConstraintType } from "matter";
 import { getMatterBody } from "../../physics/matter";
 import { MotorPulley } from "./MotorPulley";
@@ -9,7 +8,7 @@ import { MotorPulley } from "./MotorPulley";
 /**
  * Creates a motor game object
  */
-export class Motor extends Phaser.Physics.Matter.Image implements IConnectionSocket, IConnectorObject {
+export class Motor extends Phaser.Physics.Matter.Image implements IConnectionSocket {
     /**
      * Pulley offset
      */
@@ -21,17 +20,12 @@ export class Motor extends Phaser.Physics.Matter.Image implements IConnectionSoc
     /**
      * Pulley subobject
      */
-    protected readonly pulley: Phaser.Physics.Matter.Image;
+    protected readonly pulley: MotorPulley;
 
     /**
      * Pin joint for pulley
      */
     protected readonly pinJoint: ConstraintType;
-
-    /**
-     * Current rotation direction
-     */
-    protected rotationDirection: ROTATION_DIRECTION = ROTATION_DIRECTION.IDLE;
 
     /**
      * If something already connected
@@ -66,34 +60,22 @@ export class Motor extends Phaser.Physics.Matter.Image implements IConnectionSoc
             pointA: Motor.PULLEY_OFFSET,
             angularStiffness: 1
         });
-
-        // @TODO: move
-        scene.add.tween({
-            targets: this.pulley,
-            rotation: Phaser.Math.DegToRad(360),
-            duration: 1000,
-            loop: -1,
-        });
     }
 
     public getBodyLabel(): BodyLabel {
         return BodyLabel.MOTOR;
     }
 
-    public connectConnector(): void {
-        this.pulleyConnection = true;
+    public connectObject(targetObject: IConnectedObject): void {
+        this.pulley.connectObject(targetObject);
     }
 
-    public disconnectConnector(): void {
-        this.pulleyConnection = false;
+    public disconnectObject(_: IConnectedObject): void {
+        this.pulley.disconnectObject();
     }
 
-    public getConnectorObject(): IConnectorObject {
-        return this;
-    }
-
-    public getSocketPosition(): Readonly<Vector2Like> {
-        return this.getSocketLocation();
+    public getConnectorObject(): IConnectedObject {
+        return this.pulley;
     }
 
     /**
@@ -112,15 +94,6 @@ export class Motor extends Phaser.Physics.Matter.Image implements IConnectionSoc
      * @inheritdoc
      */
     public getSocketIsBusy(): boolean {
-        return this.pulleyConnection;
-    }
-
-    /**
-     * Sets new rotation direction
-     *
-     * @param newDirection
-     */
-    public updateRotationDirection(newDirection: ROTATION_DIRECTION) {
-        this.rotationDirection = newDirection;
+        return !!this.pulley.getConnectedObject();
     }
 }

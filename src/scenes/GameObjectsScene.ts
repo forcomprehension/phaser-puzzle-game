@@ -1,13 +1,10 @@
 import { Gear12 } from "@GameObjects/gears/Gear12";
 import { Gear6 } from "@GameObjects/gears/Gear6";
-import { ROTATION_DIRECTION } from "@utils/types";
 import { GearsManager, addGearsManagerTweens } from "@GameObjects/gears/GearsManager";
-import { getMatterBody } from "../physics/matter";
+import { getMatterBody, unsafeCastBody } from "../physics/matter";
 import { AbstractGear } from "@GameObjects/gears/AbstractGear";
 import { Motor } from "@GameObjects/motors/Motor";
-import { RopeDrawerTool } from "@GameObjects/connectors/Rope/RopeDrawerTool";
 import { BaseGameScene } from "./BaseGameScene";
-import { RopeDashboardPresenter } from "@GameObjects/dashboardPresenters/RopeDashboardPresenter";
 
 function setDraggable(scene: BaseGameScene, ...objects: Phaser.Physics.Matter.Image[]) {
     objects.forEach((object) => {
@@ -34,8 +31,17 @@ function setDraggable(scene: BaseGameScene, ...objects: Phaser.Physics.Matter.Im
             }
 
             object.setPosition(x, y);
+            const thisBody = getMatterBody(object);
+            const bodies = scene.matter.intersectBody(getMatterBody(object))
+                .filter((collidedBody) => {
+                    if ('collisionFilter' in collidedBody) {
+                        const castedBody = unsafeCastBody(collidedBody);
+                        return scene.matter.detector.canCollide(castedBody.collisionFilter, thisBody.collisionFilter);
+                    }
 
-            const bodies = scene.matter.intersectBody(getMatterBody(object));
+                    return false;
+                });
+
             if (bodies.length === 0) {
                 nonIntersectedPosition.x = object.body.position.x;
                 nonIntersectedPosition.y = object.body.position.y;
@@ -103,6 +109,7 @@ export class GameObjectsScene extends BaseGameScene {
 
     public create() {
         this.bootstrap();
+        super.create();
 
         const motor = new Motor(this, 300, 400);
 
@@ -118,27 +125,15 @@ export class GameObjectsScene extends BaseGameScene {
             /**
              * @TODO: In game we must check gears and autoconnect them.
              */
-            this.gearsManager.toggleMotor(gear6, ROTATION_DIRECTION.CCW)
-                .connectGears(gear12, gear6);
-
+            // this.gearsManager.toggleMotor(gear6, ROTATION_DIRECTION.CCW)
+            //     .connectGears(gear12, gear6);
             // Make subgraph jammed
-            this.gearsManager.toggleMotor(gear12, ROTATION_DIRECTION.CCW);
+            // this.gearsManager.toggleMotor(gear12, ROTATION_DIRECTION.CCW);
         });
 
         setDraggable(this, gear12, gear6, gear6_2, motor);
         gear6_2.tint = 0xFF0000;
 
-        this.createRope(this);
-    }
-
-    protected createRope(scene: Phaser.Scene) {
-        const ropeDrawer = new RopeDrawerTool(this);
-        const ropePresenter = new RopeDashboardPresenter(this, ropeDrawer, 1700, 200);
-
-        ropeDrawer.setDashboardPresenter(ropePresenter);
-
-        scene.add.existing(ropePresenter);
-        scene.add.existing(ropeDrawer);
     }
 
     protected bootstrap() {

@@ -8,12 +8,14 @@
 export interface IActiveTool {
     /**
      * Called when current tool is activated by scene
+     * 
+     * @deprecated
      */
     activateTool(): void;
 
     /**
      * Called when current tool is deactivated by scene
-     * 
+     *
      * @deprecated
      */
     deactivateTool(): void;

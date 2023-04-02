@@ -1,15 +1,15 @@
 import { RopeDashboardPresenter } from "@GameObjects/dashboardPresenters/RopeDashboardPresenter";
 import { IActiveTool } from "@interfaces/IActiveTool";
 import { IConnectionSocket } from "@interfaces/IConnectionSocket";
-import { IConnectorObject } from "@interfaces/IConnectorObject";
+import { GameObjectDuplexConnector } from "@src/classes/GameObjectsDuplexConnector";
 import { EVENT_ON_ACTIVATE_TOOL, EVENT_ON_DEACTIVATE_TOOL } from "@src/constants/tools";
 import { getGameObjectForConnectorsByBody } from "@src/physics/physicsHelpers";
-import { GameObjectsScene } from "@src/scenes/GameObjectsScene";
+import { BaseGameScene } from "@src/scenes/BaseGameScene";
 import { Rope } from "./Rope";
 
 type RopeConnectionSlots = {
-    left: IConnectionSocket & IConnectorObject,
-    right: Nullable<IConnectionSocket & IConnectorObject>
+    left: IConnectionSocket,
+    right: Nullable<IConnectionSocket>
 };
 
 /**
@@ -20,7 +20,7 @@ export class RopeDrawerTool extends Phaser.GameObjects.Graphics implements IActi
     /**
      * @inheritdoc
      */
-    public scene: GameObjectsScene;
+    public scene: BaseGameScene;
 
     /**
      * Drawer tween
@@ -48,10 +48,15 @@ export class RopeDrawerTool extends Phaser.GameObjects.Graphics implements IActi
     protected dashboardPresenter: Nullable<RopeDashboardPresenter> = null;
 
     /**
+     * @TODO:
+     */
+    protected requestToReturn: boolean = false;
+
+    /**
      * Ctor
      */
     constructor(
-        scene: GameObjectsScene
+        scene: BaseGameScene
     ) {
         super(scene, {
             lineStyle: {
@@ -85,20 +90,20 @@ export class RopeDrawerTool extends Phaser.GameObjects.Graphics implements IActi
 
         // @TODO: pointerup is unreliable
         this.scene.input
-            .on(Phaser.Input.Events.POINTER_UP, this.handleMakeConnection, this)
-            .on(Phaser.Input.Events.POINTER_MOVE, this.handleMoveCursor, this)
+            .on(Phaser.Input.Events.GAMEOBJECT_POINTER_UP, this.handleMakeConnection, this)
+            .on(Phaser.Input.Events.GAMEOBJECT_POINTER_MOVE, this.handleMoveCursor, this)
 
         this.emit(EVENT_ON_ACTIVATE_TOOL);
     }
 
     public deactivateTool(): void {
-        this.resetRopeDrawing();
+        this.resetRopeValues();
         this.getDrawer().pause();
         this.clear();
 
         this.scene.input
-            .off(Phaser.Input.Events.POINTER_UP, this.handleMakeConnection)
-            .off(Phaser.Input.Events.POINTER_MOVE, this.handleMoveCursor);
+            .off(Phaser.Input.Events.GAMEOBJECT_POINTER_UP, this.handleMakeConnection)
+            .off(Phaser.Input.Events.GAMEOBJECT_POINTER_MOVE, this.handleMoveCursor);
 
         this.emit(EVENT_ON_DEACTIVATE_TOOL);
     }
@@ -168,8 +173,15 @@ export class RopeDrawerTool extends Phaser.GameObjects.Graphics implements IActi
 
         // If we doesn't click on connector, but we already connected to at least one of connector
         } else if (!this.ropeSlots?.right) {
+            if (this.requestToReturn) {
+                this.returnToPresenter();
+                // check why click is clickable
+                // @TODO: must not be here
+                this.scene.deactivateGameObject(this);
+            }
+
             // Reset if already drawing
-            this.resetRopeDrawing();
+            this.resetRopeValues();
         }
     }
 
@@ -181,24 +193,34 @@ export class RopeDrawerTool extends Phaser.GameObjects.Graphics implements IActi
              // @TODO: make better
             const last = this.dashboardPresenter.getStackCount() === 1;
             if (this.dashboardPresenter.useItem()) {
-                new Rope(
-                    this.scene,
+                // Acquire connection
+                const connector = new GameObjectDuplexConnector(
                     this.ropeSlots!.left,
-                    this.ropeSlots!.right!,
+                    this.ropeSlots!.right!
                 );
 
-                this.ropeSlots!.left.connectConnector();
-                this.ropeSlots!.right!.connectConnector();
+                new Rope(this.scene, connector);
             }
 
-            this.resetRopeDrawing();
-            this.scene.deactivateGameObject(this);
+            this.resetRopeValues();
 
             if (last) {
+                this.scene.deactivateGameObject(this);
                 // @TODO: object pool
-                this.destroy();
+                this.setActive(false);
             }
         }
+    }
+
+    protected returnToPresenter() {
+        if (this.dashboardPresenter) {
+            this.dashboardPresenter.returnObject();
+        }
+    }
+
+    public returnRope() {
+        // @TODO: What if we already have an request?
+        this.requestToReturn = true;
     }
 
     /**
@@ -223,7 +245,7 @@ export class RopeDrawerTool extends Phaser.GameObjects.Graphics implements IActi
     protected getConnectorFromPointer(pointer: Phaser.Input.Pointer) {
         const bodies = this.scene.matter.intersectPoint(pointer.x, pointer.y);
 
-        let connector: Optional<IConnectionSocket & IConnectorObject>;
+        let connector: Optional<IConnectionSocket>;
         for (const body of bodies) {
             const gameObject = getGameObjectForConnectorsByBody(body);
             if (gameObject) {
@@ -238,10 +260,11 @@ export class RopeDrawerTool extends Phaser.GameObjects.Graphics implements IActi
     /**
      * Resets drawing rope positions
      */
-    protected resetRopeDrawing() {
+    protected resetRopeValues() {
         this.startPoint = null;
         this.endPoint = null;
         this.ropeSlots = null;
+        this.requestToReturn = false;
     }
 
     public destroy(fromScene?: boolean | undefined): void {

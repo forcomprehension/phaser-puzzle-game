@@ -24,5 +24,6 @@ export class RopeDashboardPresenter extends AbstractDashboardPresenter {
         super(scene, boundTool, 'ropeIcon', x, y);
 
         this.setScale(.5);
+        this.setStackCount(3);
     }
 }

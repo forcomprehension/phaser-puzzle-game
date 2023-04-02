@@ -2,7 +2,6 @@ import { AbstractGear } from "@GameObjects/gears/AbstractGear";
 import { Motor } from "@GameObjects/motors/Motor";
 import { MotorPulley } from "@GameObjects/motors/MotorPulley";
 import { IConnectionSocket } from "@interfaces/IConnectionSocket";
-import { IConnectorObject } from "@interfaces/IConnectorObject";
 import { BodyLabel } from "@src/constants/collision";
 import { unsafeCastBody } from "./matter";
 
@@ -12,7 +11,7 @@ import { unsafeCastBody } from "./matter";
  * @param body
  */
 export function getGameObjectForConnectorsByBody(body: Phaser.Types.Physics.Matter.MatterBody) {
-    let connector: Optional<IConnectionSocket & IConnectorObject>;
+    let connector: Optional<IConnectionSocket>;
     const castedBody = unsafeCastBody(body);
 
     if (castedBody.label === BodyLabel.MOTOR) {
