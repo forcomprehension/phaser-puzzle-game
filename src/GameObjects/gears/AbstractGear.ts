@@ -3,6 +3,7 @@ import { IConnectedObject } from '@interfaces/IConnectedObject';
 import { BodyLabel } from '@src/constants/collision';
 import { ROTATION_DIRECTION } from '@utils/types';
 import { nextString } from '../../utils/serialGenerator'
+import { GearsManager } from './GearsManager';
 
 /**
  * Abstract class for gears representation
@@ -32,6 +33,11 @@ export abstract class AbstractGear extends Phaser.Physics.Matter.Image implement
     protected connectedObject: Nullable<IConnectedObject> = null;
 
     /**
+     * Manager, which owns this gear
+     */
+    protected manager: Optional<GearsManager>;
+
+    /**
      * @TODO: remove then we not rely on display size
      */
     protected static get defaultPhysicsConfig() {
@@ -56,6 +62,15 @@ export abstract class AbstractGear extends Phaser.Physics.Matter.Image implement
 
     public getBodyLabel(): BodyLabel {
         return BodyLabel.GEAR;
+    }
+
+    /**
+     * Registration/unregistration of manager
+     * 
+     * @param manager
+     */
+    public registration(manager: Optional<GearsManager>) {
+        this.manager = manager;
     }
 
     /**
@@ -109,5 +124,14 @@ export abstract class AbstractGear extends Phaser.Physics.Matter.Image implement
 
     public getRotationDirection() {
         return this.rotationDirection;
+    }
+
+    /**
+     * Change rotation through manager
+     *
+     * @param rotation
+     */
+    public askManagerToChangeRotation(rotation: Optional<ROTATION_DIRECTION>) {
+        this.manager?.toggleMotor(this, rotation);
     }
 }

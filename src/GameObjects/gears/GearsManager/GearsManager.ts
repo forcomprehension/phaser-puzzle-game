@@ -17,6 +17,9 @@ export class GearsManager extends GameObjects.GameObject implements ISimulated {
     protected readonly jammedSet: Set<AbstractGear> = new Set();
     protected readonly rotationSet: Set<AbstractGear> = new Set();
 
+    /**
+     * Flag for bulk gear states update mode
+     */
     protected bulkModeEnabled: boolean = false;
 
     /**
@@ -46,6 +49,7 @@ export class GearsManager extends GameObjects.GameObject implements ISimulated {
      * @param gear
      */
     public registerGear(gear: AbstractGear) {
+        gear.registration(this);
         this.graph.addGear(gear.serialID, this.createGearNode(gear));
         this.updateGearStates();
 
@@ -56,6 +60,7 @@ export class GearsManager extends GameObjects.GameObject implements ISimulated {
      * Removes gear from graph
      */
     public unregisterGear(gear: AbstractGear) {
+        gear.registration(undefined);
         this.graph.removeGear(gear.serialID);
         this.updateGearStates();
 

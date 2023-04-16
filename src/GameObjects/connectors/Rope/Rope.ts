@@ -129,7 +129,7 @@ export class Rope extends Phaser.GameObjects.Graphics {
                 const coordsFrom = currentCoordsFrom.copy(this.connector.getFirstConnector().getSocketLocation());
                 const coordsTo = currentCoordsTo.copy(this.connector.getSecondConnector().getSocketLocation());
 
-                if (true || this.dirty || !lastCoordsFrom.equals(coordsFrom) || !lastCoordsTo.equals(coordsTo)) {
+                if (this.dirty || !lastCoordsFrom.equals(coordsFrom) || !lastCoordsTo.equals(coordsTo)) {
                     // Get center of the line
                     const centerPosition = coordsFrom.clone()
                         .subtract(coordsTo)

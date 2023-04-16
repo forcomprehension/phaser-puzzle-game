@@ -3,6 +3,7 @@ import { BodyLabel } from "@src/constants/collision";
 import { ROTATION_DIRECTION } from "@utils/types";
 import { MOTOR_PULLEY_EVENT_ROTATE } from "./events";
 import { Motor } from "./Motor";
+import { AbstractGear } from "@GameObjects/gears/AbstractGear";
 
 /**
  * Pulley for motor
@@ -91,9 +92,12 @@ export class MotorPulley extends Phaser.Physics.Matter.Image implements IConnect
 
     public connectObject(newConnection: IConnectedObject) {
         this.connectedObject = newConnection;
+        this.crutchSendRotationUpdate(this.rotationDirection);
     }
 
     public disconnectObject() {
+        this.crutchSendRotationUpdate(undefined);
+
         this.connectedObject = null;
     }
 
@@ -111,6 +115,8 @@ export class MotorPulley extends Phaser.Physics.Matter.Image implements IConnect
         } else if (oldDirection !== ROTATION_DIRECTION.IDLE && newDirection === ROTATION_DIRECTION.IDLE) {
             this.rotationTween.pause();
         }
+
+        this.crutchSendRotationUpdate(this.rotationDirection);
     }
 
     /**
@@ -123,6 +129,15 @@ export class MotorPulley extends Phaser.Physics.Matter.Image implements IConnect
             this.setRotation(this.rotationValue);
         } else if (this.rotationDirection === ROTATION_DIRECTION.CCW) {
             this.setRotation(Phaser.Math.DEG_TO_RAD - this.rotationValue);
+        }
+    }
+
+    /**
+     * @TODO:
+     */
+    public crutchSendRotationUpdate(newRotation: Optional<ROTATION_DIRECTION>) {
+        if (this.connectedObject instanceof AbstractGear) {
+            this.connectedObject.askManagerToChangeRotation(newRotation);
         }
     }
 }
