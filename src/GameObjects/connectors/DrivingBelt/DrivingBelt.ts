@@ -2,12 +2,12 @@ import { GameObjectDuplexConnector } from "@src/classes/GameObjectsDuplexConnect
 import { BaseGameScene } from "@src/scenes/BaseGameScene";
 
 /**
- * Rope game object
+ * DrivingBelt game object
  */
-export class Rope extends Phaser.GameObjects.Graphics {
+export class DrivingBelt extends Phaser.GameObjects.Graphics {
 
     /**
-     * Rope line width
+     * DrivingBelt line width
      */
     public static readonly LINE_WIDTH = 10;
 
@@ -24,7 +24,7 @@ export class Rope extends Phaser.GameObjects.Graphics {
     public static readonly HALF_SUBTRACT_FROM_ZONE_LENGTH = 50;
 
     /**
-     * Default color for rope
+     * Default color for DrivingBelt
      */
     public static readonly DEFAULT_COLOR = 0xDD9900;
 
@@ -57,15 +57,15 @@ export class Rope extends Phaser.GameObjects.Graphics {
     ) {
         super(scene, {
             lineStyle: {
-                width: Rope.LINE_WIDTH,
-                color: Rope.DEFAULT_COLOR,
+                width: DrivingBelt.LINE_WIDTH,
+                color: DrivingBelt.DEFAULT_COLOR,
                 alpha: 1,
             }
         });
 
         scene.add.existing(this);
 
-        this.hitZone = scene.add.zone(this.x, this.y, Rope.LINE_WIDTH, Rope.LINE_WIDTH);
+        this.hitZone = scene.add.zone(this.x, this.y, DrivingBelt.LINE_WIDTH, DrivingBelt.LINE_WIDTH);
 
         this.hitZone.setInteractive();
         this.hitZone.on(Phaser.Input.Events.GAMEOBJECT_POINTER_OVER, this.onPointerEnter, this);
@@ -77,17 +77,17 @@ export class Rope extends Phaser.GameObjects.Graphics {
 
     protected onClick() {
         // @TODO: have active object? ask on hover?
-        this.scene.activateGameObject(this.scene.ropeDrawer);
+        this.scene.activateGameObject(this.scene.drivingBeltDrawer);
         this.connector.disconnect();
-        this.scene.ropeDrawer.returnRope();
+        this.scene.drivingBeltDrawer.returnBelt();
         this.destroy();
     }
 
     protected onPointerEnter() {
         this.setDefaultStyles({
             lineStyle: {
-                width: Rope.LINE_WIDTH,
-                color: Rope.HOVER_COLOR
+                width: DrivingBelt.LINE_WIDTH,
+                color: DrivingBelt.HOVER_COLOR
             }
         })
         this.setDirty(true);
@@ -96,15 +96,15 @@ export class Rope extends Phaser.GameObjects.Graphics {
     protected onPointerLeave() {
         this.setDefaultStyles({
             lineStyle: {
-                width: Rope.LINE_WIDTH,
-                color: Rope.DEFAULT_COLOR
+                width: DrivingBelt.LINE_WIDTH,
+                color: DrivingBelt.DEFAULT_COLOR
             }
         })
         this.setDirty(true);
     }
 
     /**
-     * Forcing rerender of rope
+     * Forcing rerender of DrivingBelt
      *
      * @param isDirty
      */
@@ -144,8 +144,8 @@ export class Rope extends Phaser.GameObjects.Graphics {
                     this.hitZone.setRotation(angle);
                     this.hitZone.setPosition(centerPosition.x, centerPosition.y);
                     this.hitZone.setSize( // @TODO: calculate from half-sizes
-                        Math.max(10, magnitude - Rope.HALF_SUBTRACT_FROM_ZONE_LENGTH * 2),
-                        Rope.LINE_WIDTH * Rope.HIT_ZONE_WIDTH_MULTIPLIER,
+                        Math.max(10, magnitude - DrivingBelt.HALF_SUBTRACT_FROM_ZONE_LENGTH * 2),
+                        DrivingBelt.LINE_WIDTH * DrivingBelt.HIT_ZONE_WIDTH_MULTIPLIER,
                         true
                     );
 

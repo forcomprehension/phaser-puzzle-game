@@ -1,5 +1,5 @@
-import { RopeDrawerTool } from "@GameObjects/connectors/Rope/RopeDrawerTool";
-import { RopeDashboardPresenter } from "@GameObjects/dashboardPresenters/RopeDashboardPresenter";
+import { DrivingBeltDrawerTool } from "@GameObjects/connectors/DrivingBelt/DrivingBeltDrawerTool";
+import { DrivingBeltDashboardPresenter } from "@GameObjects/dashboardPresenters/DrivingBeltDashboardPresenter";
 import { IActiveTool } from "@interfaces/IActiveTool";
 
 /**
@@ -16,16 +16,16 @@ export class BaseGameScene extends Phaser.Scene {
      */
     protected currentActiveObject: Nullable<ActiveGameObject> = null;
 
-    public ropeDrawer: RopeDrawerTool;
+    public drivingBeltDrawer: DrivingBeltDrawerTool;
 
     public create() {
-        const ropeDrawer = this.ropeDrawer = new RopeDrawerTool(this);
-        const ropePresenter = new RopeDashboardPresenter(this, ropeDrawer, 1700, 200);
+        const drivingBeltDrawer = this.drivingBeltDrawer = new DrivingBeltDrawerTool(this);
+        const drivingBeltPresenter = new DrivingBeltDashboardPresenter(this, drivingBeltDrawer, 1700, 200);
 
-        ropeDrawer.setDashboardPresenter(ropePresenter);
+        drivingBeltDrawer.setDashboardPresenter(drivingBeltPresenter);
 
-        this.add.existing(ropePresenter);
-        this.add.existing(ropeDrawer);
+        this.add.existing(drivingBeltPresenter);
+        this.add.existing(drivingBeltDrawer);
     }
 
     /**

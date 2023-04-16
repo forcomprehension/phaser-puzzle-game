@@ -1,14 +1,14 @@
-import { RopeDrawerTool } from "@GameObjects/connectors/Rope/RopeDrawerTool";
+import { DrivingBeltDrawerTool } from "@GameObjects/connectors/DrivingBelt/DrivingBeltDrawerTool";
 import { BaseGameScene } from "@src/scenes/BaseGameScene";
 import { AbstractDashboardPresenter } from "./AbstractDashboardPresenter";
 
 /**
- * Activator for rope drawer
+ * Activator for driving belt drawer
  */
-export class RopeDashboardPresenter extends AbstractDashboardPresenter {
+export class DrivingBeltDashboardPresenter extends AbstractDashboardPresenter {
 
     /**
-     * Rope stack counts
+     * Driving belt stack counts
      */
     protected stackCount: number = 3;
 
@@ -17,11 +17,11 @@ export class RopeDashboardPresenter extends AbstractDashboardPresenter {
      */
     constructor(
         scene: BaseGameScene,
-        boundTool: RopeDrawerTool,
+        boundTool: DrivingBeltDrawerTool,
         x: number,
         y: number
     ) {
-        super(scene, boundTool, 'ropeIcon', x, y);
+        super(scene, boundTool, 'drivingBeltIcon', x, y);
 
         this.setScale(.5);
         this.setStackCount(3);

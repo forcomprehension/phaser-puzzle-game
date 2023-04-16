@@ -105,8 +105,6 @@ function setDraggable(scene: BaseGameScene, ...objects: Phaser.Physics.Matter.Im
 export class GameObjectsScene extends BaseGameScene {
     public gearsManager: GearsManager;
 
-    public rope: Phaser.GameObjects.Graphics;
-
     constructor() {
         super("GameObjects.test");
     }

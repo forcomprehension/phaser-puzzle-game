@@ -1,21 +1,21 @@
-import { RopeDashboardPresenter } from "@GameObjects/dashboardPresenters/RopeDashboardPresenter";
+import { DrivingBeltDashboardPresenter } from "@GameObjects/dashboardPresenters/DrivingBeltDashboardPresenter";
 import { IActiveTool } from "@interfaces/IActiveTool";
 import { IConnectionSocket } from "@interfaces/IConnectionSocket";
 import { GameObjectDuplexConnector } from "@src/classes/GameObjectsDuplexConnector";
 import { EVENT_ON_ACTIVATE_TOOL, EVENT_ON_DEACTIVATE_TOOL } from "@src/constants/tools";
 import { getGameObjectForConnectorsByBody } from "@src/physics/physicsHelpers";
 import { BaseGameScene } from "@src/scenes/BaseGameScene";
-import { Rope } from "./Rope";
+import { DrivingBelt } from "./DrivingBelt";
 
-type RopeConnectionSlots = {
+type DrivingBeltConnectionSlots = {
     left: IConnectionSocket,
     right: Nullable<IConnectionSocket>
 };
 
 /**
- * Tool for drawing supposed rope position
+ * Tool for drawing supposed driving belt position
  */
-export class RopeDrawerTool extends Phaser.GameObjects.Graphics implements IActiveTool {
+export class DrivingBeltDrawerTool extends Phaser.GameObjects.Graphics implements IActiveTool {
 
     /**
      * @inheritdoc
@@ -38,19 +38,14 @@ export class RopeDrawerTool extends Phaser.GameObjects.Graphics implements IActi
     protected endPoint: Nullable<Vector2Like> = null;
 
     /**
-     * Connection slots for rope
+     * Connection slots for drivingBelt
      */
-    protected ropeSlots: Nullable<RopeConnectionSlots> = null;
+    protected drivingBeltSlots: Nullable<DrivingBeltConnectionSlots> = null;
 
     /**
      * Dashboard presenter
      */
-    protected dashboardPresenter: Nullable<RopeDashboardPresenter> = null;
-
-    /**
-     * @TODO:
-     */
-    protected requestToReturn: boolean = false;
+    protected dashboardPresenter: Nullable<DrivingBeltDashboardPresenter> = null;
 
     /**
      * Ctor
@@ -72,7 +67,7 @@ export class RopeDrawerTool extends Phaser.GameObjects.Graphics implements IActi
      *
      * @param presenter
      */
-    public setDashboardPresenter(presenter: RopeDashboardPresenter) {
+    public setDashboardPresenter(presenter: DrivingBeltDashboardPresenter) {
         this.dashboardPresenter = presenter;
     }
 
@@ -97,7 +92,7 @@ export class RopeDrawerTool extends Phaser.GameObjects.Graphics implements IActi
     }
 
     public deactivateTool(): void {
-        this.resetRopeValues();
+        this.resetValues();
         this.getDrawer().pause();
         this.clear();
 
@@ -124,7 +119,7 @@ export class RopeDrawerTool extends Phaser.GameObjects.Graphics implements IActi
                 duration: 1,
                 useFrames: true,
                 onUpdate: () => {
-                    this.drawRope();
+                    this.draw();
                 }
             });
         }
@@ -135,7 +130,7 @@ export class RopeDrawerTool extends Phaser.GameObjects.Graphics implements IActi
     /**
      * "Update" method
      */
-    protected drawRope() {
+    protected draw() {
         this.clear();
 
         if (this.startPoint && this.endPoint) {
@@ -151,51 +146,51 @@ export class RopeDrawerTool extends Phaser.GameObjects.Graphics implements IActi
 
         if (connector && !connector.getSocketIsBusy()) {
             // Doesn't have first slot
-            if (!this.ropeSlots?.left) {
-                this.ropeSlots = {
+            if (!this.drivingBeltSlots?.left) {
+                this.drivingBeltSlots = {
                     left: connector,
                     right: null,
                 };
 
                 this.startPoint = connector.getSocketLocation();
                 // Have first slot but haven't second
-            } else if (this.ropeSlots.left && !this.ropeSlots?.right) {
-                this.ropeSlots.right = connector;
+            } else if (this.drivingBeltSlots.left && !this.drivingBeltSlots?.right) {
+                this.drivingBeltSlots.right = connector;
 
                 // Extra check, just in case
-                if (this.ropeSlots.left.getSocketIsBusy() || this.ropeSlots.right.getSocketIsBusy()) {
-                    console.warn('One of rope slots sockets already busy');
+                if (this.drivingBeltSlots.left.getSocketIsBusy() || this.drivingBeltSlots.right.getSocketIsBusy()) {
+                    console.warn('One of belt slots sockets already busy');
                     return;
                 }
 
-                this.handleSpawnRope();
+                this.spawnBelt();
             }
 
         // If we doesn't click on connector, but we already connected to at least one of connector
-        } else if (!this.ropeSlots?.right) {
+        } else if (!this.drivingBeltSlots?.right) {
             // Reset if already drawing
-            this.resetRopeValues();
+            this.resetValues();
         }
     }
 
     /**
-     * Spawn concrete rope
+     * Spawn concrete driving belt
      */
-    protected handleSpawnRope() {
+    protected spawnBelt() {
         if (this.dashboardPresenter) {
              // @TODO: make better
             const last = this.dashboardPresenter.getStackCount() === 1;
             if (this.dashboardPresenter.useItem()) {
                 // Acquire connection
                 const connector = new GameObjectDuplexConnector(
-                    this.ropeSlots!.left,
-                    this.ropeSlots!.right!
+                    this.drivingBeltSlots!.left,
+                    this.drivingBeltSlots!.right!
                 );
 
-                new Rope(this.scene, connector);
+                new DrivingBelt(this.scene, connector);
             }
 
-            this.resetRopeValues();
+            this.resetValues();
 
             if (last) {
                 this.scene.deactivateGameObject(this);
@@ -211,10 +206,10 @@ export class RopeDrawerTool extends Phaser.GameObjects.Graphics implements IActi
         }
     }
 
-    public returnRope() {
+    public returnBelt() {
         this.returnToPresenter();
         this.scene.deactivateGameObject(this);
-        this.resetRopeValues();
+        this.resetValues();
     }
 
     /**
@@ -223,7 +218,7 @@ export class RopeDrawerTool extends Phaser.GameObjects.Graphics implements IActi
      * @param pointer
      */
     protected handleMoveCursor(pointer: Phaser.Input.Pointer) {
-        if (this.ropeSlots?.left) {
+        if (this.drivingBeltSlots?.left) {
             this.endPoint = {
                 x: pointer.x,
                 y: pointer.y
@@ -252,13 +247,12 @@ export class RopeDrawerTool extends Phaser.GameObjects.Graphics implements IActi
     }
 
     /**
-     * Resets drawing rope positions
+     * Resets drawing belt positions
      */
-    protected resetRopeValues() {
+    protected resetValues() {
         this.startPoint = null;
         this.endPoint = null;
-        this.ropeSlots = null;
-        this.requestToReturn = false;
+        this.drivingBeltSlots = null;
     }
 
     public destroy(fromScene?: boolean | undefined): void {
