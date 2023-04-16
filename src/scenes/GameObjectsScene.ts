@@ -79,15 +79,12 @@ function setDraggable(scene: BaseGameScene, ...objects: Phaser.Physics.Matter.Im
                 if (scene instanceof GameObjectsScene) {
                     scene.gearsManager.bulkUpdate(() => {
                         if (countGears === 0) {
-                            // @TODO: Check active connections?
-                            scene.gearsManager.disconnectGear(object);
+                            scene.gearsManager.disconnectGearFromInternals(object);
                         } else if (countGears === overlaps.length) {
-                            scene.gearsManager.bulkUpdate(() => {
-                                scene.gearsManager.disconnectGear(object);
-                                overlaps.forEach((overlap) => {
-                                    // @ts-ignore
-                                    scene.gearsManager.connectGears(overlap.gameObject, object);
-                                });
+                            scene.gearsManager.disconnectGearFromInternals(object);
+                            overlaps.forEach((overlap) => {
+                                // @ts-ignore
+                                scene.gearsManager.connectGears(overlap.gameObject, object);
                             });
                         } else { // countGears !== overlaps. May be blocked?
                             // @TODO: SEND EXTERNAL_JAMMED?

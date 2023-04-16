@@ -89,9 +89,10 @@ export class GearsManager extends GameObjects.GameObject implements ISimulated {
      *
      * @param lhs
      * @param rhs
+     * @param isExternal
      */
-    public connectGears(lhs: AbstractGear, rhs: AbstractGear) {
-        this.graph.connectGears(lhs.serialID, rhs.serialID);
+    public connectGears(lhs: AbstractGear, rhs: AbstractGear, isExternal: boolean = false) {
+        this.graph.connectGears(lhs.serialID, rhs.serialID, isExternal);
         this.updateGearStates();
 
         return this;
@@ -113,8 +114,8 @@ export class GearsManager extends GameObjects.GameObject implements ISimulated {
      *
      * @param gear
      */
-    public disconnectGear(gear: AbstractGear) {
-        this.graph.disconnectGear(gear.serialID);
+    public disconnectGearFromInternals(gear: AbstractGear) {
+        this.graph.disconnectGearFromInternals(gear.serialID);
         this.updateGearStates();
 
         return this;
@@ -146,6 +147,7 @@ export class GearsManager extends GameObjects.GameObject implements ISimulated {
     public updateRotations() {
         for (const gear of this.rotationSet) {
             const direction = gear.getRotationDirection();
+            // @TODO: Rotation ratio works bad if we connect through a belt. Must contain rotation ratio in edge?
             if (!this.jammedSet.has(gear) && checkRotationDirectionIsRotated(direction)) {
                 if (direction === ROTATION_DIRECTION.CW) {
                     gear.setRotation(this.rotation * gear.rotationRatio);
@@ -171,6 +173,10 @@ export class GearsManager extends GameObjects.GameObject implements ISimulated {
      * @param cb
      */
     public bulkUpdate(block: () => any) {
+        if (this.bulkModeEnabled) {
+            console.error('Bulk mode in gears manager already enabled. This causes bugs');
+        }
+
         this.bulkModeEnabled = true;
         block();
         this.bulkModeEnabled = false;

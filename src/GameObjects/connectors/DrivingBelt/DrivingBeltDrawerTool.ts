@@ -154,7 +154,10 @@ export class DrivingBeltDrawerTool extends Phaser.GameObjects.Graphics implement
 
                 this.startPoint = connector.getSocketLocation();
                 // Have first slot but haven't second
-            } else if (this.drivingBeltSlots.left && !this.drivingBeltSlots?.right) {
+            } else if (
+                this.drivingBeltSlots.left && !this.drivingBeltSlots?.right &&
+                this.drivingBeltSlots.left !== connector
+            ) {
                 this.drivingBeltSlots.right = connector;
 
                 // Extra check, just in case

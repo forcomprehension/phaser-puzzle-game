@@ -82,7 +82,7 @@ export abstract class AbstractGear extends Phaser.Physics.Matter.Image implement
         this.connectedObject = target;
 
         if (target instanceof AbstractGear) {
-            this.manager?.connectGears(this, target);
+            this.manager?.connectGears(this, target, true);
         }
     }
 

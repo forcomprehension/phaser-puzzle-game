@@ -4,20 +4,29 @@ import { GearNode } from "./GearGraph";
 import { checkRotationDirectionIsRotated } from "./utils";
 
 const isMotorRealPropertySymbol = Symbol('$isMotor');
+const rotationSetSymbol = Symbol('$rotationSet');
+const jammedSetSymbol = Symbol('$jammedSet');
 
 /**
  * Reactive implementation of gear node.
  */
 export class GearNodeReactiveImpl implements GearNode {
     protected [isMotorRealPropertySymbol]: boolean = false;
+    protected [rotationSetSymbol]: Set<AbstractGear>;
+    protected [jammedSetSymbol]: Set<AbstractGear>;
 
+    /**
+     * Ctor
+     */
     constructor(
-        protected rotationSet: Set<AbstractGear>,
-        protected jammedSet: Set<AbstractGear>,
+        rotationSet: Set<AbstractGear>,
+        jammedSet: Set<AbstractGear>,
         protected gear: AbstractGear,
         isMotor: boolean = false
     ) {
         this[isMotorRealPropertySymbol] = isMotor;
+        this[rotationSetSymbol] = rotationSet;
+        this[jammedSetSymbol] = jammedSet;
     }
 
     public get isMotor() {
@@ -30,14 +39,14 @@ export class GearNodeReactiveImpl implements GearNode {
 
     public set isJammed(isJammed: boolean) {
         if (isJammed) {
-            this.jammedSet.add(this.gear);
+            this[jammedSetSymbol].add(this.gear);
         } else {
-            this.jammedSet.delete(this.gear);
+            this[jammedSetSymbol].delete(this.gear);
         }
     }
 
     public get isJammed() {
-        return this.jammedSet.has(this.gear);
+        return this[jammedSetSymbol].has(this.gear);
     }
 
     public get direction() {
@@ -47,9 +56,9 @@ export class GearNodeReactiveImpl implements GearNode {
     public set direction(newDirection: ROTATION_DIRECTION) {
         this.gear.setRotationDirection(newDirection);
         if (checkRotationDirectionIsRotated(newDirection)) {
-            this.rotationSet.add(this.gear);
+            this[rotationSetSymbol].add(this.gear);
         } else {
-            this.rotationSet.delete(this.gear);
+            this[rotationSetSymbol].delete(this.gear);
         }
     }
 }

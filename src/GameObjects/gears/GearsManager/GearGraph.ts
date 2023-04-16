@@ -16,9 +16,19 @@ export interface GearNode {
 };
 
 /**
+ * Edge data for gear graph
+ */
+export type GearGraphEdgeData = {
+    isExternal: boolean
+};
+
+/**
  * Graph for gears control
  */
 export class GearGraph extends Graph {
+    /**
+     * Indicies for gears, which are marked as motors
+     */
     protected readonly motorIndex: Set<GraphKey> = new Set();
 
     /**
@@ -26,8 +36,8 @@ export class GearGraph extends Graph {
      *
      * @param args
      */
-    constructor(...args: any[]) {
-        super(...args);
+    constructor() {
+        super({ directed: false });
 
         this.setDefaultNodeLabel(() => {
             throw new Error('Cannot create edge with empty label')
@@ -51,8 +61,10 @@ export class GearGraph extends Graph {
      * @param lhs
      * @param rhs
      */
-    public connectGears(lhs: GraphKey, rhs: GraphKey) {
-        this.setEdge(lhs, rhs);
+    public connectGears(lhs: GraphKey, rhs: GraphKey, isExternal: boolean) {
+        this.setEdge(lhs, rhs, {
+            isExternal,
+        } as GearGraphEdgeData);
     }
 
     /**
@@ -66,15 +78,18 @@ export class GearGraph extends Graph {
     }
 
      /**
-      * Disconnect gear from graph
+      * Disconnect gear from internal connectors
       *
       * @param gearId
       */
-     public disconnectGear(gearId: GraphKey) {
+     public disconnectGearFromInternals(gearId: GraphKey) {
         const edges = this.nodeEdges(gearId);
         if (edges) {
             edges.forEach((edge) => {
-                this.removeEdge(edge);
+                const { isExternal } = this.edge(edge) as GearGraphEdgeData;
+                if (!isExternal) {
+                    this.removeEdge(edge);
+                }
             });
         }
      }
