@@ -66,7 +66,7 @@ export abstract class AbstractGear extends Phaser.Physics.Matter.Image implement
 
     /**
      * Registration/unregistration of manager
-     * 
+     *
      * @param manager
      */
     public registration(manager: Optional<GearsManager>) {
@@ -80,6 +80,10 @@ export abstract class AbstractGear extends Phaser.Physics.Matter.Image implement
      */
     public connectObject(target: IConnectedObject): void {
         this.connectedObject = target;
+
+        if (target instanceof AbstractGear) {
+            this.manager?.connectGears(this, target);
+        }
     }
 
     /**
@@ -88,7 +92,11 @@ export abstract class AbstractGear extends Phaser.Physics.Matter.Image implement
      * @param target
      */
     public disconnectObject(target: IConnectedObject) {
-        if (this.connectedObject === target) {
+        if (this.connectedObject === target) { // @TODO: needed?
+            if (this.connectedObject instanceof AbstractGear) {
+                this.manager?.disconnectGears(this, this.connectedObject);
+            }
+
             this.connectedObject = null;
         }
     }

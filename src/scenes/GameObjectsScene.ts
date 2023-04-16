@@ -62,9 +62,10 @@ function setDraggable(scene: BaseGameScene, ...objects: Phaser.Physics.Matter.Im
 
             // @TODO: move away. Subs after physic engine update?
             if (object instanceof AbstractGear) {
-                scene.matter.body.scale(myBody, 1.1, 1.1);
+                // @TODO: TODO: how to scale?
+                scene.matter.body.scale(myBody, 1.25, 1.25);
                 const overlaps = scene.matter.intersectBody(myBody);
-                scene.matter.body.scale(myBody, 0.9, 0.9);
+                scene.matter.body.scale(myBody, 0.8, 0.8);
 
                 const countGears = overlaps.reduce((acc, overlap) => {
                     // @ts-ignore
@@ -81,9 +82,12 @@ function setDraggable(scene: BaseGameScene, ...objects: Phaser.Physics.Matter.Im
                             // @TODO: Check active connections?
                             scene.gearsManager.disconnectGear(object);
                         } else if (countGears === overlaps.length) {
-                            overlaps.forEach((overlap) => {
-                                // @ts-ignore
-                                scene.gearsManager.connectGears(overlap.gameObject, object);
+                            scene.gearsManager.bulkUpdate(() => {
+                                scene.gearsManager.disconnectGear(object);
+                                overlaps.forEach((overlap) => {
+                                    // @ts-ignore
+                                    scene.gearsManager.connectGears(overlap.gameObject, object);
+                                });
                             });
                         } else { // countGears !== overlaps. May be blocked?
                             // @TODO: SEND EXTERNAL_JAMMED?

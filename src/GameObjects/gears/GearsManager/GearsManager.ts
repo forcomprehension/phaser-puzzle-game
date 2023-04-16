@@ -41,6 +41,10 @@ export class GearsManager extends GameObjects.GameObject implements ISimulated {
      */
     constructor(scene: Phaser.Scene) {
         super(scene, GearsManager.name);
+
+        if (process.env.DEBUG) {
+            window.gearsManager = this;
+        }
     }
 
     /**
@@ -94,12 +98,24 @@ export class GearsManager extends GameObjects.GameObject implements ISimulated {
     }
 
     /**
+     * Disconnect two gears
+     *
+     * @param lhs
+     * @param rhs
+     */
+    public disconnectGears(lhs: AbstractGear, rhs: AbstractGear) {
+        this.graph.disconnectGears(lhs.serialID, rhs.serialID);
+        this.updateGearStates();
+    }
+
+    /**
      * Disconnects gear from all another gears
      *
      * @param gear
      */
     public disconnectGear(gear: AbstractGear) {
         this.graph.disconnectGear(gear.serialID);
+        this.updateGearStates();
 
         return this;
     }

@@ -21,6 +21,11 @@ export interface GearNode {
 export class GearGraph extends Graph {
     protected readonly motorIndex: Set<GraphKey> = new Set();
 
+    /**
+     * Ctor
+     *
+     * @param args
+     */
     constructor(...args: any[]) {
         super(...args);
 
@@ -48,6 +53,16 @@ export class GearGraph extends Graph {
      */
     public connectGears(lhs: GraphKey, rhs: GraphKey) {
         this.setEdge(lhs, rhs);
+    }
+
+    /**
+     * Disconnect two gears
+     *
+     * @param lhs
+     * @param rhs
+     */
+    public disconnectGears(lhs: GraphKey, rhs: GraphKey) {
+        this.removeEdge(lhs, rhs);
     }
 
      /**

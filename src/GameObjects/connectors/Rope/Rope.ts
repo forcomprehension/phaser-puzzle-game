@@ -168,13 +168,12 @@ export class Rope extends Phaser.GameObjects.Graphics {
 
     public destroy(fromScene?: boolean | undefined): void {
         this.clear();
-        // this.scene.matter.world.remove(this.body);
         super.destroy(fromScene);
         this.hitZone.destroy(fromScene);
 
         this.tween.remove();
 
         // @ts-ignore
-        this.hitZone = this.body = this.tween = null;
+        this.hitZone = this.tween = null;
     }
 }
