@@ -78,6 +78,7 @@ export class Rope extends Phaser.GameObjects.Graphics {
     protected onClick() {
         // @TODO: have active object? ask on hover?
         this.scene.activateGameObject(this.scene.ropeDrawer);
+        this.connector.disconnect();
         this.scene.ropeDrawer.returnRope();
         this.destroy();
     }

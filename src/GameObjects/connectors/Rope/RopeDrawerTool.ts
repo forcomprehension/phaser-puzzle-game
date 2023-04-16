@@ -173,13 +173,6 @@ export class RopeDrawerTool extends Phaser.GameObjects.Graphics implements IActi
 
         // If we doesn't click on connector, but we already connected to at least one of connector
         } else if (!this.ropeSlots?.right) {
-            if (this.requestToReturn) {
-                this.returnToPresenter();
-                // check why click is clickable
-                // @TODO: must not be here
-                this.scene.deactivateGameObject(this);
-            }
-
             // Reset if already drawing
             this.resetRopeValues();
         }
@@ -219,8 +212,9 @@ export class RopeDrawerTool extends Phaser.GameObjects.Graphics implements IActi
     }
 
     public returnRope() {
-        // @TODO: What if we already have an request?
-        this.requestToReturn = true;
+        this.returnToPresenter();
+        this.scene.deactivateGameObject(this);
+        this.resetRopeValues();
     }
 
     /**
