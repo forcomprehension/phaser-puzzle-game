@@ -14,7 +14,7 @@ export class DrivingBelt extends Phaser.GameObjects.Graphics {
     /**
      * Hit zone width multiplier. Multiplied by LINE_WIDTH
      */
-    public static readonly HIT_ZONE_WIDTH_MULTIPLIER = 5;
+    public static readonly HIT_ZONE_WIDTH_MULTIPLIER = 3.5;
 
     /**
      * When we point to zone, it may be cover other objects
@@ -76,7 +76,10 @@ export class DrivingBelt extends Phaser.GameObjects.Graphics {
     }
 
     protected onClick() {
-        // @TODO: have active object? ask on hover?
+        if (this.scene.hasActiveGameObject()) { // @TODO: check that object is not driving belt?
+            return;
+        }
+
         this.scene.activateGameObject(this.scene.drivingBeltDrawer);
         this.connector.disconnect();
         this.scene.drivingBeltDrawer.returnBelt();
@@ -84,6 +87,10 @@ export class DrivingBelt extends Phaser.GameObjects.Graphics {
     }
 
     protected onPointerEnter() {
+        if (this.scene.hasActiveGameObject()) {
+            // @TODO: HOW TO HANDLE OBJECT DEACTIVATION?
+            return;
+        }
         this.setDefaultStyles({
             lineStyle: {
                 width: DrivingBelt.LINE_WIDTH,

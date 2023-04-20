@@ -21,10 +21,9 @@ export class GearNodeReactiveImpl implements GearNode {
     constructor(
         rotationSet: Set<AbstractGear>,
         jammedSet: Set<AbstractGear>,
-        protected gear: AbstractGear,
-        isMotor: boolean = false
+        protected gear: AbstractGear
     ) {
-        this[isMotorRealPropertySymbol] = isMotor;
+        this[isMotorRealPropertySymbol] = false;
         this[rotationSetSymbol] = rotationSet;
         this[jammedSetSymbol] = jammedSet;
     }

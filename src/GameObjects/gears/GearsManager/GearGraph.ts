@@ -27,7 +27,7 @@ export type GearGraphEdgeData = {
  */
 export class GearGraph extends Graph {
     /**
-     * Indicies for gears, which are marked as motors
+     * Indices for gears marked as motors
      */
     protected readonly motorIndex: Set<GraphKey> = new Set();
 
@@ -40,6 +40,10 @@ export class GearGraph extends Graph {
         super({ directed: false });
 
         this.setDefaultNodeLabel(() => {
+            throw new Error('Cannot create node with empty label')
+        });
+
+        this.setDefaultEdgeLabel(() => {
             throw new Error('Cannot create edge with empty label')
         });
     }

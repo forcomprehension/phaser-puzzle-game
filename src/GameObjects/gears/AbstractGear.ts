@@ -4,6 +4,7 @@ import { BodyLabel } from '@src/constants/collision';
 import { ROTATION_DIRECTION } from '@utils/types';
 import { nextString } from '../../utils/serialGenerator'
 import { GearsManager } from './GearsManager';
+import type { GraphKey } from './GearsManager/GearGraph';
 
 /**
  * Abstract class for gears representation
@@ -13,7 +14,7 @@ export abstract class AbstractGear extends Phaser.Physics.Matter.Image implement
     /**
      * Serial ID.
      */
-    public readonly serialID: string;
+    public readonly serialID: GraphKey;
 
     /**
      * Rotation ratio, based on gear teeth count.

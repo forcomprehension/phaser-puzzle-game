@@ -45,10 +45,6 @@ export class GearStatesUpdater {
                 const vVisited = this.subgraphVisitedNodes.has(v);
                 const wVisited = this.subgraphVisitedNodes.has(w);
 
-                // if (vVisited && wVisited) {
-                //    return;
-                // }
-
                 const vData = this.graph.getNodeData(v);
                 const wData = this.graph.getNodeData(w);
 
@@ -80,7 +76,16 @@ export class GearStatesUpdater {
                     } else if (vVisited) { // if left is visited
                         this.leadOneNodeByAnother(true, wVisited, vData, wData);
                     } else if (wVisited) { // if right is visited
-                        this.leadOneNodeByAnother(false, wVisited, vData, wData);
+                        // wVisited is not a typo.
+                        // wVisited - will be opposite, because (false) will swap arguments
+                        // this.leadOneNodeByAnother(false, wVisited, vData, wData);
+                        if (vVisited) {
+                            if (!checkGearsRotationsAreCompatible(wData, vData)) {
+                                this.markSubgraphAsJammed(wData, vData);
+                            }
+                        } else {
+                            vData.direction = getOppositeDirection(wData);
+                        }
                     }
 
                     if (!this.currentSubgraphIsJammed) {
@@ -141,7 +146,7 @@ export class GearStatesUpdater {
     /**
      * This check edge nodes for jamming, and lead right or left node by another.
      *
-     * @param leftLead        Which data was leading. if false - it swaps leftData and rightData
+     * @param leftLead        Which data was leading. if true - forward order, else backward order (it swaps leftData and rightData)
      * @param oppositeVisited Does opposite node visited. if (true) checkJamming else assignOppositeDirection
      * @param leftData        Data will vData or wData based on leftLead
      * @param rightData       Data will vData or wData based on leftLead
