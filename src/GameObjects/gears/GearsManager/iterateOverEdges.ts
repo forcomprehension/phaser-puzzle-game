@@ -1,17 +1,19 @@
 import type { Edge, Graph } from 'graphlib'
 import type { GraphKey } from './GearGraph'
 
-export const DEFAULT_EDGE_NAME = "\x00";
-export const EDGE_KEY_DELIM = "\x01";
+const DEFAULT_EDGE_NAME = "\x00";
+const EDGE_KEY_DELIM = "\x01";
+const EXTERNAL_MARK_DELIM = "\x02";
 
 /**
  * Generate consistent key from edge node pair (a<===>b equal to b<===>a)
  *
  * @param edge
  */
-function edgeToKey(edge: Edge) {
+function edgeToKey(edge: Edge, isExternal: boolean) {
     let v = String(edge.v);
     let w = String(edge.w);
+    const ext = String(isExternal);
 
     if (v > w) { // swap
         let tmp = v;
@@ -19,7 +21,7 @@ function edgeToKey(edge: Edge) {
         w = tmp;
     }
 
-    return v + EDGE_KEY_DELIM + w + DEFAULT_EDGE_NAME;
+    return v + EDGE_KEY_DELIM + w + DEFAULT_EDGE_NAME + ext + EXTERNAL_MARK_DELIM;
 }
 
 /**
@@ -36,7 +38,8 @@ function iterateOverEdgesCallback(
     const edges = graph.nodeEdges(parent);
     if (edges) {
         edges.forEach((edge) => {
-            const edgeKey = edgeToKey(edge);
+            const { isExternal } = graph.edge(edge);
+            const edgeKey = edgeToKey(edge, Boolean(isExternal));
             if (visitedSet.has(edgeKey)) {
                 return;
             }
@@ -52,8 +55,7 @@ function iterateOverEdgesCallback(
 }
 
 /**
- * Graph iterator by edges. The a<===>b and b<===>a edges are equivalently.
- * There is no situation when we get same pair.
+ * Graph iterator by edges. The a<===>b and b<===>a edges are equivalently, unless they have different secondary marks
  *
  * @param graph         Current graph we will walk
  * @param parent        Starting node key

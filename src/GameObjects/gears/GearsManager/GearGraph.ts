@@ -37,7 +37,7 @@ export class GearGraph extends Graph {
      * @param args
      */
     constructor() {
-        super({ directed: false });
+        super({ directed: true });
 
         this.setDefaultNodeLabel(() => {
             throw new Error('Cannot create node with empty label')
