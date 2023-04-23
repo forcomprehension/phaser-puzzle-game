@@ -16,7 +16,12 @@ export abstract class AbstractPresenterBoundTool extends Phaser.GameObjects.Game
     /**
      * @todo: kostyl
      */
-    public isActiveTool: boolean = false;
+    protected isActiveTool: boolean = false;
+
+    /**
+     * Guard for case when we activate/deactivate during 1 macrotask
+     */
+    protected isWait: boolean = false;
 
     /**
      * Binded dashbpard presenter
@@ -32,24 +37,51 @@ export abstract class AbstractPresenterBoundTool extends Phaser.GameObjects.Game
         this.dashboardPresenter = presenter;
     }
 
+    /**
+     * Activate tool from IActiveTool
+     */
     public activateTool(): void {
+        this.isWait = true;
         this.emit(EVENT_ON_ACTIVATE_TOOL);
+
+        // @todo: набор костылей для замены click stopPropagation
+        Promise.resolve().then(() => {
+            if (this.isWait) {
+                this.isActiveTool = true;
+            }
+        });
     }
 
+    /**
+     * Deactivate tool from IActiveTool
+     */
     public deactivateTool(): void {
         this.emit(EVENT_ON_DEACTIVATE_TOOL);
-    }
-
-    public onDeactivateTool(cb: Function): void {
-        this.on(EVENT_ON_DEACTIVATE_TOOL, cb);
 
         this.isActiveTool = false;
+        this.isWait = false;
     }
 
+    /**
+     * Hook onDeactivateTool
+     *
+     * @todo: rework
+     *
+     * @param cb
+     */
+    public onDeactivateTool(cb: Function): void {
+        this.on(EVENT_ON_DEACTIVATE_TOOL, cb);
+    }
+
+    /**
+     * Hook onActivateTool
+     *
+     * @todo: rework
+     *
+     * @param cb
+     */
     public onActivateTool(cb: Function): void {
        this.on(EVENT_ON_ACTIVATE_TOOL, cb);
-
-       this.isActiveTool = true;
     }
 
     /**
@@ -86,6 +118,11 @@ export abstract class AbstractPresenterBoundTool extends Phaser.GameObjects.Game
      */
     public onResetValues() {}
 
+    /**
+     * Dtor
+     *
+     * @param fromScene
+     */
     public destroy(fromScene?: boolean | undefined): void {
         super.destroy(fromScene);
 
