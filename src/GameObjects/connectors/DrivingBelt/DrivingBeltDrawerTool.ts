@@ -1,4 +1,4 @@
-import { DrivingBeltDashboardPresenter } from "@GameObjects/dashboardPresenters/DrivingBeltDashboardPresenter";
+import { DrivingBeltDashboardPresenter } from "@GameObjects/ToolsDashboard/dashboardPresenters/DrivingBeltDashboardPresenter";
 import { IActiveTool } from "@interfaces/IActiveTool";
 import { IConnectionSocket } from "@interfaces/IConnectionSocket";
 import { GameObjectDuplexConnector } from "@src/classes/GameObjectsDuplexConnector";

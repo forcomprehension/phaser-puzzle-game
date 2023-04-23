@@ -5,13 +5,8 @@ import { AbstractDashboardPresenter } from "./AbstractDashboardPresenter";
 /**
  * Activator for driving belt drawer
  */
+
 export class DrivingBeltDashboardPresenter extends AbstractDashboardPresenter {
-
-    /**
-     * Driving belt stack counts
-     */
-    protected stackCount: number = 3;
-
     /**
      * Ctor
      */
@@ -24,6 +19,6 @@ export class DrivingBeltDashboardPresenter extends AbstractDashboardPresenter {
         super(scene, boundTool, 'drivingBeltIcon', x, y);
 
         this.setScale(.5);
-        this.setStackCount(3);
+        this.setStackCount(2);
     }
 }

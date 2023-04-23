@@ -86,6 +86,7 @@ export class AntiGravityPad extends Phaser.Physics.Matter.Sprite {
             if (throttle = ++throttle % throttleOrder) {
                 const bodies = scene.matter.intersectBody(this.influenceZone);
 
+                // @TODO: ONLY SUPPOSED BODIES
                 bodies.forEach((overlappedBody) => {
                     const casted = unsafeCastBody(overlappedBody);
 

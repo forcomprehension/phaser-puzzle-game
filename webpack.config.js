@@ -82,10 +82,7 @@ module.exports = function(_, { mode }) {
             //         },
             //     ],
             // }),
-        ],
-        watchOptions: {
-            aggregateTimeout: 1000,
-        }
+        ]
     }
 }
 

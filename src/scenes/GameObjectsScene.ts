@@ -109,8 +109,8 @@ export class GameObjectsScene extends BaseGameScene {
     }
 
     public create() {
-        this.bootstrap();
         super.create();
+        this.bootstrap();
 
         const motor = new Motor(this, 300, 400);
 
