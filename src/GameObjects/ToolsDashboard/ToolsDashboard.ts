@@ -4,7 +4,6 @@ import ScrollablePanel from "phaser3-rex-plugins/templates/ui/scrollablepanel/Sc
 import FixWidthSizer from "phaser3-rex-plugins/templates/ui/fixwidthsizer/FixWidthSizer";
 import RoundRectangle from "phaser3-rex-plugins/plugins/roundrectangle";
 import { AbstractDashboardPresenter } from "./dashboardPresenters/AbstractDashboardPresenter";
-import BaseSizer from "phaser3-rex-plugins/templates/ui/basesizer/BaseSizer";
 
 export class ToolsDashboard {
     public static readonly PANEL_WIDTH = 250;

@@ -18,7 +18,6 @@ export class DrivingBeltDashboardPresenter extends AbstractDashboardPresenter {
     ) {
         super(scene, boundTool, 'drivingBeltIcon', x, y);
 
-        this.setScale(.5);
         this.setStackCount(2);
     }
 }

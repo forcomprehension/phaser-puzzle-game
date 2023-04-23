@@ -68,7 +68,7 @@ export abstract class AbstractDashboardPresenter extends Phaser.GameObjects.Cont
             x: 0,
             y: 0,
             style: {
-                fontSize: '48px',
+                fontSize: '24px',
                 fontStyle: 'bold'
             }
         });
@@ -136,11 +136,26 @@ export abstract class AbstractDashboardPresenter extends Phaser.GameObjects.Cont
 
         if (this.stackCount === 0) {
             // @TODO: use gameobject pool
-            this.setActive(false);
-            this.setVisible(false);
+            this.hideObject();
         }
 
         return true;
+    }
+
+    /**
+     * Hides object, if is non-useful
+     */
+    protected hideObject() {
+        this.setActive(false);
+        this.setVisible(false);
+    }
+
+    /**
+     * Shows object, if it is hidden
+     */
+    protected showObject() {
+        this.setActive(true);
+        this.setVisible(true);
     }
 
     /**
@@ -148,8 +163,7 @@ export abstract class AbstractDashboardPresenter extends Phaser.GameObjects.Cont
      */
     public returnObject() {
         this.setStackCount(this.stackCount + 1);
-        this.setActive(true);
-        this.setVisible(true);
+        this.showObject();
     }
 
     public destroy(fromScene?: boolean | undefined): void {
