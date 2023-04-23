@@ -118,7 +118,7 @@ export class GameObjectsScene extends BaseGameScene {
         const gear6 = new Gear6(this, 100, 190);
         const gear6_2 = new Gear6(this, 250, 190);
 
-        new AntiGravityPad(this, 1350, 850);
+        const antiGravityPad = new AntiGravityPad(this, 1350, 850);
 
         createEightBall(this, 1350, 650);
 
@@ -136,7 +136,7 @@ export class GameObjectsScene extends BaseGameScene {
             // this.gearsManager.toggleMotor(gear12, ROTATION_DIRECTION.CCW);
         });
 
-        setDraggable(this, gear12, gear6, gear6_2, motor);
+        setDraggable(this, gear12, gear6, gear6_2, motor, antiGravityPad);
         gear6_2.tint = 0xFF0000;
 
     }
@@ -149,11 +149,11 @@ export class GameObjectsScene extends BaseGameScene {
             .setDepth(-1)
             .setOrigin(0);
 
-            const scale = Math.max(
-                this.sys.canvas.width / bgImage.displayWidth,
-                this.sys.canvas.height / bgImage.displayHeight
-            );
+        const scale = Math.max(
+            this.sys.canvas.width / bgImage.displayWidth,
+            this.sys.canvas.height / bgImage.displayHeight
+        );
 
-            bgImage.setScale(scale);
+        bgImage.setScale(scale);
     }
 }

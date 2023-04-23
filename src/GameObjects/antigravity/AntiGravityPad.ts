@@ -54,9 +54,17 @@ export class AntiGravityPad extends Phaser.Physics.Matter.Sprite {
 
         this.play('antigravitypad-work');
 
+        this.addInfluenceZone();
+    }
+
+    /**
+     * Add influence zone. Moved from ctor just for readability
+     */
+    protected addInfluenceZone() {
+        const { scene } = this;
         this.influenceZone = scene.matter.bodies.rectangle(
-            x,
-            y - AntiGravityPad.INFLUENCE_HEIGHT / 2 - this.height / 2,
+            this.x,
+            this.calculateNewYForInfluenceZone(this.y),
             this.width,
             AntiGravityPad.INFLUENCE_HEIGHT,
             {
@@ -95,6 +103,36 @@ export class AntiGravityPad extends Phaser.Physics.Matter.Sprite {
         });
     }
 
+    /**
+     * @inheritdoc
+     */
+    public setPosition(x?: number | undefined, y?: number | undefined, z?: number | undefined, w?: number | undefined): this {
+        super.setPosition(x, y, z, w);
+
+        if (this.influenceZone) {
+            this.scene.matter.body.setPosition(this.influenceZone, {
+                x: x || 0,
+                y: this.calculateNewYForInfluenceZone(y || 0)
+            });
+        }
+
+        return this;
+    }
+
+    /**
+     * Returns Y for influence zone, calculated by influence height and pad height
+     *
+     * @param padY
+     */
+    protected calculateNewYForInfluenceZone(padY: number) {
+        return padY - AntiGravityPad.INFLUENCE_HEIGHT / 2 - this.height / 2
+    }
+
+    /**
+     * Dtor
+     *
+     * @param fromScene
+     */
     public destroy(fromScene?: boolean | undefined): void {
         this.scene.matter.world.remove(this.influenceZone);
         super.destroy(fromScene);
