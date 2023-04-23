@@ -1,0 +1,146 @@
+{
+	"textures": [
+		{
+			"image": "anti-gravity-pad.png",
+			"format": "RGBA8888",
+			"size": {
+				"w": 948,
+				"h": 56
+			},
+			"scale": 0.5,
+			"frames": [
+				{
+					"filename": "antigravity_pad_step_1.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 192,
+						"h": 108
+					},
+					"spriteSourceSize": {
+						"x": 18,
+						"y": 27,
+						"w": 156,
+						"h": 54
+					},
+					"frame": {
+						"x": 1,
+						"y": 1,
+						"w": 156,
+						"h": 54
+					}
+				},
+				{
+					"filename": "antigravity_pad_step_2.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 192,
+						"h": 108
+					},
+					"spriteSourceSize": {
+						"x": 18,
+						"y": 27,
+						"w": 156,
+						"h": 54
+					},
+					"frame": {
+						"x": 159,
+						"y": 1,
+						"w": 156,
+						"h": 54
+					}
+				},
+				{
+					"filename": "antigravity_pad_step_3.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 192,
+						"h": 108
+					},
+					"spriteSourceSize": {
+						"x": 18,
+						"y": 27,
+						"w": 156,
+						"h": 54
+					},
+					"frame": {
+						"x": 317,
+						"y": 1,
+						"w": 156,
+						"h": 54
+					}
+				},
+				{
+					"filename": "antigravity_pad_step_4.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 192,
+						"h": 108
+					},
+					"spriteSourceSize": {
+						"x": 18,
+						"y": 27,
+						"w": 156,
+						"h": 54
+					},
+					"frame": {
+						"x": 475,
+						"y": 1,
+						"w": 156,
+						"h": 54
+					}
+				},
+				{
+					"filename": "disabled_antigravity_pad.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 192,
+						"h": 108
+					},
+					"spriteSourceSize": {
+						"x": 18,
+						"y": 27,
+						"w": 156,
+						"h": 54
+					},
+					"frame": {
+						"x": 633,
+						"y": 1,
+						"w": 156,
+						"h": 54
+					}
+				},
+				{
+					"filename": "enabled_antigravity_pad.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 192,
+						"h": 108
+					},
+					"spriteSourceSize": {
+						"x": 18,
+						"y": 27,
+						"w": 156,
+						"h": 54
+					},
+					"frame": {
+						"x": 791,
+						"y": 1,
+						"w": 156,
+						"h": 54
+					}
+				}
+			]
+		}
+	],
+	"meta": {
+		"app": "https://www.codeandweb.com/texturepacker",
+		"version": "3.0",
+		"smartupdate": "$TexturePacker:SmartUpdate:bc2902c292089432a1f73a8b03bdec50:ad2b56a5b04aee9ea8205fc5355e292a:32a96ea144f0b33d40fd1de6a264e574$"
+	}
+}

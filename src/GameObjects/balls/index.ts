@@ -1,4 +1,4 @@
-import { setWorldCollision } from "../../physics/matter";
+import { getMatterBody, setWorldCollision } from "../../physics/matter";
 
 /**
  * Create ball base
@@ -117,5 +117,8 @@ export function createBowlingBall(scene: Phaser.Scene, x: number, y: number) {
  * @returns
  */
 export function createEightBall(scene: Phaser.Scene, x: number, y: number) {
-    return createBall(scene, x, y, 'eight-ball', .25, .275);
+    const eightBall = createBall(scene, x, y, 'eight-ball', .25, .275);
+
+    getMatterBody(eightBall).ignoreGravity = true;
+    return eightBall;
 }

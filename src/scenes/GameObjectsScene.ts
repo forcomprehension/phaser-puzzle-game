@@ -5,6 +5,8 @@ import { getMatterBody, unsafeCastBody } from "../physics/matter";
 import { AbstractGear } from "@GameObjects/gears/AbstractGear";
 import { Motor } from "@GameObjects/motors/Motor";
 import { BaseGameScene } from "./BaseGameScene";
+import { AntiGravityPad } from "@GameObjects/antigravity/AntiGravityPad";
+import { createEightBall } from "@GameObjects/balls";
 
 function setDraggable(scene: BaseGameScene, ...objects: Phaser.Physics.Matter.Image[]) {
     objects.forEach((object) => {
@@ -116,6 +118,10 @@ export class GameObjectsScene extends BaseGameScene {
         const gear6 = new Gear6(this, 100, 190);
         const gear6_2 = new Gear6(this, 250, 190);
 
+        new AntiGravityPad(this, 1350, 850);
+
+        createEightBall(this, 1350, 650);
+
         this.gearsManager.bulkUpdate(() => {
             this.gearsManager.registerGear(gear12)
                 .registerGear(gear6)
@@ -138,5 +144,16 @@ export class GameObjectsScene extends BaseGameScene {
     protected bootstrap() {
         this.gearsManager = new GearsManager(this);
         addGearsManagerTweens(this, this.gearsManager);
+
+        const bgImage = this.add.image(0, 0, 'bg')
+            .setDepth(-1)
+            .setOrigin(0);
+
+            const scale = Math.max(
+                this.sys.canvas.width / bgImage.displayWidth,
+                this.sys.canvas.height / bgImage.displayHeight
+            );
+
+            bgImage.setScale(scale);
     }
 }
