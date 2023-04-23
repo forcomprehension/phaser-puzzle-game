@@ -1,11 +1,10 @@
-import { DrivingBeltDashboardPresenter } from "@GameObjects/ToolsDashboard/dashboardPresenters/DrivingBeltDashboardPresenter";
-import { IActiveTool } from "@interfaces/IActiveTool";
 import { IConnectionSocket } from "@interfaces/IConnectionSocket";
 import { GameObjectDuplexConnector } from "@src/classes/GameObjectsDuplexConnector";
 import { EVENT_ON_ACTIVATE_TOOL, EVENT_ON_DEACTIVATE_TOOL } from "@src/constants/tools";
 import { getGameObjectForConnectorsByBody } from "@src/physics/physicsHelpers";
 import { BaseGameScene } from "@src/scenes/BaseGameScene";
 import { DrivingBelt } from "./DrivingBelt";
+import { AbstractPresenterBoundTool } from "@GameObjects/ToolsDashboard/AbstractPresenterBoundTool";
 
 type DrivingBeltConnectionSlots = {
     left: IConnectionSocket,
@@ -15,12 +14,7 @@ type DrivingBeltConnectionSlots = {
 /**
  * Tool for drawing supposed driving belt position
  */
-export class DrivingBeltDrawerTool extends Phaser.GameObjects.Graphics implements IActiveTool {
-
-    /**
-     * @inheritdoc
-     */
-    public scene: BaseGameScene;
+export class DrivingBeltDrawerTool extends AbstractPresenterBoundTool {
 
     /**
      * Drawer tween
@@ -43,41 +37,23 @@ export class DrivingBeltDrawerTool extends Phaser.GameObjects.Graphics implement
     protected drivingBeltSlots: Nullable<DrivingBeltConnectionSlots> = null;
 
     /**
-     * Dashboard presenter
+     * Graphics object for drawing
      */
-    protected dashboardPresenter: Nullable<DrivingBeltDashboardPresenter> = null;
+    protected graphicsObject: Phaser.GameObjects.Graphics;
 
     /**
      * Ctor
      */
-    constructor(
-        scene: BaseGameScene
-    ) {
-        super(scene, {
+    constructor(scene: BaseGameScene) {
+        super(scene, DrivingBeltDrawerTool.name);
+
+        this.graphicsObject = scene.add.graphics({
             lineStyle: {
                 width: 10,
                 color: 0xff0000,
                 alpha: 1
             }
         });
-    }
-
-    /**
-     * Dashboard presenter dependency
-     *
-     * @param presenter
-     */
-    public setDashboardPresenter(presenter: DrivingBeltDashboardPresenter) {
-        this.dashboardPresenter = presenter;
-    }
-
-    public onDeactivateTool(cb: Function): void {
-        this.on(EVENT_ON_DEACTIVATE_TOOL, cb);
-    }
-
-
-    public onActivateTool(cb: Function): void {
-       this.on(EVENT_ON_ACTIVATE_TOOL, cb);
     }
 
     public activateTool() {
@@ -88,19 +64,19 @@ export class DrivingBeltDrawerTool extends Phaser.GameObjects.Graphics implement
             .on(Phaser.Input.Events.GAMEOBJECT_POINTER_UP, this.handleMakeConnection, this)
             .on(Phaser.Input.Events.GAMEOBJECT_POINTER_MOVE, this.handleMoveCursor, this)
 
-        this.emit(EVENT_ON_ACTIVATE_TOOL);
+        super.activateTool();
     }
 
     public deactivateTool(): void {
-        this.resetValues();
+        this.onResetValues();
         this.getDrawer().pause();
-        this.clear();
+        this.graphicsObject.clear();
 
         this.scene.input
             .off(Phaser.Input.Events.GAMEOBJECT_POINTER_UP, this.handleMakeConnection)
             .off(Phaser.Input.Events.GAMEOBJECT_POINTER_MOVE, this.handleMoveCursor);
 
-        this.emit(EVENT_ON_DEACTIVATE_TOOL);
+        super.deactivateTool();
     }
 
     /**
@@ -131,10 +107,10 @@ export class DrivingBeltDrawerTool extends Phaser.GameObjects.Graphics implement
      * "Update" method
      */
     protected draw() {
-        this.clear();
+        this.graphicsObject.clear();
 
         if (this.startPoint && this.endPoint) {
-            this.lineBetween(this.startPoint.x, this.startPoint.y, this.endPoint.x, this.endPoint.y);
+            this.graphicsObject.lineBetween(this.startPoint.x, this.startPoint.y, this.endPoint.x, this.endPoint.y);
         }
     }
 
@@ -166,53 +142,23 @@ export class DrivingBeltDrawerTool extends Phaser.GameObjects.Graphics implement
                     return;
                 }
 
-                this.spawnBelt();
+                this.tryToUseItem(pointer);
             }
 
         // If we doesn't click on connector, but we already connected to at least one of connector
         } else if (!this.drivingBeltSlots?.right) {
             // Reset if already drawing
-            this.resetValues();
-        }
-    }
-
-    /**
-     * Spawn concrete driving belt
-     */
-    protected spawnBelt() {
-        if (this.dashboardPresenter) {
-             // @TODO: make better
-            const last = this.dashboardPresenter.getStackCount() === 1;
-            if (this.dashboardPresenter.useItem()) {
-                // Acquire connection
-                const connector = new GameObjectDuplexConnector(
-                    this.drivingBeltSlots!.left,
-                    this.drivingBeltSlots!.right!
-                );
-
-                new DrivingBelt(this.scene, connector);
-            }
-
-            this.resetValues();
-
-            if (last) {
-                this.scene.deactivateGameObject(this);
-                // @TODO: object pool
-                this.setActive(false);
-            }
-        }
-    }
-
-    protected returnToPresenter() {
-        if (this.dashboardPresenter) {
-            this.dashboardPresenter.returnObject();
+            this.onResetValues();
         }
     }
 
     public returnBelt() {
-        this.returnToPresenter();
+        if (this.dashboardPresenter) {
+            this.dashboardPresenter.returnObject();
+        }
+
         this.scene.deactivateGameObject(this);
-        this.resetValues();
+        this.onResetValues();
     }
 
     /**
@@ -250,9 +196,26 @@ export class DrivingBeltDrawerTool extends Phaser.GameObjects.Graphics implement
     }
 
     /**
+     * Spawn rope
+     *
+     * @param pointer
+     */
+    protected onUseItem(_: Phaser.Input.Pointer): void {
+        // Acquire connection
+        const connector = new GameObjectDuplexConnector(
+            this.drivingBeltSlots!.left,
+            this.drivingBeltSlots!.right!
+        );
+
+        new DrivingBelt(this.scene, connector);
+    }
+
+    /**
      * Resets drawing belt positions
      */
-    protected resetValues() {
+    public onResetValues() {
+        super.onResetValues();
+
         this.startPoint = null;
         this.endPoint = null;
         this.drivingBeltSlots = null;
@@ -260,11 +223,12 @@ export class DrivingBeltDrawerTool extends Phaser.GameObjects.Graphics implement
 
     public destroy(fromScene?: boolean | undefined): void {
         super.destroy(fromScene);
+        this.graphicsObject.destroy(fromScene);
 
         this.tween.remove();
 
         // @ts-ignore
-        this.dashboardPresenter = this.tween = null;
+        this.graphicsObject = this.dashboardPresenter = this.tween = null;
 
         this.off(EVENT_ON_ACTIVATE_TOOL);
         this.off(EVENT_ON_DEACTIVATE_TOOL);
