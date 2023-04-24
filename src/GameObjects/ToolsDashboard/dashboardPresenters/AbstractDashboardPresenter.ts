@@ -1,4 +1,5 @@
-import { ActiveGameObject, BaseGameScene } from "@src/scenes/BaseGameScene";
+import { BaseGameScene } from "@src/scenes/BaseGameScene";
+import { AbstractGameObjectSpawner } from "../AbstractGameObjectSpawner";
 
 /**
  * Base class for all dashboard presenters
@@ -36,7 +37,7 @@ export abstract class AbstractDashboardPresenter extends Phaser.GameObjects.Cont
     });
 
     // @TODO: normal keys
-    public get toolKey() {
+    public getToolKey() {
         return this.constructor.name;
     }
 
@@ -44,8 +45,8 @@ export abstract class AbstractDashboardPresenter extends Phaser.GameObjects.Cont
      * Ctor
      */
     constructor(
-        scene: BaseGameScene,
-        protected boundTool: ActiveGameObject,
+        public scene: BaseGameScene,
+        protected spawner: AbstractGameObjectSpawner,
         icon: string | [string, string | number | undefined],
         x: number,
         y: number,
@@ -55,11 +56,11 @@ export abstract class AbstractDashboardPresenter extends Phaser.GameObjects.Cont
         const [ texture, frame ] = Array.isArray(icon) ? icon : [icon];
         this.icon = scene.add.image(0, 0, texture, frame).setOrigin(0);
 
-        this.boundTool.onDeactivateTool(() => {
+        this.spawner.onDeactivateTool(() => {
             this.icon.clearTint();
         });
 
-        this.boundTool.onActivateTool(() => {
+        this.spawner.onActivateTool(() => {
             this.icon.tint = 0xFF0000;
         });
 
@@ -92,6 +93,17 @@ export abstract class AbstractDashboardPresenter extends Phaser.GameObjects.Cont
         this.add(this.stackCountRenderer);
     }
 
+    /**
+     * Sets a new scale for icon
+     *
+     * @TODO: need?
+     *
+     * @param scale
+     */
+    protected setIconScale(scale: number) {
+        this.icon.setScale(scale);
+    }
+
     public afterAdd() {
         const scene = this.scene as BaseGameScene;
         const { width, height } = this.getBounds();
@@ -101,10 +113,10 @@ export abstract class AbstractDashboardPresenter extends Phaser.GameObjects.Cont
         this.hitZone.setInteractive({
             useHandCursor: true
         }).on(Phaser.Input.Events.POINTER_UP, () => {
-            if (this.boundTool !== scene.getCurrentActiveObject()) {
-                scene.activateGameObject(this.boundTool);
+            if (this.spawner !== scene.getCurrentActiveObject()) {
+                scene.activateGameObject(this.spawner);
             } else {
-                scene.deactivateGameObject(this.boundTool);
+                scene.deactivateGameObject(this.spawner);
             }
         });
     }
@@ -161,9 +173,14 @@ export abstract class AbstractDashboardPresenter extends Phaser.GameObjects.Cont
     /**
      * Return object into the stack
      */
-    public returnObject() {
+    public returnObject(gameObject: Phaser.GameObjects.GameObject) {
+        this.scene.activateGameObject(this.spawner);
+        this.spawner.onReturnItem(gameObject);
+
         this.setStackCount(this.stackCount + 1);
         this.showObject();
+
+        this.scene.deactivateGameObject(this.spawner);
     }
 
     public destroy(fromScene?: boolean | undefined): void {
@@ -173,7 +190,7 @@ export abstract class AbstractDashboardPresenter extends Phaser.GameObjects.Cont
         this.icon.destroy(fromScene);
 
         // @ts-ignore
-        this.boundTool = this.icon = this.hitZone = this.stackCountRenderer = undefined;
+        this.spawner = this.icon = this.hitZone = this.stackCountRenderer = undefined;
     }
 }
 

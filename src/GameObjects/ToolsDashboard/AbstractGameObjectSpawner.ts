@@ -4,14 +4,18 @@ import { EVENT_ON_ACTIVATE_TOOL, EVENT_ON_DEACTIVATE_TOOL } from "@src/constants
 import { BaseGameScene } from "@src/scenes/BaseGameScene";
 
 /**
- * Superclass of all presenter bound tools
+ * Superclass of all spawners
  */
-export abstract class AbstractPresenterBoundTool extends Phaser.GameObjects.GameObject implements IActiveTool {
-
+export abstract class AbstractGameObjectSpawner extends Phaser.GameObjects.GameObject implements IActiveTool {
     /**
      * Cast type
      */
     public scene: BaseGameScene;
+
+    /**
+     * If true, hooks spawn on onClick event
+     */
+    protected bindSpawnToOnClick: boolean = true;
 
     /**
      * @todo: kostyl
@@ -41,10 +45,15 @@ export abstract class AbstractPresenterBoundTool extends Phaser.GameObjects.Game
      * Activate tool from IActiveTool
      */
     public activateTool(): void {
-        this.isWait = true;
+        if (this.bindSpawnToOnClick) {
+            this.scene.input
+            .on(Phaser.Input.Events.GAMEOBJECT_POINTER_UP, this.tryToUseItem, this);
+        }
+
         this.emit(EVENT_ON_ACTIVATE_TOOL);
 
         // @todo: набор костылей для замены click stopPropagation
+        this.isWait = true;
         Promise.resolve().then(() => {
             if (this.isWait) {
                 this.isActiveTool = true;
@@ -56,6 +65,11 @@ export abstract class AbstractPresenterBoundTool extends Phaser.GameObjects.Game
      * Deactivate tool from IActiveTool
      */
     public deactivateTool(): void {
+        if (this.bindSpawnToOnClick) {
+            this.scene.input
+                .off(Phaser.Input.Events.GAMEOBJECT_POINTER_UP, this.tryToUseItem, this);
+        }
+
         this.emit(EVENT_ON_DEACTIVATE_TOOL);
 
         this.isActiveTool = false;
@@ -85,7 +99,15 @@ export abstract class AbstractPresenterBoundTool extends Phaser.GameObjects.Game
     }
 
     /**
-     * Use item in dashboard presenter if can. Call abstract "onUseItem" and "onResetValues"
+     * Calls on return item
+     *
+     * @param gameObject
+     */
+    public onReturnItem(gameObject: Phaser.GameObjects.GameObject) {
+    }
+
+    /**
+     * Use item in dashboard presenter if can. Call abstract "spawnItem" and "onResetValues"
      *
      * @param pointer
      */
@@ -93,7 +115,7 @@ export abstract class AbstractPresenterBoundTool extends Phaser.GameObjects.Game
         if (this.dashboardPresenter && this.isActiveTool) {
             const last = this.dashboardPresenter.getStackCount() === 1;
             if (this.dashboardPresenter.useItem()) {
-                this.onUseItem(pointer);
+                this.spawnItem(pointer);
             }
 
             this.onResetValues();
@@ -111,7 +133,7 @@ export abstract class AbstractPresenterBoundTool extends Phaser.GameObjects.Game
      *
      * @param pointer
      */
-    protected abstract onUseItem(pointer: Phaser.Input.Pointer): void;
+    protected abstract spawnItem(pointer: Phaser.Input.Pointer): void;
 
     /**
      * If we need reset values

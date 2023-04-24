@@ -5,11 +5,11 @@ import { AntiGravityPadSpawner } from "@GameObjects/antigravity/AntiGravityPadSp
 export class AntiGravityPadDashboardPresenter extends AbstractDashboardPresenter {
     constructor(
         scene: BaseGameScene,
-        boundTool: AntiGravityPadSpawner,
+        spawner: AntiGravityPadSpawner,
         x: number,
         y: number
     ) {
-        super(scene, boundTool, ['anti-gravity-pad', 4], x, y);
+        super(scene, spawner, ['anti-gravity-pad', 4], x, y);
         this.setStackCount(3);
     }
 }

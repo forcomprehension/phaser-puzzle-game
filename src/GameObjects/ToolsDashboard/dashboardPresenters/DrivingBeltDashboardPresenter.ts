@@ -12,11 +12,11 @@ export class DrivingBeltDashboardPresenter extends AbstractDashboardPresenter {
      */
     constructor(
         scene: BaseGameScene,
-        boundTool: DrivingBeltDrawerTool,
+        spawner: DrivingBeltDrawerTool,
         x: number,
         y: number
     ) {
-        super(scene, boundTool, 'drivingBeltIcon', x, y);
+        super(scene, spawner, 'drivingBeltIcon', x, y);
 
         this.setStackCount(2);
     }

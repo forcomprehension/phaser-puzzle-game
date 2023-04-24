@@ -5,6 +5,9 @@ import FixWidthSizer from "phaser3-rex-plugins/templates/ui/fixwidthsizer/FixWid
 import RoundRectangle from "phaser3-rex-plugins/plugins/roundrectangle";
 import { AbstractDashboardPresenter } from "./dashboardPresenters/AbstractDashboardPresenter";
 
+/**
+ * Tools dashboard container
+ */
 export class ToolsDashboard {
     public static readonly PANEL_WIDTH = 250;
 
@@ -15,6 +18,11 @@ export class ToolsDashboard {
     protected panel: ScrollablePanel;
     protected sizer: FixWidthSizer;
 
+    /**
+     * Ctor
+     *
+     * @param scene
+     */
     constructor(protected scene: BaseGameScene) {}
 
     public init() {
@@ -53,7 +61,7 @@ export class ToolsDashboard {
     }
 
     public register(tool: AbstractDashboardPresenter) {
-        const { toolKey } = tool;
+        const toolKey = tool.getToolKey();
 
         if (this.toolsMap.has(toolKey)) {
             throw new Error(`Attempt to register tool "${toolKey}" twice. Exiting`);
@@ -87,6 +95,9 @@ export class ToolsDashboard {
 
     // @TODO: DTOR
     public destroy() {
-        
+        this.toolsMap.clear();
+
+        // @ts-ignore
+        this.scene = this.panel = this.sizer = undefined;
     }
 }

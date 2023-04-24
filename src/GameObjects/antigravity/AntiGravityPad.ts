@@ -1,3 +1,4 @@
+import { AntiGravityPadDashboardPresenter } from "@GameObjects/ToolsDashboard/dashboardPresenters/AntiGravityPadDashboardPresenter";
 import { unsafeCastBody } from "@src/physics/matter";
 import { BaseGameScene } from "@src/scenes/BaseGameScene";
 
@@ -33,7 +34,7 @@ export class AntiGravityPad extends Phaser.Physics.Matter.Sprite {
      * @param x
      * @param y
      */
-    constructor(scene: BaseGameScene, x: number, y: number) {
+    constructor(public scene: BaseGameScene, x: number, y: number) {
         super(scene.matter.world, x, y, 'anti-gravity-pad', 4, {
             ignoreGravity: true,
             isStatic: true
@@ -51,6 +52,13 @@ export class AntiGravityPad extends Phaser.Physics.Matter.Sprite {
             frameRate: 12,
             repeat: -1
         });
+
+        this.setInteractive()
+            .on(Phaser.Input.Events.POINTER_DOWN, (pointer: Phaser.Input.Pointer) => {
+                if (pointer.rightButtonDown()) {
+                    this.handleReturn();
+                }
+            });
 
         this.play('antigravitypad-work');
 
@@ -84,24 +92,34 @@ export class AntiGravityPad extends Phaser.Physics.Matter.Sprite {
         let throttle = 0;
         scene.matter.world.on(Phaser.Physics.Matter.Events.AFTER_UPDATE, () => {
             if (throttle = ++throttle % throttleOrder) {
-                const bodies = scene.matter.intersectBody(this.influenceZone);
+                if (this.influenceZone) {
+                    const bodies = scene.matter.intersectBody(this.influenceZone);
 
-                // @TODO: ONLY SUPPOSED BODIES
-                bodies.forEach((overlappedBody) => {
-                    const casted = unsafeCastBody(overlappedBody);
+                    // @TODO: ONLY SUPPOSED BODIES
+                    bodies.forEach((overlappedBody) => {
+                        const casted = unsafeCastBody(overlappedBody);
 
-                    // @TODO: how to calculate properly?
-                    const yForce = casted.ignoreGravity ?
-                        - AntiGravityPad.NON_GRAVITY_FORCE_MULTIPLIER
-                        : -casted.gravityScale.y * AntiGravityPad.GRAVITY_FORCE_MULTIPLIER;
+                        // @TODO: how to calculate properly?
+                        const yForce = casted.ignoreGravity ?
+                            - AntiGravityPad.NON_GRAVITY_FORCE_MULTIPLIER
+                            : -casted.gravityScale.y * AntiGravityPad.GRAVITY_FORCE_MULTIPLIER;
 
-                    scene.matter.applyForce(overlappedBody, {
-                        x: 0,
-                        y: yForce
+                        scene.matter.applyForce(overlappedBody, {
+                            x: 0,
+                            y: yForce
+                        });
                     });
-                });
+                }
             }
         });
+    }
+
+    protected handleReturn() {
+        this.scene.toolsDashboard
+            .get(AntiGravityPadDashboardPresenter.name)
+            .returnObject(this);
+
+        this.destroy();
     }
 
     /**

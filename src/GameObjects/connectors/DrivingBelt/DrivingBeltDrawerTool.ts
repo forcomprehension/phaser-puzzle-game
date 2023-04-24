@@ -4,7 +4,7 @@ import { EVENT_ON_ACTIVATE_TOOL, EVENT_ON_DEACTIVATE_TOOL } from "@src/constants
 import { getGameObjectForConnectorsByBody } from "@src/physics/physicsHelpers";
 import { BaseGameScene } from "@src/scenes/BaseGameScene";
 import { DrivingBelt } from "./DrivingBelt";
-import { AbstractPresenterBoundTool } from "@GameObjects/ToolsDashboard/AbstractPresenterBoundTool";
+import { AbstractGameObjectSpawner } from "@GameObjects/ToolsDashboard/AbstractGameObjectSpawner";
 
 type DrivingBeltConnectionSlots = {
     left: IConnectionSocket,
@@ -14,12 +14,17 @@ type DrivingBeltConnectionSlots = {
 /**
  * Tool for drawing supposed driving belt position
  */
-export class DrivingBeltDrawerTool extends AbstractPresenterBoundTool {
+export class DrivingBeltDrawerTool extends AbstractGameObjectSpawner {
 
     /**
      * Drawer tween
      */
     protected tween: Phaser.Tweens.Tween;
+
+    /**
+     * @inheritdoc
+     */
+    protected bindSpawnToOnClick: boolean = false;
 
     /**
      * Starts drawing from
@@ -152,13 +157,13 @@ export class DrivingBeltDrawerTool extends AbstractPresenterBoundTool {
         }
     }
 
-    public returnBelt() {
-        if (this.dashboardPresenter) {
-            this.dashboardPresenter.returnObject();
-        }
-
-        this.scene.deactivateGameObject(this);
+    /**
+     * @inheritdoc
+     */
+    public onReturnItem(gameObject: Phaser.GameObjects.GameObject) {
         this.onResetValues();
+
+        super.onReturnItem(gameObject);
     }
 
     /**
@@ -200,7 +205,7 @@ export class DrivingBeltDrawerTool extends AbstractPresenterBoundTool {
      *
      * @param pointer
      */
-    protected onUseItem(_: Phaser.Input.Pointer): void {
+    protected spawnItem(_: Phaser.Input.Pointer): void {
         // Acquire connection
         const connector = new GameObjectDuplexConnector(
             this.drivingBeltSlots!.left,

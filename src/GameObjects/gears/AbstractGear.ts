@@ -5,6 +5,9 @@ import { ROTATION_DIRECTION } from '@utils/types';
 import { nextString } from '../../utils/serialGenerator'
 import { GearsManager } from './GearsManager';
 import type { GraphKey } from './GearsManager/GearGraph';
+import { BaseGameScene } from '@src/scenes/BaseGameScene';
+import { GearDashboardPresenter } from '@GameObjects/ToolsDashboard/dashboardPresenters/GearDashboardPresenter';
+import { GearsSpawnerType } from './GearsSpawners/GearSpawner';
 
 /**
  * Abstract class for gears representation
@@ -15,6 +18,11 @@ export abstract class AbstractGear extends Phaser.Physics.Matter.Image implement
      * Serial ID.
      */
     public readonly serialID: GraphKey;
+
+    /**
+     * SpawnerType
+     */
+    public abstract readonly spawnerType: GearsSpawnerType;
 
     /**
      * Rotation ratio, based on gear teeth count.
@@ -53,12 +61,24 @@ export abstract class AbstractGear extends Phaser.Physics.Matter.Image implement
     /**
      * @inheritdoc
      */
-    constructor(scene: Phaser.Scene, x: number, y: number, texture: string | Phaser.Textures.Texture) {
+    constructor(public scene: BaseGameScene, x: number, y: number, texture: string | Phaser.Textures.Texture) {
         super(scene.matter.world, x, y, texture, undefined, AbstractGear.defaultPhysicsConfig);
 
         this.serialID = nextString();
 
         scene.add.existing(this);
+
+        this.setInteractive()
+            .on(Phaser.Input.Events.POINTER_DOWN, (pointer: Phaser.Input.Pointer) => {
+                if (pointer.rightButtonDown()) {
+                    // @TODO:
+                    if (this.connectedObject) {
+                        alert('Cannot return gear, because we have another connected object');
+                    } else {
+                        this.handleReturn();
+                    }
+                }
+            })
     }
 
     public getBodyLabel(): BodyLabel {
@@ -133,6 +153,14 @@ export abstract class AbstractGear extends Phaser.Physics.Matter.Image implement
 
     public getRotationDirection() {
         return this.rotationDirection;
+    }
+
+    protected handleReturn() {
+        this.scene.toolsDashboard
+            .get(GearDashboardPresenter.name + '|' + this.spawnerType)
+            .returnObject(this);
+
+            this.destroy();
     }
 
     /**

@@ -1,3 +1,4 @@
+import { DrivingBeltDashboardPresenter } from "@GameObjects/ToolsDashboard/dashboardPresenters/DrivingBeltDashboardPresenter";
 import { GameObjectDuplexConnector } from "@src/classes/GameObjectsDuplexConnector";
 import { BaseGameScene } from "@src/scenes/BaseGameScene";
 
@@ -80,9 +81,11 @@ export class DrivingBelt extends Phaser.GameObjects.Graphics {
             return;
         }
 
-        this.scene.activateGameObject(this.scene.drivingBeltDrawer);
+        this.scene.toolsDashboard
+            .get(DrivingBeltDashboardPresenter.name)
+            .returnObject(this);
+
         this.connector.disconnect();
-        this.scene.drivingBeltDrawer.returnBelt();
         this.destroy();
     }
 

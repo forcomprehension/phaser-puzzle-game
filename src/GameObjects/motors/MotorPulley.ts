@@ -63,11 +63,7 @@ export class MotorPulley extends Phaser.Physics.Matter.Image implements IConnect
             }
         });
 
-        // @TODO: KOSTYL
-
-        setTimeout(() => {
-            this.updateRotationDirection(ROTATION_DIRECTION.CCW);
-        }, 1000);
+        this.updateRotationDirection(ROTATION_DIRECTION.CCW);
     }
 
 
@@ -107,6 +103,11 @@ export class MotorPulley extends Phaser.Physics.Matter.Image implements IConnect
      * @param newDirection
      */
     public updateRotationDirection(newDirection: ROTATION_DIRECTION) {
+        if (!this.rotationTween) {
+            // Pending destroy
+            return;
+        }
+
         const oldDirection = this.rotationDirection;
         this.rotationDirection = newDirection;
 
@@ -139,5 +140,16 @@ export class MotorPulley extends Phaser.Physics.Matter.Image implements IConnect
         if (this.connectedObject instanceof AbstractGear) {
             this.connectedObject.askManagerToChangeRotation(newRotation);
         }
+    }
+
+    public destroy(fromScene?: boolean | undefined): void {
+        this.updateRotationDirection(ROTATION_DIRECTION.IDLE);
+        this.rotationTween.remove();
+
+        super.destroy(fromScene);
+
+        // @TODO: notify
+        // @ts-ignore
+        this.rotationTween = this.connectedObject = null;
     }
 }

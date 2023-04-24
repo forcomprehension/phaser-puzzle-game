@@ -4,6 +4,8 @@ import { BodyLabel } from "@src/constants/collision";
 import type { ConstraintType } from "matter";
 import { getMatterBody } from "../../physics/matter";
 import { MotorPulley } from "./MotorPulley";
+import { BaseGameScene } from "@src/scenes/BaseGameScene";
+import { MotorDashboardPresenter } from "@GameObjects/ToolsDashboard/dashboardPresenters/MotorDashboardPresenter";
 
 /**
  * Creates a motor game object
@@ -28,14 +30,9 @@ export class Motor extends Phaser.Physics.Matter.Image implements IConnectionSoc
     protected readonly pinJoint: ConstraintType;
 
     /**
-     * If something already connected
-     */
-    protected pulleyConnection: boolean = false;
-
-    /**
      * Ctor
      */
-    constructor(scene: Phaser.Scene, x: number, y: number) {
+    constructor(public scene: BaseGameScene, x: number, y: number) {
         const texture = scene.textures.get('motor');
         const frameNames = texture.getFrameNames();
         const pulleyFrame = scene.textures.getFrame(texture.key, frameNames[1]);
@@ -56,10 +53,29 @@ export class Motor extends Phaser.Physics.Matter.Image implements IConnectionSoc
             this
         );
 
+        this.setInteractive()
+            .on(Phaser.Input.Events.POINTER_DOWN, (pointer: Phaser.Input.Pointer) => {
+                if (pointer.rightButtonDown()) {
+                    if (this.pulley.getConnectedObject()) {
+                        alert('Cannot return motor, because it has connected object');
+                    } else {
+                        this.handleReturn();
+                    }
+                }
+            });
+
         this.pinJoint = scene.matter.add.constraint(getMatterBody(this), getMatterBody(this.pulley), 0, 1, {
             pointA: Motor.PULLEY_OFFSET,
             angularStiffness: 1
         });
+    }
+
+    protected handleReturn() {
+        this.scene.toolsDashboard
+            .get(MotorDashboardPresenter.name)
+            .returnObject(this);
+
+        this.destroy();
     }
 
     public getBodyLabel(): BodyLabel {
@@ -95,5 +111,15 @@ export class Motor extends Phaser.Physics.Matter.Image implements IConnectionSoc
      */
     public getSocketIsBusy(): boolean {
         return !!this.pulley.getConnectedObject();
+    }
+
+    public destroy(fromScene?: boolean | undefined): void {
+        this.scene.matter.world.removeConstraint(this.pinJoint);
+
+        super.destroy(fromScene);
+        this.pulley.destroy(fromScene);
+
+        // @ts-ignore
+        this.pinJoint = this.pulley = undefined;
     }
 }
