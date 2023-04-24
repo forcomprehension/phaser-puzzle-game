@@ -14,7 +14,7 @@ export function setDraggable(
     ...objects: Phaser.Physics.Matter.Image[]
 ) {
     objects.forEach((object) => {
-        if (object.input.enabled) {
+        if (object.input?.enabled) {
             scene.input.setDraggable(object);
             scene.input.setHitArea(object, {
                 draggable: true,
