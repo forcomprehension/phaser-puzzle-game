@@ -112,6 +112,12 @@ export abstract class AbstractGameObjectSpawner extends Phaser.GameObjects.GameO
      * @param pointer
      */
     public tryToUseItem(pointer: Phaser.Input.Pointer) {
+        // @TODO: kostyl for prevent spawning in dashboard
+        if (pointer.x >= this.scene.getCanvasSize().canvasWidth - 300) {
+            console.warn(this.constructor.name + ' has spawn attempt.');
+            return;
+        }
+
         if (this.dashboardPresenter && this.isActiveTool) {
             const last = this.dashboardPresenter.getStackCount() === 1;
             if (this.dashboardPresenter.useItem()) {

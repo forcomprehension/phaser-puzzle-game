@@ -27,8 +27,6 @@ export class BaseGameScene extends Phaser.Scene {
      */
     protected currentActiveObject: Nullable<ActiveGameObject> = null;
 
-    public drivingBeltDrawer: DrivingBeltDrawerTool;
-
     public create() {
         this.initGearsManager();
         this.initDashboardTools();
@@ -91,7 +89,7 @@ export class BaseGameScene extends Phaser.Scene {
         this.toolsDashboard.init();
 
         // Driving belt
-        const drivingBeltDrawer = this.drivingBeltDrawer = new DrivingBeltDrawerTool(this);
+        const drivingBeltDrawer = new DrivingBeltDrawerTool(this);
         const drivingBeltPresenter = new DrivingBeltDashboardPresenter(
             this, drivingBeltDrawer, 0, 0
         );
