@@ -17,6 +17,8 @@ export class LoadingScene extends Phaser.Scene {
         this.load.image("gear-12", "assets/gears/gear-12.png");
         this.load.image("gear-6", "assets/gears/gear-6.png");
         this.load.atlas('motor', 'assets/motors/motor.png', 'assets/motors/motor.json');
+        this.load.atlas('cannon', 'assets/cannon/cannon.png', 'assets/cannon/cannon.json');
+        this.load.json('cannon-body', 'assets/cannon/cannon-matterjs.json');
         this.load.spritesheet(
             'anti-gravity-pad',
             'assets/antigravity/anti-gravity-pad.png',

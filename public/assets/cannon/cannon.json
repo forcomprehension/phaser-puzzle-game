@@ -1,0 +1,62 @@
+{
+	"textures": [
+		{
+			"image": "canon.png",
+			"format": "RGBA8888",
+			"size": {
+				"w": 222,
+				"h": 58
+			},
+			"scale": 0.2,
+			"frames": [
+				{
+					"filename": "cannon.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 192,
+						"h": 108
+					},
+					"spriteSourceSize": {
+						"x": 5,
+						"y": 26,
+						"w": 181,
+						"h": 56
+					},
+					"frame": {
+						"x": 1,
+						"y": 1,
+						"w": 181,
+						"h": 56
+					}
+				},
+				{
+					"filename": "cannonball.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 67,
+						"h": 38
+					},
+					"spriteSourceSize": {
+						"x": 12,
+						"y": 0,
+						"w": 37,
+						"h": 38
+					},
+					"frame": {
+						"x": 184,
+						"y": 1,
+						"w": 37,
+						"h": 38
+					}
+				}
+			]
+		}
+	],
+	"meta": {
+		"app": "https://www.codeandweb.com/texturepacker",
+		"version": "3.0",
+		"smartupdate": "$TexturePacker:SmartUpdate:040b428233378f1da7f02e17ffc83381:7aa4764d909b42a95d4b94b72437a615:559cf4b2d72c2c6b9bb7f19117fa03ec$"
+	}
+}
