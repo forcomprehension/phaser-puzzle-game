@@ -1,5 +1,6 @@
 import { BaseGameScene } from "@src/scenes/BaseGameScene";
 import { CannonBall } from "./CannonBall";
+import { CannonDashboardPresenter } from "@GameObjects/ToolsDashboard/dashboardPresenters/CannonDashboardPresenter";
 
 /**
  * Cannon game object. Shoots {@see CannonBall}
@@ -41,6 +42,21 @@ export class Cannon extends Phaser.Physics.Matter.Image {
             ease: Phaser.Math.Easing.Quintic.Out,
             yoyo: true,
         });
+
+        this.setInteractive()
+            .on(Phaser.Input.Events.POINTER_DOWN, (pointer: Phaser.Input.Pointer) => {
+                if (pointer.rightButtonDown()) {
+                    this.handleReturn();
+                }
+            });
+    }
+
+    public handleReturn() {
+        this.scene.toolsDashboard
+            .get(CannonDashboardPresenter.name)
+            .returnObject(this);
+
+        this.destroy();
     }
 
     public shoot() {

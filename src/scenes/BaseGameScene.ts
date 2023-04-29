@@ -9,6 +9,8 @@ import { GearsSpawner } from "@GameObjects/gears/GearsSpawners/GearSpawner";
 import { GearDashboardPresenter } from "@GameObjects/ToolsDashboard/dashboardPresenters/GearDashboardPresenter";
 import { MotorSpawner } from "@GameObjects/motors/MotorSpawner";
 import { MotorDashboardPresenter } from "@GameObjects/ToolsDashboard/dashboardPresenters/MotorDashboardPresenter";
+import { CannonSpawner } from "@GameObjects/cannon/CannonSpawner";
+import { CannonDashboardPresenter } from "@GameObjects/ToolsDashboard/dashboardPresenters/CannonDashboardPresenter";
 
 /**
  * Current active gameobject
@@ -127,13 +129,21 @@ export class BaseGameScene extends Phaser.Scene {
         this.add.existing(motorPresenter);
         this.add.existing(motorSpawner);
 
+        // Cannon
+        const cannonSpawner = new CannonSpawner(this);
+        const cannonPresenter = new CannonDashboardPresenter(this, cannonSpawner, 0, getNextYShift());
+        cannonSpawner.setDashboardPresenter(cannonPresenter);
+        this.add.existing(cannonSpawner);
+        this.add.existing(cannonPresenter);
+
         // Registration
         this.toolsDashboard
             .register(drivingBeltPresenter)
             .register(antiGravityPresenter)
             .register(gear6Presenter)
             .register(gear12Presenter)
-            .register(motorPresenter);
+            .register(motorPresenter)
+            .register(cannonPresenter);
 
         this.toolsDashboard.seal();
     }
