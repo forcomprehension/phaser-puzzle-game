@@ -39,7 +39,7 @@ export class GearsSpawner extends AbstractGameObjectSpawner {
      *
      * @param pointer
      */
-    protected spawnItem(pointer: Phaser.Input.Pointer): void {
+    protected spawnItem(pointer: Phaser.Input.Pointer) {
         let gear: AbstractGear;
         if (this.spawnerType === 'gear6') {
             gear = new Gear6(this.scene, pointer.x, pointer.y);
@@ -48,5 +48,7 @@ export class GearsSpawner extends AbstractGameObjectSpawner {
         }
 
         this.scene.gearsManager.registerGear(gear);
+
+        return gear;
     }
 }

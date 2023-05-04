@@ -19,6 +19,6 @@ export class AntiGravityPadSpawner extends AbstractGameObjectSpawner {
      * @inheritdoc
      */
     protected spawnItem(pointer: Phaser.Input.Pointer) {
-        new AntiGravityPad(this.scene, pointer.x, pointer.y);
+        return new AntiGravityPad(this.scene, pointer.x, pointer.y);
     }
 }

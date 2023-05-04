@@ -205,14 +205,14 @@ export class DrivingBeltDrawerTool extends AbstractGameObjectSpawner {
      *
      * @param pointer
      */
-    protected spawnItem(_: Phaser.Input.Pointer): void {
+    protected spawnItem(_: Phaser.Input.Pointer) {
         // Acquire connection
         const connector = new GameObjectDuplexConnector(
             this.drivingBeltSlots!.left,
             this.drivingBeltSlots!.right!
         );
 
-        new DrivingBelt(this.scene, connector);
+        return new DrivingBelt(this.scene, connector);
     }
 
     /**

@@ -4,6 +4,12 @@ import { BaseGameScene } from "@src/scenes/BaseGameScene";
 import { GameObjectsScene } from "@src/scenes/GameObjectsScene";
 
 /**
+ * Union of supported draggable objects
+ */
+type SupportedObjectsUnion = Phaser.Physics.Matter.Image |
+    Phaser.Physics.Matter.Sprite;
+
+/**
  * Enable draggable
  *
  * @param scene
@@ -11,7 +17,7 @@ import { GameObjectsScene } from "@src/scenes/GameObjectsScene";
  */
 export function setDraggable(
     scene: BaseGameScene,
-    ...objects: Phaser.Physics.Matter.Image[]
+    ...objects: SupportedObjectsUnion[]
 ) {
     objects.forEach((object) => {
         if (object.input?.enabled) {

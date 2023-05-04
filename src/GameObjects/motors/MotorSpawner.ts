@@ -10,7 +10,7 @@ export class MotorSpawner extends AbstractGameObjectSpawner {
         super(scene, MotorSpawner.name);
     }
 
-    protected spawnItem(pointer: Phaser.Input.Pointer): void {
-        new Motor(this.scene, pointer.x, pointer.y);
+    protected spawnItem(pointer: Phaser.Input.Pointer) {
+        return new Motor(this.scene, pointer.x, pointer.y);
     }
 }

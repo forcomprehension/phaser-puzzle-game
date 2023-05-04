@@ -2,6 +2,7 @@ import { IActiveTool } from "@interfaces/IActiveTool";
 import { AbstractDashboardPresenter } from "./dashboardPresenters/AbstractDashboardPresenter";
 import { EVENT_ON_ACTIVATE_TOOL, EVENT_ON_DEACTIVATE_TOOL } from "@src/constants/tools";
 import { BaseGameScene } from "@src/scenes/BaseGameScene";
+import { setDraggable } from "@utils/gameObjects/setDraggable";
 
 /**
  * Superclass of all spawners
@@ -121,7 +122,13 @@ export abstract class AbstractGameObjectSpawner extends Phaser.GameObjects.GameO
         if (this.dashboardPresenter && this.isActiveTool) {
             const last = this.dashboardPresenter.getStackCount() === 1;
             if (this.dashboardPresenter.useItem()) {
-                this.spawnItem(pointer);
+                const object = this.spawnItem(pointer);
+
+                // @TODO: kostyl
+                if (object instanceof Phaser.Physics.Matter.Image || object instanceof Phaser.Physics.Matter.Sprite) {
+                    // @TODO: here?
+                    setDraggable(this.scene, object);
+                }
             }
 
             this.onResetValues();
@@ -139,7 +146,7 @@ export abstract class AbstractGameObjectSpawner extends Phaser.GameObjects.GameO
      *
      * @param pointer
      */
-    protected abstract spawnItem(pointer: Phaser.Input.Pointer): void;
+    protected abstract spawnItem(pointer: Phaser.Input.Pointer): Phaser.GameObjects.GameObject;
 
     /**
      * If we need reset values
