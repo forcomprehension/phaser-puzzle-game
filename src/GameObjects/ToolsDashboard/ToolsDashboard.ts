@@ -1,9 +1,10 @@
 import { BaseGameScene } from "@src/scenes/BaseGameScene";
 
 import ScrollablePanel from "phaser3-rex-plugins/templates/ui/scrollablepanel/ScrollablePanel";
-import FixWidthSizer from "phaser3-rex-plugins/templates/ui/fixwidthsizer/FixWidthSizer";
 import RoundRectangle from "phaser3-rex-plugins/plugins/roundrectangle";
 import { AbstractDashboardPresenter } from "./dashboardPresenters/AbstractDashboardPresenter";
+import { Sizer } from "phaser3-rex-plugins/templates/ui/ui-components";
+import { DASHBOARD_PRESENTER_HIDE, DASHBOARD_PRESENTER_SHOW } from "./dashboardPresenters/events";
 
 /**
  * Tools dashboard container
@@ -16,7 +17,7 @@ export class ToolsDashboard {
     protected toolsMap = new Map<string, AbstractDashboardPresenter>();
 
     protected panel: ScrollablePanel;
-    protected sizer: FixWidthSizer;
+    protected sizer: Sizer;
 
     /**
      * Ctor
@@ -35,25 +36,30 @@ export class ToolsDashboard {
 
         scene.add.existing(background);
 
-        const sizer = this.sizer = new FixWidthSizer(scene, {
-            name: ToolsDashboard.SIZER_NAME
+        this.sizer = new Sizer(this.scene, {
+            orientation: 'y',
+            space: {
+                left: 6,
+                right: 6,
+                top: 6,
+                bottom: 60,
+                item: 6
+            }
         });
-        scene.add.existing(sizer);
+
+        scene.add.existing(this.sizer);
 
         this.panel = new ScrollablePanel(scene, {
             x: canvasWidth - ToolsDashboard.PANEL_WIDTH,
             space: {
-                top: 20,
-                bottom: 20,
-                left: 10,
-                right: 10,
+                bottom: 10,
             },
             y: 0,
             width: ToolsDashboard.PANEL_WIDTH,
             height: canvasHeight,
             background,
             panel: {
-                child: sizer
+                child: this.sizer
             }
         }).setOrigin(0);
 
@@ -69,11 +75,33 @@ export class ToolsDashboard {
 
         this.toolsMap.set(toolKey, tool);
 
-        this.sizer.add(tool, {
+        const background1 = new RoundRectangle(this.scene);
+        background1.fillColor = 0x0000FF;
+        background1.alpha = 0.7;
+
+        const current = this.scene.rexUI.add.sizer({
+            // width: ToolsDashboard.PANEL_WIDTH,
+            height: 200,
+        }).add(tool, {
+            align: 'center',
             padding: {
-                top: tool.y // @TODO: kostyl. FIX WITH GRID
+                left: -75
             }
+        }).addBackground(background1).setOrigin(0);
+
+        tool.on(DASHBOARD_PRESENTER_SHOW, () => {
+            current.show();
+            current.layout();
+            this.panel.layout();
         });
+
+        tool.on(DASHBOARD_PRESENTER_HIDE, () => {
+            current.hide();
+            current.layout();
+            this.panel.layout();
+        });
+
+        this.sizer.add(current);
 
         return this;
     }

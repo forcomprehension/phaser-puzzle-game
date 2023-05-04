@@ -11,6 +11,7 @@ import { MotorSpawner } from "@GameObjects/motors/MotorSpawner";
 import { MotorDashboardPresenter } from "@GameObjects/ToolsDashboard/dashboardPresenters/MotorDashboardPresenter";
 import { CannonSpawner } from "@GameObjects/cannon/CannonSpawner";
 import { CannonDashboardPresenter } from "@GameObjects/ToolsDashboard/dashboardPresenters/CannonDashboardPresenter";
+import type RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js';
 
 /**
  * Current active gameobject
@@ -21,6 +22,8 @@ export type ActiveGameObject = Phaser.GameObjects.GameObject & IActiveTool;
  * Base scene for gameplay
  */
 export class BaseGameScene extends Phaser.Scene {
+    public rexUI: RexUIPlugin;
+
     public gearsManager: GearsManager;
     public toolsDashboard: ToolsDashboard = new ToolsDashboard(this);
 

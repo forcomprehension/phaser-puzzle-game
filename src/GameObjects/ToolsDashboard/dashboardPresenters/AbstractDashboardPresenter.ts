@@ -1,5 +1,6 @@
 import { BaseGameScene } from "@src/scenes/BaseGameScene";
 import { AbstractGameObjectSpawner } from "../AbstractGameObjectSpawner";
+import { DASHBOARD_PRESENTER_HIDE, DASHBOARD_PRESENTER_SHOW } from "./events";
 
 /**
  * Base class for all dashboard presenters
@@ -160,6 +161,7 @@ export abstract class AbstractDashboardPresenter extends Phaser.GameObjects.Cont
     protected hideObject() {
         this.setActive(false);
         this.setVisible(false);
+        this.emit(DASHBOARD_PRESENTER_HIDE);
     }
 
     /**
@@ -168,6 +170,7 @@ export abstract class AbstractDashboardPresenter extends Phaser.GameObjects.Cont
     protected showObject() {
         this.setActive(true);
         this.setVisible(true);
+        this.emit(DASHBOARD_PRESENTER_SHOW);
     }
 
     /**
@@ -188,6 +191,7 @@ export abstract class AbstractDashboardPresenter extends Phaser.GameObjects.Cont
         this.hitZone.destroy(fromScene);
         this.stackCountRenderer.destroy(fromScene);
         this.icon.destroy(fromScene);
+        // @TODO: events?
 
         // @ts-ignore
         this.spawner = this.icon = this.hitZone = this.stackCountRenderer = undefined;
