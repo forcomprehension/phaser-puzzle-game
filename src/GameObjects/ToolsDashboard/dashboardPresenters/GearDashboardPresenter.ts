@@ -15,13 +15,11 @@ export class GearDashboardPresenter extends AbstractDashboardPresenter {
     /**
      * Ctor
      */
-    constructor(scene: BaseGameScene, spawner: GearsSpawner, x: number, y: number) {
+    constructor(scene: BaseGameScene, spawner: GearsSpawner) {
         super(
             scene,
             spawner,
             spawner.spawnerType === "gear6" ? "gear-6" : "gear-12",
-            x,
-            y
         );
 
         this.spawnerType = spawner.spawnerType;

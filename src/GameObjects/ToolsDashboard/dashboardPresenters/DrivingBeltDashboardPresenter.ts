@@ -16,7 +16,7 @@ export class DrivingBeltDashboardPresenter extends AbstractDashboardPresenter {
         x: number,
         y: number
     ) {
-        super(scene, spawner, 'drivingBeltIcon', x, y);
+        super(scene, spawner, 'drivingBeltIcon');
 
         this.setStackCount(2);
     }

@@ -32,9 +32,16 @@ export class BaseGameScene extends Phaser.Scene {
      */
     protected currentActiveObject: Nullable<ActiveGameObject> = null;
 
+    /**
+     * "Create" hook
+     */
     public create() {
         this.initGearsManager();
         this.initDashboardTools();
+
+        this.events.on(Phaser.Scenes.Events.DESTROY, () => {
+            this.destroy();
+        })
     }
 
     /**
@@ -87,10 +94,6 @@ export class BaseGameScene extends Phaser.Scene {
      * Init dashboard tools
      */
     protected initDashboardTools() {
-        // @todo: kostyl
-        let currentYShift = 0;
-        const getNextYShift = () => currentYShift = currentYShift + 170;
-
         this.toolsDashboard.init();
 
         // Driving belt
@@ -104,37 +107,35 @@ export class BaseGameScene extends Phaser.Scene {
 
         // Anti-gravity pad
         const antiGravityPadSpawner = new AntiGravityPadSpawner(this);
-        const antiGravityPresenter = new AntiGravityPadDashboardPresenter(
-            this, antiGravityPadSpawner, 0, getNextYShift() // @TODO: FIX Y WITH GRID
-        );
+        const antiGravityPresenter = new AntiGravityPadDashboardPresenter(this, antiGravityPadSpawner);
         antiGravityPadSpawner.setDashboardPresenter(antiGravityPresenter);
         this.add.existing(antiGravityPadSpawner);
         this.add.existing(antiGravityPresenter);
 
         // Gear 6
         const gear6Spawner = new GearsSpawner(this, 'gear6');
-        const gear6Presenter = new GearDashboardPresenter(this, gear6Spawner, 0, getNextYShift());
+        const gear6Presenter = new GearDashboardPresenter(this, gear6Spawner);
         gear6Spawner.setDashboardPresenter(gear6Presenter);
         this.add.existing(gear6Presenter);
         this.add.existing(gear6Spawner);
 
         // Gear 12
         const gear12Spawner = new GearsSpawner(this, 'gear12');
-        const gear12Presenter = new GearDashboardPresenter(this, gear12Spawner, 0, getNextYShift());
+        const gear12Presenter = new GearDashboardPresenter(this, gear12Spawner);
         gear12Spawner.setDashboardPresenter(gear12Presenter);
         this.add.existing(gear12Presenter);
         this.add.existing(gear12Spawner);
 
         // Motor
         const motorSpawner = new MotorSpawner(this);
-        const motorPresenter = new MotorDashboardPresenter(this, motorSpawner, 0, getNextYShift());
+        const motorPresenter = new MotorDashboardPresenter(this, motorSpawner);
         motorSpawner.setDashboardPresenter(motorPresenter);
         this.add.existing(motorPresenter);
         this.add.existing(motorSpawner);
 
         // Cannon
         const cannonSpawner = new CannonSpawner(this);
-        const cannonPresenter = new CannonDashboardPresenter(this, cannonSpawner, 0, getNextYShift());
+        const cannonPresenter = new CannonDashboardPresenter(this, cannonSpawner);
         cannonSpawner.setDashboardPresenter(cannonPresenter);
         this.add.existing(cannonSpawner);
         this.add.existing(cannonPresenter);
@@ -163,7 +164,6 @@ export class BaseGameScene extends Phaser.Scene {
         };
     }
 
-    // @TODO: does it works like dtor?
     public destroy() {
         this.toolsDashboard.destroy();
     }

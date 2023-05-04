@@ -1,11 +1,12 @@
 import { BaseGameScene } from "@src/scenes/BaseGameScene";
 import { AbstractGameObjectSpawner } from "../AbstractGameObjectSpawner";
 import { DASHBOARD_PRESENTER_HIDE, DASHBOARD_PRESENTER_SHOW } from "./events";
+import { Sizer } from "phaser3-rex-plugins/templates/ui/ui-components";
 
 /**
  * Base class for all dashboard presenters
  */
-export abstract class AbstractDashboardPresenter extends Phaser.GameObjects.Container {
+export abstract class AbstractDashboardPresenter extends Sizer {
 
     /**
      * Number of items in the stack
@@ -23,11 +24,6 @@ export abstract class AbstractDashboardPresenter extends Phaser.GameObjects.Cont
     protected icon: Phaser.GameObjects.Image;
 
     /**
-     * Hitzone for this container events
-     */
-    protected hitZone: Phaser.GameObjects.Zone;
-
-    /**
      * Stack count renderer offset
      *
      * @TODO: Dynamic?
@@ -43,16 +39,21 @@ export abstract class AbstractDashboardPresenter extends Phaser.GameObjects.Cont
     }
 
     /**
+     * Hack for types
+     *
+     * @inheritdoc
+     */
+    public onCreateModalBehavior: (self: AbstractDashboardPresenter) => void;
+
+    /**
      * Ctor
      */
     constructor(
         public scene: BaseGameScene,
         protected spawner: AbstractGameObjectSpawner,
         icon: string | [string, string | number | undefined],
-        x: number,
-        y: number,
     ) {
-        super(scene, x, y);
+        super(scene, 0, 0);
 
         const [ texture, frame ] = Array.isArray(icon) ? icon : [icon];
         this.icon = scene.add.image(0, 0, texture, frame).setOrigin(0);
@@ -105,21 +106,12 @@ export abstract class AbstractDashboardPresenter extends Phaser.GameObjects.Cont
         this.icon.setScale(scale);
     }
 
-    public afterAdd() {
-        const scene = this.scene as BaseGameScene;
-        const { width, height } = this.getBounds();
-        this.hitZone = this.scene.add.zone(this.x, this.y, width, height)
-            .setOrigin(0);
-
-        this.hitZone.setInteractive({
-            useHandCursor: true
-        }).on(Phaser.Input.Events.POINTER_UP, () => {
-            if (this.spawner !== scene.getCurrentActiveObject()) {
-                scene.activateGameObject(this.spawner);
-            } else {
-                scene.deactivateGameObject(this.spawner);
-            }
-        });
+    public handleClick() {
+        if (this.spawner !== this.scene.getCurrentActiveObject()) {
+            this.scene.activateGameObject(this.spawner);
+        } else {
+            this.scene.deactivateGameObject(this.spawner);
+        }
     }
 
     /**
@@ -188,13 +180,12 @@ export abstract class AbstractDashboardPresenter extends Phaser.GameObjects.Cont
 
     public destroy(fromScene?: boolean | undefined): void {
         super.destroy(fromScene);
-        this.hitZone.destroy(fromScene);
         this.stackCountRenderer.destroy(fromScene);
         this.icon.destroy(fromScene);
         // @TODO: events?
 
         // @ts-ignore
-        this.spawner = this.icon = this.hitZone = this.stackCountRenderer = undefined;
+        this.spawner = this.icon = this.stackCountRenderer = undefined;
     }
 }
 

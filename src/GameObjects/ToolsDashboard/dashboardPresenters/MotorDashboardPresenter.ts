@@ -7,13 +7,11 @@ export class MotorDashboardPresenter extends AbstractDashboardPresenter {
     /**
      * Ctor
      */
-    constructor(scene: BaseGameScene, spawner: MotorSpawner, x: number, y: number) {
+    constructor(scene: BaseGameScene, spawner: MotorSpawner) {
         super(
             scene,
             spawner,
-            'motor',
-            x,
-            y
+            'motor'
         );
 
         this.setIconScale(.7);

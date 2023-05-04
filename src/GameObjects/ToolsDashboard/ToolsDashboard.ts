@@ -52,6 +52,7 @@ export class ToolsDashboard {
         this.panel = new ScrollablePanel(scene, {
             x: canvasWidth - ToolsDashboard.PANEL_WIDTH,
             space: {
+                top: 10,
                 bottom: 10,
             },
             y: 0,
@@ -75,19 +76,10 @@ export class ToolsDashboard {
 
         this.toolsMap.set(toolKey, tool);
 
-        const background1 = new RoundRectangle(this.scene);
-        background1.fillColor = 0x0000FF;
-        background1.alpha = 0.7;
-
         const current = this.scene.rexUI.add.sizer({
-            // width: ToolsDashboard.PANEL_WIDTH,
+            // @TODO: constant
             height: 200,
-        }).add(tool, {
-            align: 'center',
-            padding: {
-                left: -75
-            }
-        }).addBackground(background1).setOrigin(0);
+        }).add(tool);
 
         tool.on(DASHBOARD_PRESENTER_SHOW, () => {
             current.show();
@@ -110,11 +102,18 @@ export class ToolsDashboard {
      * @todo: kostyl
      */
     public seal() {
-        this.panel.layout();
-
-        this.toolsMap.forEach((tool) => {
-            tool.afterAdd();
+        this.panel.setChildrenInteractive({
+            click: true
+        }).on('child.click', function(child: Sizer) {
+            const gameObject = child.getChildren()[0];
+            if (gameObject instanceof AbstractDashboardPresenter) {
+                gameObject.handleClick();
+            } else {
+                console.error('Got unexpected child while click on tools panel');
+            }
         })
+
+        this.panel.layout();
     }
 
     public get(toolKey: string) {
