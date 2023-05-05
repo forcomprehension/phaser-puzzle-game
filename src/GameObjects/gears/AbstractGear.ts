@@ -7,7 +7,7 @@ import { GearsManager } from './GearsManager';
 import type { GraphKey } from './GearsManager/GearGraph';
 import { BaseGameScene } from '@src/scenes/BaseGameScene';
 import { GearDashboardPresenter } from '@GameObjects/ToolsDashboard/dashboardPresenters/GearDashboardPresenter';
-import { GearsSpawnerType } from './GearsSpawners/GearSpawner';
+import { GearsSpawnerType } from './GearSpawner/gearSpawnerType';
 
 /**
  * Abstract class for gears representation

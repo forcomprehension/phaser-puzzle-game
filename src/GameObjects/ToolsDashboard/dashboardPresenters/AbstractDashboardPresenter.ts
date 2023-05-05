@@ -7,7 +7,6 @@ import { Sizer } from "phaser3-rex-plugins/templates/ui/ui-components";
  * Base class for all dashboard presenters
  */
 export abstract class AbstractDashboardPresenter extends Sizer {
-
     /**
      * Number of items in the stack
      */

@@ -5,13 +5,15 @@ import { ToolsDashboard } from "@GameObjects/ToolsDashboard/ToolsDashboard";
 import { AntiGravityPadSpawner } from "@GameObjects/antigravity/AntiGravityPadSpawner";
 import { AntiGravityPadDashboardPresenter } from "@GameObjects/ToolsDashboard/dashboardPresenters/AntiGravityPadDashboardPresenter";
 import { GearsManager, addGearsManagerTweens } from "@GameObjects/gears/GearsManager";
-import { GearsSpawner } from "@GameObjects/gears/GearsSpawners/GearSpawner";
+import { GearsSpawner, GearsSpawnerType } from "@GameObjects/gears";
 import { GearDashboardPresenter } from "@GameObjects/ToolsDashboard/dashboardPresenters/GearDashboardPresenter";
 import { MotorSpawner } from "@GameObjects/motors/MotorSpawner";
 import { MotorDashboardPresenter } from "@GameObjects/ToolsDashboard/dashboardPresenters/MotorDashboardPresenter";
 import { CannonSpawner } from "@GameObjects/cannon/CannonSpawner";
 import { CannonDashboardPresenter } from "@GameObjects/ToolsDashboard/dashboardPresenters/CannonDashboardPresenter";
 import type RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js';
+// import { BallSpawnType, BallSpawner } from "@GameObjects/balls";
+// import { BallDashboardPresenter } from "@GameObjects/ToolsDashboard/dashboardPresenters/BallDashboardPresenter";
 
 /**
  * Current active gameobject
@@ -98,9 +100,7 @@ export class BaseGameScene extends Phaser.Scene {
 
         // Driving belt
         const drivingBeltDrawer = new DrivingBeltDrawerTool(this);
-        const drivingBeltPresenter = new DrivingBeltDashboardPresenter(
-            this, drivingBeltDrawer, 0, 0
-        );
+        const drivingBeltPresenter = new DrivingBeltDashboardPresenter(this, drivingBeltDrawer);
         drivingBeltDrawer.setDashboardPresenter(drivingBeltPresenter);
         this.add.existing(drivingBeltDrawer);
         this.add.existing(drivingBeltPresenter);
@@ -112,19 +112,16 @@ export class BaseGameScene extends Phaser.Scene {
         this.add.existing(antiGravityPadSpawner);
         this.add.existing(antiGravityPresenter);
 
-        // Gear 6
-        const gear6Spawner = new GearsSpawner(this, 'gear6');
-        const gear6Presenter = new GearDashboardPresenter(this, gear6Spawner);
-        gear6Spawner.setDashboardPresenter(gear6Presenter);
-        this.add.existing(gear6Presenter);
-        this.add.existing(gear6Spawner);
+        // Gears
+        const gearsPresenters = [GearsSpawnerType.Gear6, GearsSpawnerType.Gear12].map((gearSpawnerType) => {
+            const gearSpawner = new GearsSpawner(this, gearSpawnerType);
+            const gearPresenter = new GearDashboardPresenter(this, gearSpawner);
+            gearSpawner.setDashboardPresenter(gearPresenter);
+            this.add.existing(gearPresenter);
+            this.add.existing(gearSpawner);
 
-        // Gear 12
-        const gear12Spawner = new GearsSpawner(this, 'gear12');
-        const gear12Presenter = new GearDashboardPresenter(this, gear12Spawner);
-        gear12Spawner.setDashboardPresenter(gear12Presenter);
-        this.add.existing(gear12Presenter);
-        this.add.existing(gear12Spawner);
+            return gearPresenter;
+        });
 
         // Motor
         const motorSpawner = new MotorSpawner(this);
@@ -140,14 +137,39 @@ export class BaseGameScene extends Phaser.Scene {
         this.add.existing(cannonSpawner);
         this.add.existing(cannonPresenter);
 
-        // Registration
+        // Balls
+        // const ballPresenters = [
+        //     BallSpawnType.Basket,
+        //     BallSpawnType.Bouncy,
+        //     BallSpawnType.Bowling,
+        //     BallSpawnType.Eight,
+        //     BallSpawnType.Football
+        // ].map((ballType) => {
+        //     const ballSpawner = new BallSpawner(this, ballType);
+        //     const ballPresenter = new BallDashboardPresenter(this, ballSpawner);
+        //     ballSpawner.setDashboardPresenter(ballPresenter);
+        //     this.add.existing(ballSpawner);
+        //     this.add.existing(ballPresenter);
+
+        //     return ballPresenter;
+        // });
+
+        // Registration individual presenters
         this.toolsDashboard
             .register(drivingBeltPresenter)
             .register(antiGravityPresenter)
-            .register(gear6Presenter)
-            .register(gear12Presenter)
             .register(motorPresenter)
             .register(cannonPresenter);
+
+        // Register gears
+        gearsPresenters.forEach((gearsPresenter) => {
+            this.toolsDashboard.register(gearsPresenter);
+        });
+
+        // Register balls
+        // ballPresenters.forEach((ballPresenter) => {
+        //     this.toolsDashboard.register(ballPresenter);
+        // });
 
         this.toolsDashboard.seal();
     }

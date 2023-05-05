@@ -29,7 +29,7 @@ module.exports = function(_, { mode }) {
 
     return {
         mode,
-        devtool: isDevMode ? 'source-map' : false,
+        devtool: false, //isDevMode ? 'source-map' : false,
         entry: './src/index.ts',
         output: {
             filename: '[name].[contenthash].js',

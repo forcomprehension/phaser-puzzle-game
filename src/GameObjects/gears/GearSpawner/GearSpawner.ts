@@ -3,8 +3,7 @@ import { BaseGameScene } from "@src/scenes/BaseGameScene";
 import { AbstractGear } from "../AbstractGear";
 import { Gear6 } from "../Gear6";
 import { Gear12 } from "../Gear12";
-
-export type GearsSpawnerType = 'gear6' | 'gear12';
+import { GearsSpawnerType } from "./gearSpawnerType";
 
 /**
  * Spawn gear depends on type
@@ -40,8 +39,9 @@ export class GearsSpawner extends AbstractGameObjectSpawner {
      * @param pointer
      */
     protected spawnItem(pointer: Phaser.Input.Pointer) {
+        // @TODO: CHECK BOUNDS BEFORE SPAWN!
         let gear: AbstractGear;
-        if (this.spawnerType === 'gear6') {
+        if (this.spawnerType === GearsSpawnerType.Gear6) {
             gear = new Gear6(this.scene, pointer.x, pointer.y);
         } else {
             gear = new Gear12(this.scene, pointer.x, pointer.y);

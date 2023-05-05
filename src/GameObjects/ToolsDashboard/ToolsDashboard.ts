@@ -12,6 +12,8 @@ import { DASHBOARD_PRESENTER_HIDE, DASHBOARD_PRESENTER_SHOW } from "./dashboardP
 export class ToolsDashboard {
     public static readonly PANEL_WIDTH = 250;
 
+    public static readonly ITEM_HEIGHT = 175;
+
     public static readonly SIZER_NAME = 'sizer';
 
     protected toolsMap = new Map<string, AbstractDashboardPresenter>();
@@ -51,6 +53,8 @@ export class ToolsDashboard {
 
         this.panel = new ScrollablePanel(scene, {
             x: canvasWidth - ToolsDashboard.PANEL_WIDTH,
+            scrollMode: 'y',
+            mouseWheelScroller: true,
             space: {
                 top: 10,
                 bottom: 10,
@@ -77,8 +81,7 @@ export class ToolsDashboard {
         this.toolsMap.set(toolKey, tool);
 
         const current = this.scene.rexUI.add.sizer({
-            // @TODO: constant
-            height: 200,
+            height: ToolsDashboard.ITEM_HEIGHT,
         }).add(tool);
 
         tool.on(DASHBOARD_PRESENTER_SHOW, () => {

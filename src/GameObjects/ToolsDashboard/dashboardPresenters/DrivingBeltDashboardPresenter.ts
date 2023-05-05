@@ -5,19 +5,16 @@ import { AbstractDashboardPresenter } from "./AbstractDashboardPresenter";
 /**
  * Activator for driving belt drawer
  */
-
 export class DrivingBeltDashboardPresenter extends AbstractDashboardPresenter {
+    /**
+     * @inheritdoc
+     */
+    protected stackCount: number = 2;
+
     /**
      * Ctor
      */
-    constructor(
-        scene: BaseGameScene,
-        spawner: DrivingBeltDrawerTool,
-        x: number,
-        y: number
-    ) {
+    constructor(scene: BaseGameScene, spawner: DrivingBeltDrawerTool) {
         super(scene, spawner, 'drivingBeltIcon');
-
-        this.setStackCount(2);
     }
 }
