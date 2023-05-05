@@ -38,10 +38,7 @@ export class BallDashboardPresenter extends AbstractDashboardPresenter {
     /**
      * Ctor
      */
-    constructor(
-        public scene: BaseGameScene,
-        spawner: BallSpawner,
-    ) {
+    constructor(scene: BaseGameScene, spawner: BallSpawner) {
         super(
             scene,
             spawner,
