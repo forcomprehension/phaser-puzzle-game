@@ -102,11 +102,12 @@ export class AntiGravityPad extends Phaser.Physics.Matter.Sprite {
                     // @TODO: ONLY SUPPOSED BODIES
                     bodies.forEach((overlappedBody) => {
                         const casted = unsafeCastBody(overlappedBody);
+                        const massMultiplier = casted.mass / 2;
 
                         // @TODO: how to calculate properly?
                         const yForce = casted.ignoreGravity ?
                             - AntiGravityPad.NON_GRAVITY_FORCE_MULTIPLIER
-                            : -casted.gravityScale.y * AntiGravityPad.GRAVITY_FORCE_MULTIPLIER;
+                            : -casted.gravityScale.y * AntiGravityPad.GRAVITY_FORCE_MULTIPLIER * massMultiplier;
 
                         scene.matter.applyForce(overlappedBody, {
                             x: 0,
