@@ -2,6 +2,7 @@ import type { BaseGameScene } from "@src/scenes/BaseGameScene";
 import { BaseFlatBlock } from "./BaseFlatBlock";
 import type { iDraggable } from "@interfaces/iDraggable";
 import { FlatBlockSpawnerType } from "./Spawners/flatBlockSpawnerType";
+import { setDraggable } from "@utils/gameObjects/setDraggable";
 
 /**
  * Apply mixins for object
@@ -18,9 +19,12 @@ export function applyMixins(object: BaseFlatBlock): BaseFlatBlock & iDraggable {
  */
 function flatBlockFactory(textureKey: string, spawnerType: FlatBlockSpawnerType) {
     return function BlockCreator(scene: BaseGameScene, x: number, y: number, width: number = 0) {
-        return applyMixins(
+        const constructed = applyMixins(
             new BaseFlatBlock(scene, x, y, textureKey, spawnerType, width)
         )
+
+        setDraggable(scene, constructed);
+        return constructed;
     }
 }
 
