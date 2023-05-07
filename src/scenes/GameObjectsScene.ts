@@ -2,6 +2,7 @@ import { Gear12 } from "@GameObjects/gears";
 import { Gear6 } from "@GameObjects/gears";
 import { BaseGameScene } from "./BaseGameScene";
 import { setDraggable } from "@utils/gameObjects/setDraggable";
+import { flatMetalBlockFactory, flatWoodenBlockFactory } from "@GameObjects/blocks/flatBlockFactories";
 
 /**
  * Game objects tests scene
@@ -19,6 +20,8 @@ export class GameObjectsScene extends BaseGameScene {
         const gear12 = new Gear12(this, 99, 100);
         const gear6 = new Gear6(this, 100, 190);
         const gear6_2 = new Gear6(this, 250, 190);
+        const metalBlock = flatMetalBlockFactory(this, 400, 500, 450);
+        const woodBlock = flatWoodenBlockFactory(this, 700, 650, 650);
 
         this.gearsManager.bulkUpdate(() => {
             this.gearsManager.registerGear(gear12)
@@ -34,7 +37,7 @@ export class GameObjectsScene extends BaseGameScene {
             // this.gearsManager.toggleMotor(gear12, ROTATION_DIRECTION.CCW);
         });
 
-        setDraggable(this, gear12, gear6, gear6_2);
+        setDraggable(this, gear12, gear6, gear6_2, woodBlock, metalBlock);
         gear6_2.tint = 0xFF0000;
 
     }

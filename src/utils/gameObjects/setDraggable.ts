@@ -1,4 +1,5 @@
 import { AbstractGear } from "@GameObjects/gears/AbstractGear";
+import { iDraggable } from "@interfaces/iDraggable";
 import { getMatterBody, unsafeCastBody } from "@src/physics/matter";
 import type { BaseGameScene } from "@src/scenes/BaseGameScene";
 import { GameObjectsScene } from "@src/scenes/GameObjectsScene";
@@ -7,7 +8,7 @@ import { GameObjectsScene } from "@src/scenes/GameObjectsScene";
  * Union of supported draggable objects
  */
 type SupportedObjectsUnion = Phaser.Physics.Matter.Image |
-    Phaser.Physics.Matter.Sprite;
+    Phaser.Physics.Matter.Sprite | Phaser.GameObjects.GameObject & iDraggable;
 
 /**
  * Enable draggable

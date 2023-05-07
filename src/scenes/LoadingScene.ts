@@ -25,6 +25,8 @@ export class LoadingScene extends Phaser.Scene {
             { frameWidth: 158, frameHeight: 56 }
         );
         this.load.image('drivingBeltIcon', 'assets/toolsIcons/drivingBeltIcon.png');
+        this.load.image('flatWoodBlock', 'assets/blocks/wood/flat_block.png');
+        this.load.image('flatMetalBlock', 'assets/blocks/metal/flat_block.png');
 
         // BG
         this.load.image('bg', 'assets/common/bg/bg_stringsOnGarbage.png');
