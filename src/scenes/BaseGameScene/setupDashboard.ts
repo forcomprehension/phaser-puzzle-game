@@ -11,6 +11,9 @@ import { MotorDashboardPresenter } from "@GameObjects/ToolsDashboard/dashboardPr
 import { GearsSpawner, GearsSpawnerType } from "@GameObjects/gears";
 import { MotorSpawner } from "@GameObjects/motors/MotorSpawner";
 import { CannonSpawner } from "@GameObjects/cannon/CannonSpawner";
+import { FlatBlockSpawnerType } from "@GameObjects/blocks/Spawners/flatBlockSpawnerType";
+import { FlatBlockDashboardPresenter } from "@GameObjects/ToolsDashboard/dashboardPresenters/FlatBlockDashboardPresenter";
+import { FlatBlockSpawner } from "@GameObjects/blocks/Spawners/FlatBlocksSpawner";
 
 /**
  * Setup dashboard helper for Base Game Scene
@@ -76,6 +79,20 @@ export function setupDashboard(scene: BaseGameScene) {
         return ballPresenter;
     });
 
+    // Blocks
+    const blockPresenters = [
+        FlatBlockSpawnerType.Metal,
+        FlatBlockSpawnerType.Wood
+    ].map((blockType) => {
+        const blockSpawner = new FlatBlockSpawner(scene, blockType);
+        const blockPresenter = new FlatBlockDashboardPresenter(scene, blockSpawner);
+        blockSpawner.setDashboardPresenter(blockPresenter);
+        scene.add.existing(blockSpawner);
+        scene.add.existing(blockPresenter);
+
+        return blockPresenter;
+    });
+
     // Registration individual presenters
     scene.toolsDashboard
         .register(drivingBeltPresenter)
@@ -91,6 +108,11 @@ export function setupDashboard(scene: BaseGameScene) {
     // Register balls
     ballPresenters.forEach((ballPresenter) => {
         scene.toolsDashboard.register(ballPresenter);
+    });
+
+    // Register blocks
+    blockPresenters.forEach((blockPresenter) => {
+        scene.toolsDashboard.register(blockPresenter);
     });
 
     scene.toolsDashboard.seal();

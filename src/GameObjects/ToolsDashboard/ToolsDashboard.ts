@@ -101,7 +101,7 @@ export class ToolsDashboard {
     }
 
     /**
-     * @todo: kostyl
+     * Seal the dashboard registry
      */
     public seal() {
         this.panel.setChildrenInteractive({

@@ -1,4 +1,6 @@
+import { FlatBlockDashboardPresenter } from "@GameObjects/ToolsDashboard/dashboardPresenters/FlatBlockDashboardPresenter";
 import type { BaseGameScene } from "@src/scenes/BaseGameScene";
+import { FlatBlockSpawnerType } from "./Spawners/flatBlockSpawnerType";
 
 /**
  * Base class for all substance flat blocks
@@ -12,6 +14,7 @@ export class BaseFlatBlock extends Phaser.GameObjects.TileSprite {
         x: number,
         y: number,
         textureKey: string,
+        public readonly spawnerType: FlatBlockSpawnerType,
         width: number = 0,
     ) {
         const tex = scene.textures.get(textureKey);
@@ -33,6 +36,24 @@ export class BaseFlatBlock extends Phaser.GameObjects.TileSprite {
 
         scene.matter.add.gameObject(this, body);
         scene.add.existing(this);
+
+        this.setInteractive()
+            .on(Phaser.Input.Events.POINTER_DOWN, (pointer: Phaser.Input.Pointer) => {
+                if (pointer.rightButtonDown()) {
+                    this.handleReturn();
+                }
+            });
+    }
+
+    /**
+     * Handle return this to dashboard presenter stack
+     */
+    protected handleReturn() {
+        this.scene.toolsDashboard
+            .get(FlatBlockDashboardPresenter.name + '|' + this.spawnerType)
+            .returnObject(this);
+
+        this.destroy();
     }
 }
 

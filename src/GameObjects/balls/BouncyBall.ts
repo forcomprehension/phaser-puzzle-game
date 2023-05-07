@@ -1,5 +1,6 @@
 import type { BaseGameScene } from "@src/scenes/BaseGameScene";
 import { AbstractBall } from "./AbstractBall";
+import { BallSpawnerType } from "./BallSpawner/ballSpawnerType";
 
 /**
  * Ball with high bounciness
@@ -13,7 +14,7 @@ export class BouncyBall extends AbstractBall {
         x: number,
         y: number
     ) {
-        super(scene, x, y, 'ball-124');
+        super(scene, x, y, 'ball-124', BallSpawnerType.Bouncy);
 
         const { canvasHeight, canvasWidth } = scene.getCanvasSize();
 
