@@ -2,7 +2,7 @@ const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
-// const CopyWebpackPlugin = require('copy-webpack-plugin');
+const CircularDependencyPlugin = require('circular-dependency-plugin');
 const tsConfig = require('./tsconfig.json');
 
 const rootPath = path.resolve(__dirname);
@@ -24,12 +24,30 @@ function buildAliases(defaultAliases = {}) {
     }, defaultAliases);
 }
 
-module.exports = function(_, { mode }) {
+module.exports = function({ checkCircular }, { mode }) {
     const isDevMode = mode !== 'production';
+
+    const plugins = [
+        new HtmlWebpackPlugin({
+            title: 'PuzzleGame',
+            template: path.resolve(publicPath, 'index.html'),
+        }),
+        new webpack.EnvironmentPlugin({
+            DEBUG: isDevMode
+        }),
+    ];
+
+    if (checkCircular) {
+        plugins.push(
+            new CircularDependencyPlugin({
+                exclude: /node_modules/,
+            })
+        )
+    }
 
     return {
         mode,
-        devtool: false, //isDevMode ? 'source-map' : false,
+        devtool: isDevMode ? 'source-map' : false,
         entry: './src/index.ts',
         output: {
             filename: '[name].[contenthash].js',
@@ -66,23 +84,7 @@ module.exports = function(_, { mode }) {
                 type: 'asset/resource'
             }]
         },
-        plugins: [
-            new HtmlWebpackPlugin({
-                title: 'PuzzleGame',
-                template: path.resolve(publicPath, 'index.html'),
-            }),
-            new webpack.EnvironmentPlugin({
-                DEBUG: isDevMode
-            }),
-            // new CopyWebpackPlugin({
-            //     patterns: [
-            //         {
-            //             from: "public/assets/",
-            //             to: "assets/",
-            //         },
-            //     ],
-            // }),
-        ]
+        plugins
     }
 }
 

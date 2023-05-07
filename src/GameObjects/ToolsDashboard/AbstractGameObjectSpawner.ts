@@ -1,7 +1,7 @@
-import { IActiveTool } from "@interfaces/IActiveTool";
+import type { IActiveTool } from "@interfaces/IActiveTool";
 import { AbstractDashboardPresenter } from "./dashboardPresenters/AbstractDashboardPresenter";
 import { EVENT_ON_ACTIVATE_TOOL, EVENT_ON_DEACTIVATE_TOOL } from "@src/constants/tools";
-import { BaseGameScene } from "@src/scenes/BaseGameScene";
+import type { BaseGameScene } from "@src/scenes/BaseGameScene";
 import { setDraggable } from "@utils/gameObjects/setDraggable";
 
 /**

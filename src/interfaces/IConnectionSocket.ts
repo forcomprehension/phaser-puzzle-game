@@ -1,4 +1,4 @@
-import { IConnectedObject } from "./IConnectedObject";
+import type { IConnectedObject } from "./IConnectedObject";
 
 /**
  * Interface which represents connection socket between two game objects

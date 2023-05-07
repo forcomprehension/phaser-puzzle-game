@@ -1,5 +1,5 @@
 import { getMatterBody } from "@src/physics/matter";
-import { BaseGameScene } from "@src/scenes/BaseGameScene";
+import type { BaseGameScene } from "@src/scenes/BaseGameScene";
 
 /**
  * Cannon ball. Shoot by {@see Cannon}

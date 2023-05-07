@@ -1,4 +1,4 @@
-import { BaseGameScene } from "@src/scenes/BaseGameScene";
+import type { BaseGameScene } from "@src/scenes/BaseGameScene";
 import { AbstractGear } from "./AbstractGear";
 import { GearsSpawnerType } from "./GearSpawner/gearSpawnerType";
 

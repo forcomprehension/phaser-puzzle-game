@@ -1,11 +1,11 @@
 import { AbstractGameObjectSpawner } from "@GameObjects/ToolsDashboard/AbstractGameObjectSpawner";
-import { BaseGameScene } from "@src/scenes/BaseGameScene";
+import type { BaseGameScene } from "@src/scenes/BaseGameScene";
 import { BasketballBall } from "../BasketballBall";
 import { BouncyBall } from "../BouncyBall";
 import { BowlingBall } from "../BowlingBall";
 import { EightBall } from "../EightBall";
 import { FootballBall } from "../FootballBall";
-import { BallSpawnType } from "./ballSpawnType";
+import { BallSpawnerType } from "./ballSpawnerType";
 
 /**
  * Ball spawner
@@ -16,7 +16,7 @@ export class BallSpawner extends AbstractGameObjectSpawner {
      */
     constructor(
         public scene: BaseGameScene,
-        public readonly spawnerType: BallSpawnType
+        public readonly spawnerType: BallSpawnerType
     ) {
         super(scene, BallSpawner.name + '|' + spawnerType);
     }
@@ -26,19 +26,19 @@ export class BallSpawner extends AbstractGameObjectSpawner {
      */
     protected spawnItem({ x, y }: Phaser.Input.Pointer): Phaser.GameObjects.GameObject {
         switch (this.spawnerType) {
-            case BallSpawnType.Basket: {
+            case BallSpawnerType.Basket: {
                 return new BasketballBall(this.scene, x, y);
             }
-            case BallSpawnType.Bouncy: {
+            case BallSpawnerType.Bouncy: {
                 return new BouncyBall(this.scene, x, y);
             }
-            case BallSpawnType.Bowling: {
+            case BallSpawnerType.Bowling: {
                 return new BowlingBall(this.scene, x, y);
             }
-            case BallSpawnType.Eight: {
+            case BallSpawnerType.Eight: {
                 return new EightBall(this.scene, x, y);
             }
-            case BallSpawnType.Football: {
+            case BallSpawnerType.Football: {
                 return new FootballBall(this.scene, x, y);
             }
         }

@@ -1,5 +1,5 @@
-import { IConnectionSocket } from "@interfaces/IConnectionSocket";
-import { IConnectedObject } from "@interfaces/IConnectedObject";
+import type { IConnectionSocket } from "@interfaces/IConnectionSocket";
+import type { IConnectedObject } from "@interfaces/IConnectedObject";
 
 export class GameObjectDuplexConnector {
     protected lhsObject: IConnectedObject;

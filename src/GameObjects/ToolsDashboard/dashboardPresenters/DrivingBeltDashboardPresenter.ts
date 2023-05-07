@@ -1,5 +1,5 @@
 import { DrivingBeltDrawerTool } from "@GameObjects/connectors/DrivingBelt/DrivingBeltDrawerTool";
-import { BaseGameScene } from "@src/scenes/BaseGameScene";
+import type { BaseGameScene } from "@src/scenes/BaseGameScene";
 import { AbstractDashboardPresenter } from "./AbstractDashboardPresenter";
 
 /**

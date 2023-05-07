@@ -1,5 +1,5 @@
 import { ROTATION_DIRECTION } from '@utils/types';
-import { GraphKey, GearGraph, GearNode } from './GearGraph'
+import type { GraphKey, GearGraph, GearNode } from './GearGraph'
 import { iterateOverEdges } from './iterateOverEdges';
 import { checkGearsRotationsAreCompatible, getOppositeDirection } from './utils';
 

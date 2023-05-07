@@ -5,4 +5,4 @@ export * from './BowlingBall';
 export * from './EightBall';
 export * from './FootballBall';
 export * from './BallSpawner/BallSpawner';
-export * from './BallSpawner/ballSpawnType';
+export * from './BallSpawner/ballSpawnerType';

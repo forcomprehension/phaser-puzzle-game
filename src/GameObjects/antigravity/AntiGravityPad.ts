@@ -1,6 +1,6 @@
 import { AntiGravityPadDashboardPresenter } from "@GameObjects/ToolsDashboard/dashboardPresenters/AntiGravityPadDashboardPresenter";
 import { unsafeCastBody } from "@src/physics/matter";
-import { BaseGameScene } from "@src/scenes/BaseGameScene";
+import type { BaseGameScene } from "@src/scenes/BaseGameScene";
 
 /**
  * Antigravity pad object
@@ -34,7 +34,11 @@ export class AntiGravityPad extends Phaser.Physics.Matter.Sprite {
      * @param x
      * @param y
      */
-    constructor(public scene: BaseGameScene, x: number, y: number) {
+    constructor(
+        public scene: BaseGameScene,
+        x: number,
+        y: number
+    ) {
         super(scene.matter.world, x, y, 'anti-gravity-pad', 4, {
             ignoreGravity: true,
             isStatic: true

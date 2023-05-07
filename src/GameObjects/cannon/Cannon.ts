@@ -1,4 +1,4 @@
-import { BaseGameScene } from "@src/scenes/BaseGameScene";
+import type { BaseGameScene } from "@src/scenes/BaseGameScene";
 import { CannonBall } from "./CannonBall";
 import { CannonDashboardPresenter } from "@GameObjects/ToolsDashboard/dashboardPresenters/CannonDashboardPresenter";
 
@@ -21,7 +21,11 @@ export class Cannon extends Phaser.Physics.Matter.Image {
      * @param x
      * @param y
      */
-    constructor(public scene: BaseGameScene, x: number, y: number) {
+    constructor(
+        public scene: BaseGameScene,
+        x: number,
+        y: number
+    ) {
         const shape = scene.cache.json.get('cannon-body');
 
         super(scene.matter.world, x, y, 'cannon', 'cannon.png', {

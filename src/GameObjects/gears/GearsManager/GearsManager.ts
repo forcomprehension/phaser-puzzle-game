@@ -1,5 +1,5 @@
 import { GameObjects } from 'phaser';
-import { AbstractGear } from "@GameObjects/gears/AbstractGear";
+import type { AbstractGear } from "@GameObjects/gears/AbstractGear";
 import { ROTATION_DIRECTION } from '@utils/types';
 import type { ISimulated } from '@interfaces/ISimulated';
 import { GearGraph } from './GearGraph';

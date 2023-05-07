@@ -1,10 +1,10 @@
-import { IConnectionSocket } from "@interfaces/IConnectionSocket";
-import { IConnectedObject } from "@interfaces/IConnectedObject";
+import type { IConnectionSocket } from "@interfaces/IConnectionSocket";
+import type { IConnectedObject } from "@interfaces/IConnectedObject";
 import { BodyLabel } from "@src/constants/collision";
 import type { ConstraintType } from "matter";
 import { getMatterBody } from "../../physics/matter";
 import { MotorPulley } from "./MotorPulley";
-import { BaseGameScene } from "@src/scenes/BaseGameScene";
+import type { BaseGameScene } from "@src/scenes/BaseGameScene";
 import { MotorDashboardPresenter } from "@GameObjects/ToolsDashboard/dashboardPresenters/MotorDashboardPresenter";
 
 /**
@@ -32,7 +32,11 @@ export class Motor extends Phaser.Physics.Matter.Image implements IConnectionSoc
     /**
      * Ctor
      */
-    constructor(public scene: BaseGameScene, x: number, y: number) {
+    constructor(
+        public scene: BaseGameScene,
+        x: number,
+        y: number
+    ) {
         const texture = scene.textures.get('motor');
         const frameNames = texture.getFrameNames();
         const pulleyFrame = scene.textures.getFrame(texture.key, frameNames[1]);

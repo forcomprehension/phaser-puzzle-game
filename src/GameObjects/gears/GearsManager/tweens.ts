@@ -1,4 +1,4 @@
-import { GearsManager } from "./GearsManager";
+import type { GearsManager } from "./GearsManager";
 
 export function addGearsManagerTweens(scene: Phaser.Scene, gm: GearsManager) {
     scene.tweens.add({

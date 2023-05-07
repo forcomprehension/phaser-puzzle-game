@@ -1,5 +1,5 @@
 import { WORLD_STATIC } from "@src/constants/collision";
-import { BaseGameScene } from "@src/scenes/BaseGameScene";
+import type { BaseGameScene } from "@src/scenes/BaseGameScene";
 
 /**
  * All balls shape

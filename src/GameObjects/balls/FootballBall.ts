@@ -1,4 +1,4 @@
-import { BaseGameScene } from "@src/scenes/BaseGameScene";
+import type { BaseGameScene } from "@src/scenes/BaseGameScene";
 import { AbstractBall } from "./AbstractBall";
 
 /**

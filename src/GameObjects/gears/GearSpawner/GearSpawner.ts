@@ -1,5 +1,5 @@
 import { AbstractGameObjectSpawner } from "@GameObjects/ToolsDashboard/AbstractGameObjectSpawner";
-import { BaseGameScene } from "@src/scenes/BaseGameScene";
+import type { BaseGameScene } from "@src/scenes/BaseGameScene";
 import { AbstractGear } from "../AbstractGear";
 import { Gear6 } from "../Gear6";
 import { Gear12 } from "../Gear12";

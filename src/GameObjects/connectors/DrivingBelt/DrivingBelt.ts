@@ -1,6 +1,6 @@
 import { DrivingBeltDashboardPresenter } from "@GameObjects/ToolsDashboard/dashboardPresenters/DrivingBeltDashboardPresenter";
-import { GameObjectDuplexConnector } from "@src/classes/GameObjectsDuplexConnector";
-import { BaseGameScene } from "@src/scenes/BaseGameScene";
+import type { GameObjectDuplexConnector } from "@src/classes/GameObjectsDuplexConnector";
+import type { BaseGameScene } from "@src/scenes/BaseGameScene";
 
 /**
  * DrivingBelt game object

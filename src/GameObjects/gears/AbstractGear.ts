@@ -1,11 +1,11 @@
-import { IConnectionSocket } from '@interfaces/IConnectionSocket';
-import { IConnectedObject } from '@interfaces/IConnectedObject';
+import type { IConnectionSocket } from '@interfaces/IConnectionSocket';
+import type { IConnectedObject } from '@interfaces/IConnectedObject';
 import { BodyLabel } from '@src/constants/collision';
 import { ROTATION_DIRECTION } from '@utils/types';
 import { nextString } from '../../utils/serialGenerator'
 import { GearsManager } from './GearsManager';
 import type { GraphKey } from './GearsManager/GearGraph';
-import { BaseGameScene } from '@src/scenes/BaseGameScene';
+import type { BaseGameScene } from '@src/scenes/BaseGameScene';
 import { GearDashboardPresenter } from '@GameObjects/ToolsDashboard/dashboardPresenters/GearDashboardPresenter';
 import { GearsSpawnerType } from './GearSpawner/gearSpawnerType';
 
@@ -61,7 +61,12 @@ export abstract class AbstractGear extends Phaser.Physics.Matter.Image implement
     /**
      * @inheritdoc
      */
-    constructor(public scene: BaseGameScene, x: number, y: number, texture: string | Phaser.Textures.Texture) {
+    constructor(
+        public scene: BaseGameScene,
+        x: number,
+        y: number,
+        texture: string | Phaser.Textures.Texture
+    ) {
         super(scene.matter.world, x, y, texture, undefined, AbstractGear.defaultPhysicsConfig);
 
         this.serialID = nextString();

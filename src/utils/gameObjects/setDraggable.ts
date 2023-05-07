@@ -1,6 +1,6 @@
 import { AbstractGear } from "@GameObjects/gears/AbstractGear";
 import { getMatterBody, unsafeCastBody } from "@src/physics/matter";
-import { BaseGameScene } from "@src/scenes/BaseGameScene";
+import type { BaseGameScene } from "@src/scenes/BaseGameScene";
 import { GameObjectsScene } from "@src/scenes/GameObjectsScene";
 
 /**

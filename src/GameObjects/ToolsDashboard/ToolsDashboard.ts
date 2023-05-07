@@ -1,5 +1,4 @@
-import { BaseGameScene } from "@src/scenes/BaseGameScene";
-
+import type { BaseGameScene } from "@src/scenes/BaseGameScene";
 import ScrollablePanel from "phaser3-rex-plugins/templates/ui/scrollablepanel/ScrollablePanel";
 import RoundRectangle from "phaser3-rex-plugins/plugins/roundrectangle";
 import { AbstractDashboardPresenter } from "./dashboardPresenters/AbstractDashboardPresenter";

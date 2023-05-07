@@ -1,6 +1,14 @@
-import { BaseGameScene } from "@src/scenes/BaseGameScene";
+import type { BaseGameScene } from "@src/scenes/BaseGameScene";
 import { AbstractDashboardPresenter } from "./AbstractDashboardPresenter";
-import { BallSpawnType, BallSpawner } from "@GameObjects/balls";
+import { BallSpawnerType, BallSpawner } from "@GameObjects/balls";
+
+/**
+ * Icon data settings for BallDashboardPresenter
+ */
+type IconData = [
+    string,
+    number
+];
 
 /**
  * Balls spawner
@@ -10,27 +18,27 @@ export class BallDashboardPresenter extends AbstractDashboardPresenter {
     /**
      * SpawnerType
      */
-    protected spawnerType: BallSpawnType;
+    protected spawnerType: BallSpawnerType;
 
     /**
      * Gets dashboard icon by spawner type
      */
-    public static getIconBySpawnerType(type: BallSpawnType) {
+    public static getIconDataBySpawnerType(type: BallSpawnerType): IconData {
         switch (type) {
-            case BallSpawnType.Basket: {
-                return 'basketball-ball';
+            case BallSpawnerType.Basket: {
+                return ['basketball-ball', .7];
             }
-            case BallSpawnType.Bouncy: {
-                return 'ball-124';
+            case BallSpawnerType.Bouncy: {
+                return ['ball-124', 1];
             }
-            case BallSpawnType.Bowling: {
-                return 'bowling-ball';
+            case BallSpawnerType.Bowling: {
+                return ['bowling-ball', .7];
             }
-            case BallSpawnType.Eight: {
-                return 'eight-ball';
+            case BallSpawnerType.Eight: {
+                return ['eight-ball', 1];
             }
-            case BallSpawnType.Football: {
-                return 'football-ball';
+            case BallSpawnerType.Football: {
+                return ['football-ball', .8];
             }
         }
     }
@@ -39,11 +47,19 @@ export class BallDashboardPresenter extends AbstractDashboardPresenter {
      * Ctor
      */
     constructor(scene: BaseGameScene, spawner: BallSpawner) {
+        const [
+            textureKey,
+            iconScale
+        ] = BallDashboardPresenter.getIconDataBySpawnerType(spawner.spawnerType);
+
         super(
             scene,
             spawner,
-            BallDashboardPresenter.getIconBySpawnerType(spawner.spawnerType)
+            textureKey
         );
+
+        this.spawnerType = spawner.spawnerType;
+        this.setIconScale(iconScale);
     }
 
     /**

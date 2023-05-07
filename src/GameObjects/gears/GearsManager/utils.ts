@@ -1,5 +1,5 @@
 import { ROTATION_DIRECTION } from "@utils/types";
-import { GearNode } from "./GearGraph";
+import type { GearNode } from "./GearGraph";
 
 
 export type DirectionFromGearNode = Pick<GearNode, 'direction'>

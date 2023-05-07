@@ -1,7 +1,7 @@
 import { AbstractGear } from "@GameObjects/gears/AbstractGear";
 import { Motor } from "@GameObjects/motors/Motor";
 import { MotorPulley } from "@GameObjects/motors/MotorPulley";
-import { IConnectionSocket } from "@interfaces/IConnectionSocket";
+import type { IConnectionSocket } from "@interfaces/IConnectionSocket";
 import { BodyLabel } from "@src/constants/collision";
 import { unsafeCastBody } from "./matter";
 

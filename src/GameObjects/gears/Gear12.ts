@@ -1,7 +1,10 @@
-import { BaseGameScene } from "@src/scenes/BaseGameScene";
+import type { BaseGameScene } from "@src/scenes/BaseGameScene";
 import { AbstractGear } from "./AbstractGear";
 import { GearsSpawnerType } from "./GearSpawner/gearSpawnerType";
 
+/**
+ * Gear with 12 teeth
+ */
 export class Gear12 extends AbstractGear {
     public spawnerType: GearsSpawnerType = GearsSpawnerType.Gear12;
 

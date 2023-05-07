@@ -1,7 +1,7 @@
 /**
  * Which ball we will spawn
  */
-export enum BallSpawnType {
+export enum BallSpawnerType {
     Basket = 'basket',
     Bouncy = 'bouncy',
     Bowling = 'bowling',

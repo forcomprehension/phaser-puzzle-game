@@ -1,8 +1,8 @@
-import { IConnectionSocket } from "@interfaces/IConnectionSocket";
+import type { IConnectionSocket } from "@interfaces/IConnectionSocket";
 import { GameObjectDuplexConnector } from "@src/classes/GameObjectsDuplexConnector";
 import { EVENT_ON_ACTIVATE_TOOL, EVENT_ON_DEACTIVATE_TOOL } from "@src/constants/tools";
 import { getGameObjectForConnectorsByBody } from "@src/physics/physicsHelpers";
-import { BaseGameScene } from "@src/scenes/BaseGameScene";
+import type { BaseGameScene } from "@src/scenes/BaseGameScene";
 import { DrivingBelt } from "./DrivingBelt";
 import { AbstractGameObjectSpawner } from "@GameObjects/ToolsDashboard/AbstractGameObjectSpawner";
 

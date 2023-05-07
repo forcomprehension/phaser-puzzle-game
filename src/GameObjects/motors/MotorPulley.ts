@@ -1,4 +1,4 @@
-import { IConnectedObject } from "@interfaces/IConnectedObject";
+import type { IConnectedObject } from "@interfaces/IConnectedObject";
 import { BodyLabel } from "@src/constants/collision";
 import { ROTATION_DIRECTION } from "@utils/types";
 import { MOTOR_PULLEY_EVENT_ROTATE } from "./events";
