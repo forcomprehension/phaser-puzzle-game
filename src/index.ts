@@ -4,6 +4,7 @@ import { LoadingScene } from './scenes/LoadingScene';
 
 // Plugins
 import UIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js';
+import DragPlugin from 'phaser3-rex-plugins/plugins/drag-plugin.js';
 
 new Phaser.Game({
     backgroundColor: 0x3333AA,
@@ -22,6 +23,11 @@ new Phaser.Game({
     },
     scene:[LoadingScene, GameObjectsScene],
     plugins: {
+        global: [{
+            key: 'rexDrag',
+            plugin: DragPlugin,
+            start: true
+        }],
         scene: [{
             key: 'rexUI',
             plugin: UIPlugin,

@@ -11,6 +11,11 @@ type SupportedObjectsUnion = Phaser.Physics.Matter.Image |
     Phaser.Physics.Matter.Sprite | Phaser.GameObjects.GameObject & iDraggable;
 
 /**
+ * Crutch for "unstatic" object
+ */
+const RESET_STATIC_POSITION_DIFFERENCE = 10e-7;
+
+/**
  * Enable draggable
  *
  * @param scene
@@ -26,7 +31,7 @@ export function setDraggable(
             scene.input.setHitArea(object, {
                 draggable: true,
                 useHandCursor: true
-            })
+            });
         } else {
             object.setInteractive({
                 draggable: true,
@@ -40,8 +45,13 @@ export function setDraggable(
                 return;
             }
 
+            const thisBody = getMatterBody(object);
+
             nonIntersectedPosition.x = object.body.position.x;
             nonIntersectedPosition.y = object.body.position.y;
+
+            thisBody.positionPrev.x = object.body.position.x + RESET_STATIC_POSITION_DIFFERENCE;
+            thisBody.positionPrev.y = object.body.position.y + RESET_STATIC_POSITION_DIFFERENCE;
 
             object.setStatic(false);
         });
