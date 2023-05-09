@@ -23,14 +23,16 @@ export class CannonBall extends Phaser.Physics.Matter.Image {
      * @param y
      */
     constructor(scene: BaseGameScene, x: number, y: number) {
-        super(scene.matter.world, x, y, 'cannon', 'cannonball.png', {
-            gravityScale: {
-                y: CannonBall.GRAVITY_SCALE_VERTICAL,
-                x: 1
-            },
-            circleRadius: 16 + 2 // @TODO: determine from sys
-        });
-        scene.add.existing(this);
+        super(scene.matter.world, x, y, 'cannon', 'cannonball.png');
+        this.setCircle(
+            16 + 2, // @TODO: determine from sys
+            {
+                gravityScale: {
+                    y: CannonBall.GRAVITY_SCALE_VERTICAL,
+                    x: 1
+                },
+            }
+        );
 
         const textureOffset = this.frame.width / 2;
 
@@ -42,5 +44,7 @@ export class CannonBall extends Phaser.Physics.Matter.Image {
             },
             { x: CannonBall.FORCE_VALUE, y: 0 }
         );
+
+        scene.add.existing(this);
     }
 }

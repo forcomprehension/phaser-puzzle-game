@@ -21,23 +21,22 @@ export abstract class AbstractBall extends Phaser.Physics.Matter.Image {
         const textureObject = scene.textures.get(texture);
         const imageHeight = textureObject.getSourceImage().height;
 
-        super(scene.matter.world, x, y, texture, undefined, {
+        super(scene.matter.world, x, y, texture);
+        this.setCircle(imageHeight / 2, {
             collisionFilter: {
                 category: WORLD_STATIC,
             },
-            circleRadius: imageHeight / 2
         });
-
         this.setBounce(bounce);
 
         scene.add.existing(this);
 
         this.setInteractive()
-        .on(Phaser.Input.Events.POINTER_DOWN, (pointer: Phaser.Input.Pointer) => {
-            if (pointer.rightButtonDown()) {
-                this.handleReturn();
-            }
-        });
+            .on(Phaser.Input.Events.POINTER_DOWN, (pointer: Phaser.Input.Pointer) => {
+                if (pointer.rightButtonDown()) {
+                    this.handleReturn();
+                }
+            });
     }
 
     protected handleReturn() {

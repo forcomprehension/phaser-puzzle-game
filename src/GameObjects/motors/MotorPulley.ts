@@ -41,12 +41,15 @@ export class MotorPulley extends Phaser.Physics.Matter.Image implements IConnect
         frame: Phaser.Textures.Frame,
         protected readonly motor: Motor
     ) {
-        super(world, x, y, frame.texture.key, frame.name, {
-            ignoreGravity: true,
-            isSensor: true,
-            label: BodyLabel.MOTOR_PULLEY,
-            circleRadius: frame.radius * .75 // @TODO:
-        });
+        super(world, x, y, frame.texture.key, frame.name);
+        this.setCircle(
+            frame.radius * .75, // @TODO:
+            {
+                ignoreGravity: true,
+                isSensor: true,
+                label: BodyLabel.MOTOR_PULLEY
+            }
+        );
 
         world.scene.add.existing(this);
 

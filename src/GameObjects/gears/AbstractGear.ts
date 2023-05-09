@@ -67,7 +67,7 @@ export abstract class AbstractGear extends Phaser.Physics.Matter.Image implement
         y: number,
         texture: string | Phaser.Textures.Texture
     ) {
-        super(scene.matter.world, x, y, texture, undefined, AbstractGear.defaultPhysicsConfig);
+        super(scene.matter.world, x, y, texture);
 
         this.serialID = nextString();
 
