@@ -39,6 +39,8 @@ export function setDraggable(
             });
         }
 
+        let hadGravity = false;
+        let canBeStatic = false;
         let nonIntersectedPosition: Vector2Like = { x: 0, y: 0 };
         object.on(Phaser.Input.Events.DRAG_START, () => {
             if (scene.hasActiveGameObject()) {
@@ -53,7 +55,13 @@ export function setDraggable(
             thisBody.positionPrev.x = object.body.position.x + RESET_STATIC_POSITION_DIFFERENCE;
             thisBody.positionPrev.y = object.body.position.y + RESET_STATIC_POSITION_DIFFERENCE;
 
-            object.setStatic(false);
+            canBeStatic = object.isStatic();
+            hadGravity = !thisBody.ignoreGravity;
+            canBeStatic && object.setStatic(false);
+
+            if (hadGravity) {
+                thisBody.ignoreGravity = true;
+            }
         });
 
         object.on(Phaser.Input.Events.GAMEOBJECT_DRAG, function(_: any, x: number, y: number) {
@@ -84,19 +92,22 @@ export function setDraggable(
                 return;
             }
 
-            const myBody = getMatterBody(object);
+            const thisBody = getMatterBody(object);
             if (object instanceof AbstractGear) {
                 object.setPosition(nonIntersectedPosition.x, nonIntersectedPosition.y);
             }
 
-            object.setStatic(true);
+            canBeStatic && object.setStatic(true);
+            if (hadGravity) {
+                thisBody.ignoreGravity = false;
+            }
 
             // @TODO: move away. Subs after physic engine update?
             if (object instanceof AbstractGear) {
                 // @TODO: TODO: how to scale?
-                scene.matter.body.scale(myBody, 1.25, 1.25);
-                const overlaps = scene.matter.intersectBody(myBody);
-                scene.matter.body.scale(myBody, 0.8, 0.8);
+                scene.matter.body.scale(thisBody, 1.25, 1.25);
+                const overlaps = scene.matter.intersectBody(thisBody);
+                scene.matter.body.scale(thisBody, 0.8, 0.8);
 
                 const countGears = overlaps.reduce((acc, overlap) => {
                     // @ts-ignore
