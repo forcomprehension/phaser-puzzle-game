@@ -15,5 +15,6 @@ export class BowlingBall extends AbstractBall {
         y: number
     ) {
         super(scene, x, y, 'bowling-ball', BallSpawnerType.Bowling, .275);
+        this.setDensity(0.005);
     }
 }

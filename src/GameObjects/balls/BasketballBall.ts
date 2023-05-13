@@ -14,6 +14,6 @@ export class BasketballBall extends AbstractBall {
         x: number,
         y: number
     ) {
-        super(scene, x, y, 'basketball-ball', BallSpawnerType.Basket, .675);
+        super(scene, x, y, 'basketball-ball', BallSpawnerType.Basket, .7);
     }
 }
