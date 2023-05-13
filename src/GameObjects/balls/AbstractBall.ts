@@ -27,7 +27,7 @@ export abstract class AbstractBall extends Phaser.Physics.Matter.Image {
             collisionFilter: {
                 category: WORLD_STATIC,
             },
-            friction: 0.4,
+            friction: 0.075,
         });
         this.setScale(.5);
         this.setBounce(bounce);
