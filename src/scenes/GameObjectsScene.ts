@@ -3,6 +3,7 @@ import { Gear6 } from "@GameObjects/gears";
 import { BaseGameScene } from "./BaseGameScene";
 import { setDraggable } from "@utils/gameObjects/setDraggable";
 import { flatMetalBlockFactory, flatWoodenBlockFactory } from "@GameObjects/blocks/flatBlockFactories";
+import { BasketballBall } from "@GameObjects/balls";
 
 /**
  * Game objects tests scene
@@ -17,11 +18,12 @@ export class GameObjectsScene extends BaseGameScene {
         super.create();
         this.bootstrap();
 
-        const gear12 = new Gear12(this, 99, 100);
-        const gear6 = new Gear6(this, 100, 190);
-        const gear6_2 = new Gear6(this, 250, 190);
-        const metalBlock = flatMetalBlockFactory(this, 400, 500, 450);
-        const woodBlock = flatWoodenBlockFactory(this, 700, 650, 650);
+        const gear12 = new Gear12(this, 499, 100);
+        const gear6 = new Gear6(this, 500, 190);
+        const gear6_2 = new Gear6(this, 650, 190);
+        const metalBlock = flatMetalBlockFactory(this, 200, 500, 750).setAngle(30);
+        const woodBlock = flatWoodenBlockFactory(this, 1130, 925, 950);
+        new BasketballBall(this, 270, 220);
 
         this.gearsManager.bulkUpdate(() => {
             this.gearsManager.registerGear(gear12)

@@ -19,6 +19,10 @@ new Phaser.Game({
         default: 'matter',
         matter: {
             debug: !!process.env.DEBUG,
+            // @ts-ignore
+            timing: {
+                timeScale: 1
+            }
         }
     },
     scene:[LoadingScene, GameObjectsScene],

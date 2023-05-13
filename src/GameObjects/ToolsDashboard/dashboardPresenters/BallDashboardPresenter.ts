@@ -16,6 +16,11 @@ type IconData = [
 export class BallDashboardPresenter extends AbstractDashboardPresenter {
 
     /**
+     * @inheritdoc
+     */
+    protected stackCount: number = 10;
+
+    /**
      * SpawnerType
      */
     protected spawnerType: BallSpawnerType;

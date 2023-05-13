@@ -15,8 +15,12 @@ export class BaseFlatBlock extends Phaser.GameObjects.TileSprite {
     public static readonly RESIZE_ZONE_SIZE_X = 50;
     public static readonly RESIZE_ZONE_SIZE_Y = 75;
 
+    public static readonly ROTATION_STEP = 30;
+
     protected leftZone: Phaser.GameObjects.Zone;
     protected rightZone: Phaser.GameObjects.Zone;
+
+    protected rotator: Phaser.GameObjects.Image;
 
     /**
      * Update this object after physics update
@@ -59,6 +63,7 @@ export class BaseFlatBlock extends Phaser.GameObjects.TileSprite {
             });
 
         this.setupResize();
+        this.setupRotator();
 
         // AfterUpdate hook
         this.scene.matter.world
@@ -66,6 +71,30 @@ export class BaseFlatBlock extends Phaser.GameObjects.TileSprite {
 
 
         scene.add.existing(this);
+    }
+
+    /**
+     * Setup Rotator Element
+     */
+    protected setupRotator() {
+        this.rotator = this.scene.add.image(this.x, this.y, 'icon-rotate')
+            .setScale(2);
+        this.rotator.setInteractive({
+            useHandCursor: true
+        }).on(Phaser.Input.Events.POINTER_DOWN, () => {
+            const nextAngle = this.angle + BaseFlatBlock.ROTATION_STEP;
+            const zones = [this.leftZone, this.rightZone];
+
+            this.setAngle(nextAngle);
+
+            Phaser.Actions.SetRotation(zones, Phaser.Math.DegToRad(nextAngle));
+            Phaser.Actions.RotateAround(
+                zones,
+                { x: this.x, y: this.y },
+                Phaser.Math.DegToRad(BaseFlatBlock.ROTATION_STEP),
+            );
+
+        }).setDepth(1);
     }
 
     /**
@@ -113,12 +142,13 @@ export class BaseFlatBlock extends Phaser.GameObjects.TileSprite {
                         const vecLength = leftTopVec.distance(rightTop);
 
                         if (vecLength >= BaseFlatBlock.MIN_SIZE && vecLength <= BaseFlatBlock.MAX_SIZE) {
-                            this.scene.matter.body.scale(
-                                body,
-                                (rightTop.x - dragX) / (rightTop.x - leftTop.x),
-                                1,
-                                rightTop
-                            );
+                            const scaleSize = (rightTop.x - dragX) / (rightTop.x - leftTop.x);
+                            this.scene.matter.body.scale(body, scaleSize, 1, rightTop);
+
+                            const intersected = this.scene.matter.intersectBody(body);
+                            if (intersected.length) {
+                                this.scene.matter.body.scale(body, 1 / scaleSize, 1, rightTop);
+                            }
 
                             this.resizeTileAfterPhysics = true;
                         }
@@ -127,12 +157,13 @@ export class BaseFlatBlock extends Phaser.GameObjects.TileSprite {
                         const vecLength = newRightTopVec.distance(leftTop);
 
                         if (vecLength >= BaseFlatBlock.MIN_SIZE && vecLength <= BaseFlatBlock.MAX_SIZE) {
-                            this.scene.matter.body.scale(
-                                body,
-                                (dragX - leftTop.x) / (rightTop.x - leftTop.x),
-                                1,
-                                leftTop
-                            );
+                            const scaleSize = (dragX - leftTop.x) / (rightTop.x - leftTop.x)
+                            this.scene.matter.body.scale(body, scaleSize, 1, leftTop);
+
+                            const intersected = this.scene.matter.intersectBody(body);
+                            if (intersected.length) {
+                                this.scene.matter.body.scale(body, 1 / scaleSize, 1, leftTop);
+                            }
 
                             this.resizeTileAfterPhysics = true;
                         }
@@ -141,6 +172,7 @@ export class BaseFlatBlock extends Phaser.GameObjects.TileSprite {
             });
         });
     }
+
 
     /**
      * Weld zones to body sides
@@ -151,9 +183,18 @@ export class BaseFlatBlock extends Phaser.GameObjects.TileSprite {
             const [ leftTop, rightTop ] = body.vertices;
             const width = new Phaser.Math.Vector2(leftTop).distance(rightTop);
 
-            // Move zones after resize/position changing
-            this.leftZone.setPosition(body.position.x - width / 2, body.position.y);
-            this.rightZone.setPosition(body.position.x + width / 2, body.position.y);
+            if (!(body.position.x === this.rotator.x && body.position.y === this.rotator.y)) {
+                // Sets position to zero, then rotate
+                this.leftZone.setPosition(body.position.x - width / 2, body.position.y);
+                this.rightZone.setPosition(body.position.x + width / 2, body.position.y);
+                this.rotator.setPosition(body.position.x, body.position.y);
+
+                Phaser.Actions.RotateAround(
+                    [this.leftZone, this.rightZone],
+                    { x: this.x, y: this.y },
+                    - this.rotation,
+                )
+            }
 
             // Update tile
             if (this.resizeTileAfterPhysics) {
@@ -184,13 +225,14 @@ export class BaseFlatBlock extends Phaser.GameObjects.TileSprite {
         this.scene.matter.world.remove(this.body);
         this.leftZone.destroy(fromScene);
         this.rightZone.destroy(fromScene);
+        this.rotator.destroy(fromScene);
         this.off(Phaser.Input.Events.POINTER_DOWN);
         this.off(Phaser.Physics.Matter.Events.AFTER_UPDATE, this.handleAfterPhysics);
 
         super.destroy(fromScene);
 
         // @ts-ignore
-        this.leftZone = this.rightZone = this.body = null;
+        this.rotator = this.leftZone = this.rightZone = this.body = null;
     }
 }
 

@@ -30,6 +30,9 @@ export class LoadingScene extends Phaser.Scene {
 
         // BG
         this.load.image('bg', 'assets/common/bg/bg_stringsOnGarbage.png');
+
+        // UI
+        this.load.image('icon-rotate', 'assets/ui/icons/sync.png');
     }
 
     public create() {
