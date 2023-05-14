@@ -44,8 +44,6 @@ export class AntiGravityPad extends Phaser.Physics.Matter.Sprite {
             isStatic: true
         });
 
-        scene.add.existing(this);
-
         scene.anims.create({
             key: 'antigravitypad-work',
             frames: this.anims.generateFrameNumbers('anti-gravity-pad', {
@@ -67,6 +65,8 @@ export class AntiGravityPad extends Phaser.Physics.Matter.Sprite {
         this.play('antigravitypad-work');
 
         this.addInfluenceZone();
+
+        scene.add.existing(this);
     }
 
     /**

@@ -33,6 +33,13 @@ export class LoadingScene extends Phaser.Scene {
 
         // UI
         this.load.image('icon-rotate', 'assets/ui/icons/sync.png');
+
+        // Characters
+        this.load.atlas(
+            'tom',
+            'assets/characters/tom/tom-walk.png',
+            'assets/characters/tom/tom-walk.json',
+        );
     }
 
     public create() {
