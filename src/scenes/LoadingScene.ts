@@ -29,7 +29,7 @@ export class LoadingScene extends Phaser.Scene {
         this.load.image('flatMetalBlock', 'assets/blocks/metal/flat_block.png');
 
         // BG
-        this.load.image('bg', 'assets/common/bg/bg_Night.png');
+        this.load.image('bg', ['assets/common/bg/bg_Night.png', 'assets/common/bg/bg_Night_n.png']);
 
         // UI
         this.load.image('icon-rotate', 'assets/ui/icons/sync.png');

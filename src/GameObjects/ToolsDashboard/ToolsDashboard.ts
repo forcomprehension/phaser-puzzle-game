@@ -4,6 +4,7 @@ import RoundRectangle from "phaser3-rex-plugins/plugins/roundrectangle";
 import { AbstractDashboardPresenter } from "./dashboardPresenters/AbstractDashboardPresenter";
 import { Sizer } from "phaser3-rex-plugins/templates/ui/ui-components";
 import { DASHBOARD_PRESENTER_HIDE, DASHBOARD_PRESENTER_SHOW } from "./dashboardPresenters/events";
+import { DEPTH } from "@src/constants/depth";
 
 /**
  * Tools dashboard container
@@ -32,8 +33,8 @@ export class ToolsDashboard {
         const { canvasHeight, canvasWidth } = scene.getCanvasSize();
 
         const background = new RoundRectangle(scene);
-        background.fillColor = 0x993333;
-        background.alpha = 0.3;
+        background.fillColor = 0x333333;
+        background.alpha = 1;
 
         scene.add.existing(background);
 
@@ -65,7 +66,7 @@ export class ToolsDashboard {
             panel: {
                 child: this.sizer
             }
-        }).setOrigin(0);
+        }).setOrigin(0).setDepth(DEPTH.DASHBOARD);
 
         scene.add.existing(this.panel);
     }
@@ -81,7 +82,7 @@ export class ToolsDashboard {
 
         const current = this.scene.rexUI.add.sizer({
             height: ToolsDashboard.ITEM_HEIGHT,
-        }).add(tool);
+        }).add(tool).setDepth(DEPTH.DASHBOARD_ITEM);
 
         tool.on(DASHBOARD_PRESENTER_SHOW, () => {
             current.show();

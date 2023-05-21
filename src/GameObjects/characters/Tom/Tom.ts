@@ -46,48 +46,52 @@ export class Tom extends Phaser.GameObjects.Sprite {
     }
 
     /**
-     * Walk through X-axis to "moveX" pixels. Speed calculated from distance
+     * Walk through X-axis to "moveX" pixels. Time will be calculated from distance
      *
      * @param moveX
      */
-    public walk(moveX: number) {
-        const y = this.y;
+    public walk(moveX: number): Promise<void> {
+        return new Promise((resolve) => {
+            const y = this.y;
 
-        const walkingTween = this.scene.tweens.add({
-            targets: this,
-            y: {
-                from: y + 5,
-                to: y - 5
-            },
-            yoyo: true,
-            loop: -1,
-            delay: 150,
-            duration: 200,
-            frameRate: 30,
-        });
+            const walkingTween = this.scene.tweens.add({
+                targets: this,
+                y: {
+                    from: y + 5,
+                    to: y - 5
+                },
+                yoyo: true,
+                loop: -1,
+                delay: 150,
+                duration: 200,
+                frameRate: 30,
+            });
 
-        const speed = 200;
+            const speed = 200;
 
-        this.scene.tweens.add({
-            targets: this,
-            x: {
-                from: this.x,
-                to: moveX
-            },
-            delay: 150,
-            duration: (moveX + Math.abs(this.x)) / speed * 1000,
-            onComplete: () => {
-                this.anims.stop();
-                this.anims.play('tom-walking-end');
-                walkingTween.stop();
-            }
-        });
+            this.scene.tweens.add({
+                targets: this,
+                x: {
+                    from: this.x,
+                    to: moveX
+                },
+                delay: 150,
+                duration: (moveX + Math.abs(this.x)) / speed * 1000,
+                onComplete: () => {
+                    this.anims.stop();
+                    this.anims.play('tom-walking-end');
+                    walkingTween.stop();
 
-        this.play('tom-walk-start')
-            .once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
-                this.play({
-                    key: 'tom-walking',
-                    repeat: -1,
+                    resolve();
+                }
+            });
+
+            this.play('tom-walk-start')
+                .once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+                    this.play({
+                        key: 'tom-walking',
+                        repeat: -1,
+                    });
                 });
             });
     }
