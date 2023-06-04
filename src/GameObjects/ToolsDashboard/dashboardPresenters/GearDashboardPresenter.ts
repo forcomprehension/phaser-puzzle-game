@@ -1,6 +1,7 @@
 import type { BaseGameScene } from "@src/scenes/BaseGameScene";
 import { AbstractDashboardPresenter } from "./AbstractDashboardPresenter";
-import { GearsSpawner, GearsSpawnerType } from "@GameObjects/gears";
+import { GearsSpawner } from "@GameObjects/gears/GearSpawner/GearSpawner";
+import { GearsSpawnerType } from "@GameObjects/gears/GearSpawner/gearSpawnerType";
 
 /**
  * Gears dashboard presenter

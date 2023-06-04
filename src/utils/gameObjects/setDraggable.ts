@@ -1,8 +1,8 @@
-import { AbstractGear } from "@GameObjects/gears/AbstractGear";
+import type { AbstractGear } from "@GameObjects/gears/AbstractGear";
 import { iDraggable } from "@interfaces/iDraggable";
+import { BodyLabel } from "@src/constants/collision";
 import { getMatterBody, unsafeCastBody } from "@src/physics/matter";
 import type { BaseGameScene } from "@src/scenes/BaseGameScene";
-import { GameObjectsScene } from "@src/scenes/GameObjectsScene";
 
 /**
  * Union of supported draggable objects
@@ -93,7 +93,7 @@ export function setDraggable(
             }
 
             const thisBody = getMatterBody(object);
-            if (object instanceof AbstractGear) {
+            if (thisBody.label === BodyLabel.GEAR) {
                 object.setPosition(nonIntersectedPosition.x, nonIntersectedPosition.y);
             }
 
@@ -103,7 +103,7 @@ export function setDraggable(
             }
 
             // @TODO: move away. Subs after physic engine update?
-            if (object instanceof AbstractGear) {
+            if (thisBody.label === BodyLabel.GEAR) {
                 // @TODO: TODO: how to scale?
                 scene.matter.body.scale(thisBody, 1.25, 1.25);
                 const overlaps = scene.matter.intersectBody(thisBody);
@@ -111,28 +111,32 @@ export function setDraggable(
 
                 const countGears = overlaps.reduce((acc, overlap) => {
                     // @ts-ignore
-                    if (overlap.gameObject instanceof AbstractGear) {
+                    if (thisBody.label === BodyLabel.GEAR) {
                         acc++;
                     }
 
                     return acc;
                 }, 0);
 
-                if (scene instanceof GameObjectsScene) {
-                    scene.gearsManager.bulkUpdate(() => {
-                        if (countGears === 0) {
-                            scene.gearsManager.disconnectGearFromInternals(object);
-                        } else if (countGears === overlaps.length) {
-                            scene.gearsManager.disconnectGearFromInternals(object);
-                            overlaps.forEach((overlap) => {
-                                // @ts-ignore
-                                scene.gearsManager.connectGears(overlap.gameObject, object);
-                            });
-                        } else { // countGears !== overlaps. May be blocked?
-                            // @TODO: SEND EXTERNAL_JAMMED?
+                scene.gearsManager.bulkUpdate(() => {
+                    if (countGears === 0) {
+                        // @TODO: KOSTYL
+                        if (getMatterBody(object).label === BodyLabel.GEAR) {
+                            scene.gearsManager.disconnectGearFromInternals(object as AbstractGear);
                         }
-                    });
-                }
+                    } else if (countGears === overlaps.length) {
+                        // @TODO: KOSTYL
+                        if (getMatterBody(object).label === BodyLabel.GEAR) {
+                            scene.gearsManager.disconnectGearFromInternals(object as AbstractGear);
+                        }
+                        overlaps.forEach((overlap) => {
+                            // @ts-ignore
+                            scene.gearsManager.connectGears(overlap.gameObject, object);
+                        });
+                    } else { // countGears !== overlaps. May be blocked?
+                        // @TODO: SEND EXTERNAL_JAMMED?
+                    }
+                });
             }
         });
     });

@@ -1,6 +1,7 @@
 import type { BaseGameScene } from "@src/scenes/BaseGameScene";
 import { AbstractDashboardPresenter } from "./AbstractDashboardPresenter";
-import { BallSpawnerType, BallSpawner } from "@GameObjects/balls";
+import { BallSpawner } from "@GameObjects/balls/BallSpawner/BallSpawner";
+import { BallSpawnerType } from "@GameObjects/balls/BallSpawner/ballSpawnerType";
 
 /**
  * Icon data settings for BallDashboardPresenter

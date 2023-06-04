@@ -1,5 +1,5 @@
 import Phaser from 'phaser'
-import { GameObjectsScene } from './scenes/GameObjectsScene';
+import { TestProgrammingScene } from './scenes/TestProgrammingScene';
 import { LoadingScene } from './scenes/LoadingScene';
 
 // Plugins
@@ -25,7 +25,7 @@ new Phaser.Game({
             }
         }
     },
-    scene:[LoadingScene, GameObjectsScene],
+    scene:[LoadingScene, TestProgrammingScene],
     plugins: {
         global: [{
             key: 'rexDrag',

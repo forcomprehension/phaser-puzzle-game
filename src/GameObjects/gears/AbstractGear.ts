@@ -3,7 +3,7 @@ import type { IConnectedObject } from '@interfaces/IConnectedObject';
 import { BodyLabel } from '@src/constants/collision';
 import { ROTATION_DIRECTION } from '@utils/types';
 import { nextString } from '../../utils/serialGenerator'
-import { GearsManager } from './GearsManager';
+import { GearsManager } from './GearsManager/GearsManager';
 import type { GraphKey } from './GearsManager/GearGraph';
 import type { BaseGameScene } from '@src/scenes/BaseGameScene';
 import { GearDashboardPresenter } from '@GameObjects/ToolsDashboard/dashboardPresenters/GearDashboardPresenter';

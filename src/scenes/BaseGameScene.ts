@@ -15,6 +15,8 @@ export type ActiveGameObject = Phaser.GameObjects.GameObject & IActiveTool;
 export class BaseGameScene extends Phaser.Scene {
     public rexUI: RexUIPlugin;
 
+    public enableDashboard: boolean = true;
+
     public gearsManager: GearsManager;
     public toolsDashboard: ToolsDashboard = new ToolsDashboard(this);
 
@@ -28,7 +30,9 @@ export class BaseGameScene extends Phaser.Scene {
      */
     public create() {
         this.initGearsManager();
-        setupDashboard(this);
+        if (this.enableDashboard) {
+            setupDashboard(this);
+        }
 
         this.events.on(Phaser.Scenes.Events.DESTROY, () => {
             this.destroy();
