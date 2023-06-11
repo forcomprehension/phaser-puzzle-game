@@ -20,8 +20,8 @@ export class GameObjectDuplexConnector {
         this.lhsObject = lhsObject.getConnectorObject();
         this.rhsObject = rhsObject.getConnectorObject();
 
-        lhsObject.connectObject(this.rhsObject);
-        rhsObject.connectObject(this.lhsObject);
+        lhsObject.connectObject(this.rhsObject, false);
+        rhsObject.connectObject(this.lhsObject, true);
 
         this.onDisconnect = () => {
             if (this.rhsObject && this.lhsObject) {

@@ -5,4 +5,5 @@ export enum BodyLabel {
     MOTOR = 'MOTOR',
     MOTOR_PULLEY = 'MOTOR_PULLEY',
     GEAR = 'GEAR',
+    NODE_PIN = 'NODE_PIN'
 }

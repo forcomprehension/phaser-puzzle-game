@@ -1,6 +1,7 @@
 import { DEFAULT_NODE_COLOR } from "@src/constants/colors";
 import type { BaseGameScene } from "@src/scenes/BaseGameScene";
 import { NodePin } from "../NodePin";
+import type { TestProgrammingScene } from "@src/scenes/TestProgrammingScene";
 
 type MainComponent = Phaser.GameObjects.GameObject & Phaser.GameObjects.Components.Origin & {
     height: number,
@@ -84,7 +85,7 @@ export class CommandNode extends Phaser.GameObjects.Container {
      * @final
      */
     constructor(
-        public scene: BaseGameScene,
+        public scene: TestProgrammingScene,
         x: number,
         y: number,
         protected isDraggable: boolean = true,

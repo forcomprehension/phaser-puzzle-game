@@ -1,5 +1,3 @@
-import { AbstractGear } from "@GameObjects/gears/AbstractGear";
-import { Motor } from "@GameObjects/motors/Motor";
 import { MotorPulley } from "@GameObjects/motors/MotorPulley";
 import type { IConnectionSocket } from "@interfaces/IConnectionSocket";
 import { BodyLabel } from "@src/constants/collision";
@@ -15,11 +13,13 @@ export function getGameObjectForConnectorsByBody(body: Phaser.Types.Physics.Matt
     const castedBody = unsafeCastBody(body);
 
     if (castedBody.label === BodyLabel.MOTOR) {
-        connector = castedBody.gameObject as Motor;
+        connector = castedBody.gameObject as IConnectionSocket;
     } else if (castedBody.label === BodyLabel.MOTOR_PULLEY) {
         connector = (castedBody.gameObject as MotorPulley).getMotor();
     } else if (castedBody.label === BodyLabel.GEAR) {
-        connector = (castedBody.gameObject as AbstractGear);
+        connector = (castedBody.gameObject as IConnectionSocket);
+    } else if (castedBody.label === BodyLabel.NODE_PIN) {
+        connector = (castedBody.gameObject as IConnectionSocket);
     }
 
     return connector;

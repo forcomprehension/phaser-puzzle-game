@@ -86,7 +86,7 @@ export class Motor extends Phaser.Physics.Matter.Image implements IConnectionSoc
         return BodyLabel.MOTOR;
     }
 
-    public connectObject(targetObject: IConnectedObject): void {
+    public connectObject(targetObject: IConnectedObject, allConnected: boolean): void {
         this.pulley.connectObject(targetObject);
     }
 

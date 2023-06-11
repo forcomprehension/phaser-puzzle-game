@@ -22,7 +22,7 @@ export interface IConnectionSocket {
      /**
      * Connect other object to this object's socket
      */
-    connectObject(targetObject: IConnectedObject): void;
+    connectObject(targetObject: IConnectedObject, allConnected: boolean): void;
 
      /**
       * Disconnect other object from this object.

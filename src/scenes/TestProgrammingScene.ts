@@ -3,10 +3,13 @@ import { BaseGameScene } from "./BaseGameScene";
 import { addBackgroundImageCover } from "@utils/images";
 import { MonochromeDisplayNode } from "@GameObjects/commands/nodes/MonochromeDisplayNode";
 import { RandomIntNode } from "@GameObjects/commands/nodes/RandomIntNode";
+import { NodeConnectionDrawingTool } from "@GameObjects/commands/NodeConnectorDrawingTool";
 
 export class TestProgrammingScene extends BaseGameScene {
 
     public enableDashboard: boolean = false;
+
+    public nodeConnectorDrawer: NodeConnectionDrawingTool;
 
     constructor() {
         super('ProgrammingScene');
@@ -15,6 +18,12 @@ export class TestProgrammingScene extends BaseGameScene {
     public create() {
         super.create();
         this.bootstrap();
+
+        this.nodeConnectorDrawer = new NodeConnectionDrawingTool(this);
+        this.events.once(Phaser.Scenes.Events.DESTROY, () => {
+            // @ts-ignore
+            this.nodeConnectorDrawer = undefined;
+        })
 
         const { canvasHeight } = this.getCanvasSize();
 

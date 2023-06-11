@@ -104,7 +104,7 @@ export abstract class AbstractGear extends Phaser.Physics.Matter.Image implement
      *
      * @param target
      */
-    public connectObject(target: IConnectedObject): void {
+    public connectObject(target: IConnectedObject, allConnected: boolean): void {
         this.connectedObject = target;
 
         if (target instanceof AbstractGear) {
