@@ -1,9 +1,68 @@
+import { DEFAULT_NODE_COLOR } from "@src/constants/colors";
 import type { BaseGameScene } from "@src/scenes/BaseGameScene";
+import { NodePin } from "../NodePin";
+
+type MainComponent = Phaser.GameObjects.GameObject & Phaser.GameObjects.Components.Origin & {
+    height: number,
+    width: number,
+};
+
+export type BaseComponentsFactoryResult = {
+    list: Array<Phaser.GameObjects.GameObject>;
+    mainComponent: MainComponent;
+}
 
 /**
  * Base command node
  */
 export class CommandNode extends Phaser.GameObjects.Container {
+
+    public static readonly MIN_PIN_OFFSET = 20;
+
+    /**
+     * Use pin size size as its height, because it has square bounds
+     */
+    public static readonly PIN_SIDE_SIZE = NodePin.HEIGHT;
+
+    /**
+     * @deprecated
+     * @see realWidth
+     */
+    public width: number;
+
+    /**
+     * @deprecated
+     * @see realHeight
+     */
+    public height: number;
+
+    /**
+     * Real container width
+     */
+    public get realWidth() {
+        // @TODO: Scale?
+        return this.mainComponent?.width || this.width;
+    }
+
+    /**
+     * Real container height
+     */
+    public get realHeight() {
+        return this.mainComponent?.height || this.height;
+    }
+
+    /**
+     * Calculates pin offset
+     *
+     * @param index
+     * @param offsetTop
+     */
+    public static calculateVerticalPinOffset(index: number, offsetTop: number) {
+        return index * this.PIN_SIDE_SIZE // Count of pins
+            + offsetTop // + offsetTop, which is mainComp height multiplied by originY
+            + (.5 * this.PIN_SIDE_SIZE) // @TODO: get original nodepin originY
+            + index + 1 * this.MIN_PIN_OFFSET; // Always add top offset
+    }
 
     /**
      * Respect relative drag offset
@@ -14,29 +73,95 @@ export class CommandNode extends Phaser.GameObjects.Container {
     };
 
     /**
+     * Main component pointer
+     */
+    protected mainComponent: Optional<MainComponent>;
+
+    /**
      * Ctor
+     *
+     * @inner
+     * @final
      */
     constructor(
-        scene: BaseGameScene,
+        public scene: BaseGameScene,
         x: number,
-        y: number
+        y: number,
+        protected isDraggable: boolean = true,
     ) {
         super(scene, x, y);
 
-        this.add(this.createBaseComponents());
-        this.setSize(200, 75);
-        scene.add.existing(this);
+        const {
+            list,
+            mainComponent,
+        } = this.createBaseComponents();
+        this.mainComponent = mainComponent;
+        this.add(list);
 
-        const zone = this.list.find((gameObject) => gameObject instanceof Phaser.GameObjects.Zone);
-        if (zone) {
-            zone.setInteractive({
-                useHandCursor: true,
-                draggable: true,
-            });
-
-            zone.on(Phaser.Input.Events.DRAG_START, this.onDragStart, this);
-            zone.on(Phaser.Input.Events.DRAG, this.onDrag, this);
+        if (this.isDraggable) {
+            const { width, height } = mainComponent;
+            const zone = this.createZone(width, height);
+            this.add(zone);
         }
+
+        // @TODO:
+        this.setSize(200, 75);
+        this.once(Phaser.GameObjects.Events.ADDED_TO_SCENE, () => {
+            this.addPins(true, this.getLeftPins());
+            this.addPins(false, this.getRightPins());
+        });
+
+        scene.add.existing(this);
+    }
+
+    /**
+     * Aux initializer
+     */
+    public init(): this {
+        return this;
+    }
+
+    /**
+     * Add pins to this node
+     */
+    public addPins(isLeft: boolean, pins: NodePin[]) {
+        const mainComponentWidth = this.mainComponent?.width || 0;
+        const mainComponentHeight = this.mainComponent?.height || 0;
+        const mainComponentOriginY = this.mainComponent?.originY || 0;
+
+        const pinsLength = pins.length;
+        const needHeight = pinsLength *
+            CommandNode.PIN_SIDE_SIZE + CommandNode.MIN_PIN_OFFSET // Calculate Height + bottom offset
+            CommandNode.MIN_PIN_OFFSET; // Top offset
+
+        if (this.mainComponent && mainComponentHeight < needHeight) {
+            this.mainComponent.height = needHeight;
+        }
+
+        const alignedPins: Phaser.GameObjects.GameObject[] = [];
+        const originOffset = mainComponentHeight * mainComponentOriginY * -1;
+        for (let i = 0; i < pinsLength; i++) {
+            if (pins[i]) {
+                pins[i].setY(CommandNode.calculateVerticalPinOffset(i, originOffset));
+                pins[i].setX(
+                     // @TODO: Which origin gave .5?
+                    (mainComponentWidth / 2 - CommandNode.PIN_SIDE_SIZE * .5) * (isLeft ? -1 : 1)
+                );
+
+                this.scene.add.existing(pins[i]);
+                alignedPins.push(pins[i]);
+            }
+        }
+
+        this.add(alignedPins);
+    }
+
+    protected getLeftPins(): NodePin[] {
+        return [];
+    }
+
+    protected getRightPins(): NodePin[]  {
+        return [];
     }
 
     /**
@@ -53,22 +178,44 @@ export class CommandNode extends Phaser.GameObjects.Container {
      * @param pointer
      */
     protected onDrag(pointer: Phaser.Input.Pointer) {
-        this.setPosition(
-            pointer.x - this.dragOffset.x,
-            pointer.y - this.dragOffset.y
-        );
+        const { canvasHeight, canvasWidth } = this.scene.getCanvasSize();
+
+        // Clamp to display
+        const newX = Phaser.Math.Clamp(pointer.x - this.dragOffset.x, 2, canvasWidth - 2);
+        const newY = Phaser.Math.Clamp(pointer.y - this.dragOffset.y, 2, canvasHeight - 2);
+
+        this.setPosition(newX, newY);
+    }
+
+    /**
+     * Create dragging zone
+     *
+     * @param width
+     * @param height
+     */
+    public createZone(width: number, height: number) {
+        const zone = this.scene.add.zone(0, 0, width, height);
+        zone.setInteractive({
+            useHandCursor: true,
+            draggable: true,
+        });
+
+        zone.on(Phaser.Input.Events.DRAG_START, this.onDragStart, this);
+        zone.on(Phaser.Input.Events.DRAG, this.onDrag, this);
+
+        return zone;
     }
 
     /**
      * Create base components needed for each command node
      */
-    protected createBaseComponents(): Phaser.GameObjects.GameObject[] {
+    protected createBaseComponents(): BaseComponentsFactoryResult {
         const rect = this.scene.add.rectangle(
             0,
             0,
             200,
             75,
-            Phaser.Display.Color.GetColor(0x33, 0x33, 0x33)
+            DEFAULT_NODE_COLOR,
         );
 
         const text = this.scene.add.text(
@@ -77,7 +224,8 @@ export class CommandNode extends Phaser.GameObjects.Container {
             'Node()',
             {
                 fontSize: '36px',
-                color: 'yellow'
+                color: 'white',
+                fontFamily: 'RobotoRegular'
             }
         ).setOrigin(.5);
 
@@ -87,12 +235,18 @@ export class CommandNode extends Phaser.GameObjects.Container {
             rect.width = textWidth;
         }
 
-        const zone = this.scene.add.zone(0, 0, rect.width, rect.height);
+        return {
+            list: [
+                rect,
+                text
+            ],
+            mainComponent: rect
+        };
+    }
 
-        return [
-            zone,
-            rect,
-            text
-        ];
+    public destroy(fromScene?: boolean | undefined): void {
+        this.mainComponent = undefined;
+
+        super.destroy(fromScene);
     }
 }

@@ -1,0 +1,113 @@
+import { NodePin } from "../NodePin";
+import { BaseComponentsFactoryResult, CommandNode } from "./CommandNode";
+import { RANDOM_INT_UPDATED } from "./events";
+
+export class RandomIntNode extends CommandNode {
+    protected rect: Optional<Phaser.GameObjects.Rectangle>;
+    protected text: Optional<Phaser.GameObjects.Text>;
+
+    protected tween: Optional<Phaser.Tweens.Tween>;
+
+    protected static readonly INITIAL_COLOR = [0, 91, 219] as const;
+
+    protected readonly color = new Phaser.Display.Color(...RandomIntNode.INITIAL_COLOR);
+
+    protected readonly range = {
+        min: 70,
+        max: 90,
+    };
+
+    /**
+     * Update value after timer
+     */
+    protected canUpdateValue: boolean = false;
+
+    protected getRightPins(): NodePin[] {
+        return [
+            new NodePin(this.scene)
+        ];
+    }
+
+    public init() {
+        super.init();
+
+        const updateValueGuard = this.scene.time.addEvent({
+            loop: true,
+            delay: 500,
+            callback: () => {
+                this.canUpdateValue = true;
+            }
+        });
+        this.once(Phaser.GameObjects.Events.DESTROY, () => {
+            updateValueGuard.destroy();
+        });
+
+        this.tween = this.scene.tweens.addCounter({
+            useFrames: true,
+            from: 0,
+            to: 1,
+            duration: 500,
+            loop: -1,
+            onUpdateScope: this,
+            onUpdate(this: RandomIntNode, _, holder: { value: number }) {
+                const randomValue = Phaser.Math.Between(this.range.min, this.range.max);
+
+                this.color.h = holder.value;
+                if (this.rect) {
+                    this.rect.fillColor = this.color.color;
+                }
+
+                if (this.canUpdateValue) {
+                    // @TODO: Argument name
+                    this.text?.setText(`Voltage(${String(randomValue).padStart(2, '0')})`);
+                    this.emit(
+                        RANDOM_INT_UPDATED,
+                        randomValue
+                    );
+
+                    this.canUpdateValue = false;
+                }
+            }
+        });
+
+        return this;
+    }
+
+    protected createBaseComponents(): BaseComponentsFactoryResult {
+        const rect = this.rect = this.scene.add.rectangle(
+            0,
+            0,
+            250,
+            100,
+            Phaser.Display.Color.GetColor(...RandomIntNode.INITIAL_COLOR),
+        );
+
+        const text = this.text = this.scene.add.text(
+            0,
+            0,
+            'Voltage(00)',
+            {
+                fontSize: '24px',
+                fontFamily: 'RobotoRegular',
+            }
+        ).setOrigin(.5);
+
+        return {
+            list: [
+                rect,
+                text
+            ],
+            mainComponent: rect
+        }
+    }
+
+    public destroy(fromScene?: boolean | undefined): void {
+        this.tween?.remove();
+
+        this.text?.destroy(fromScene);
+        this.rect?.destroy(fromScene);
+        this.text = this.rect = undefined;
+
+        super.destroy(fromScene);
+    }
+}

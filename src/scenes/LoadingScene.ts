@@ -30,6 +30,7 @@ export class LoadingScene extends Phaser.Scene {
 
         // BG
         this.load.image('bg', ['assets/common/bg/mars-background.webp', 'assets/common/bg/mars-background_n.webp']);
+        this.load.image('bg-controlPanel', 'assets/common/bg/bg-ControlPanel.png');
 
         // UI
         this.load.image('icon-rotate', 'assets/ui/icons/sync.png');
