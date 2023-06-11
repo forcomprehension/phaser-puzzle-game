@@ -3,6 +3,7 @@ import { IConnectionSocket } from "@interfaces/IConnectionSocket";
 import { BodyLabel } from "@src/constants/collision";
 import { INACTIVE_PIN_COLOR } from "@src/constants/colors";
 import type { TestProgrammingScene } from "@src/scenes/TestProgrammingScene";
+import { ON_PIN_CONNECTED, ON_PIN_DISCONNECTED } from "./nodepins/events";
 
 /**
  * Node Pin for commands
@@ -22,7 +23,8 @@ export class NodePin extends Phaser.GameObjects.Container implements IConnection
      * Ctor
      */
     constructor(
-        public scene: TestProgrammingScene
+        public scene: TestProgrammingScene,
+        public readonly isRight: boolean,
     ) {
         super(scene, 0, 0);
 
@@ -86,11 +88,15 @@ export class NodePin extends Phaser.GameObjects.Container implements IConnection
         this.connectedObject = targetObject;
 
         if (allConnected) {
-
+            // @TODO: WHY ARGUMENTS COME IN REVERSED ORDER?
+            this.emit(ON_PIN_CONNECTED, this, targetObject);
+            // @TODO:
+            (this.connectedObject as NodePin).emit(ON_PIN_CONNECTED, targetObject, this);
         }
     }
     disconnectObject(targetObject: IConnectedObject): void {
         if (this.connectedObject === targetObject) { // @TODO: needed?
+            this.emit(ON_PIN_DISCONNECTED);
             this.connectedObject = null;
         }
     }

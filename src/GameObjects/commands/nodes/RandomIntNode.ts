@@ -1,5 +1,7 @@
 import { NodePin } from "../NodePin";
+import { ON_PIN_CONNECTED, ON_PIN_DISCONNECTED } from "../nodepins/events";
 import { BaseComponentsFactoryResult, CommandNode } from "./CommandNode";
+import { MonochromeDisplayNode } from "./MonochromeDisplayNode";
 import { RANDOM_INT_UPDATED } from "./events";
 
 export class RandomIntNode extends CommandNode {
@@ -23,8 +25,30 @@ export class RandomIntNode extends CommandNode {
     protected canUpdateValue: boolean = false;
 
     protected getRightPins(): NodePin[] {
+        const valuesPin = new NodePin(this.scene, true);
+
+        valuesPin.on(ON_PIN_CONNECTED, (_: NodePin, other: NodePin) => {
+            // @TODO: kostyl
+            const { parentContainer } = other;
+            if (parentContainer instanceof MonochromeDisplayNode) {
+
+                const forwardRandUpdated = function(value: number) {
+                    parentContainer.updateText(String(value));
+                };
+
+                this.on(RANDOM_INT_UPDATED, forwardRandUpdated, this);
+                this.on(ON_PIN_DISCONNECTED, function disconnectPin(this: RandomIntNode, disconnectedPin: NodePin) {
+                    // @TODO: Unsub does not wotk
+                    if (disconnectedPin === other) {
+                        this.off(RANDOM_INT_UPDATED, forwardRandUpdated);
+                        this.off(ON_PIN_DISCONNECTED, disconnectPin);
+                    }
+                });
+            }
+        });
+
         return [
-            new NodePin(this.scene)
+            valuesPin
         ];
     }
 

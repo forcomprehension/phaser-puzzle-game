@@ -42,7 +42,7 @@ export class MonochromeDisplayNode extends CommandNode {
 
     public getLeftPins() {
         return [
-            new NodePin(this.scene)
+            new NodePin(this.scene, false)
         ]
     }
 

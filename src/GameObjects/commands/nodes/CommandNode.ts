@@ -1,7 +1,7 @@
 import { DEFAULT_NODE_COLOR } from "@src/constants/colors";
-import type { BaseGameScene } from "@src/scenes/BaseGameScene";
 import { NodePin } from "../NodePin";
 import type { TestProgrammingScene } from "@src/scenes/TestProgrammingScene";
+import { ON_PIN_CONNECTED, ON_PIN_DISCONNECTED } from "../nodepins/events";
 
 type MainComponent = Phaser.GameObjects.GameObject & Phaser.GameObjects.Components.Origin & {
     height: number,
@@ -151,6 +151,17 @@ export class CommandNode extends Phaser.GameObjects.Container {
 
                 this.scene.add.existing(pins[i]);
                 alignedPins.push(pins[i]);
+
+                const forwardMessage = function forwardMessage(this: CommandNode, ...args: any[]) {
+                    this.emit(ON_PIN_CONNECTED, ...args);
+                };
+
+                pins[i].on(ON_PIN_CONNECTED, forwardMessage, this);
+                pins[i].once(ON_PIN_DISCONNECTED, () => {
+                    this.emit(ON_PIN_DISCONNECTED, pins[i]);
+                });
+
+                pins[i].once(ON_PIN_DISCONNECTED, forwardMessage, this);
             }
         }
 
