@@ -27,7 +27,7 @@ export class RandomIntNode extends CommandNode {
     protected getRightPins(): NodePin[] {
         const valuesPin = new NodePin(this.scene, true);
 
-        valuesPin.on(ON_PIN_CONNECTED, (_: NodePin, other: NodePin) => {
+        valuesPin.on(ON_PIN_CONNECTED, (myPin: NodePin, other: NodePin) => {
             // @TODO: kostyl
             const { parentContainer } = other;
             if (parentContainer instanceof MonochromeDisplayNode) {
@@ -38,8 +38,7 @@ export class RandomIntNode extends CommandNode {
 
                 this.on(RANDOM_INT_UPDATED, forwardRandUpdated, this);
                 this.on(ON_PIN_DISCONNECTED, function disconnectPin(this: RandomIntNode, disconnectedPin: NodePin) {
-                    // @TODO: Unsub does not wotk
-                    if (disconnectedPin === other) {
+                    if (disconnectedPin === myPin) {
                         this.off(RANDOM_INT_UPDATED, forwardRandUpdated);
                         this.off(ON_PIN_DISCONNECTED, disconnectPin);
                     }
@@ -82,8 +81,7 @@ export class RandomIntNode extends CommandNode {
                 }
 
                 if (this.canUpdateValue) {
-                    // @TODO: Argument name
-                    this.text?.setText(`Voltage(${String(randomValue).padStart(2, '0')})`);
+                    this.text?.setText(this.getVoltageText(randomValue));
                     this.emit(
                         RANDOM_INT_UPDATED,
                         randomValue
@@ -95,6 +93,11 @@ export class RandomIntNode extends CommandNode {
         });
 
         return this;
+    }
+
+    protected getVoltageText(randomValue: number) {
+        // @TODO: Argument name
+        return `Voltage(${String(randomValue).padStart(2, '0')})`;
     }
 
     protected createBaseComponents(): BaseComponentsFactoryResult {
@@ -109,7 +112,7 @@ export class RandomIntNode extends CommandNode {
         const text = this.text = this.scene.add.text(
             0,
             0,
-            'Voltage(00)',
+            this.getVoltageText(0),
             {
                 fontSize: '24px',
                 fontFamily: 'RobotoRegular',

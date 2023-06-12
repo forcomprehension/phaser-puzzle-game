@@ -1,6 +1,7 @@
 import { MonochromeDisplay } from "@GameObjects/displays/monochrome/MonochromeDisplay";
 import { CommandNode } from "./CommandNode";
 import { NodePin } from "../NodePin";
+import { ON_PIN_CONNECTED, ON_PIN_DISCONNECTED } from "../nodepins/events";
 
 export class MonochromeDisplayNode extends CommandNode {
     protected text: Optional<Phaser.GameObjects.Text>;
@@ -41,8 +42,13 @@ export class MonochromeDisplayNode extends CommandNode {
     }
 
     public getLeftPins() {
+        const pin = new NodePin(this.scene, false);
+        pin.once(ON_PIN_DISCONNECTED, (_: NodePin, other: NodePin) => {
+            this.updateText('00');
+        });
+
         return [
-            new NodePin(this.scene, false)
+            pin
         ]
     }
 
