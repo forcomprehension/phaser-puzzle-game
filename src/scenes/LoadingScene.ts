@@ -34,6 +34,7 @@ export class LoadingScene extends Phaser.Scene {
 
         // UI
         this.load.image('icon-rotate', 'assets/ui/icons/sync.png');
+        this.load.image('nextPage', 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/assets/images/arrow-down-left.png');
 
         // Characters
         this.load.atlas(

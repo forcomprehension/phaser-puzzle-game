@@ -2,6 +2,8 @@ import { MonochromeDisplay } from "@GameObjects/displays/monochrome/MonochromeDi
 import { CommandNode } from "./CommandNode";
 import { NodePin } from "../NodePin";
 import { ON_PIN_CONNECTED, ON_PIN_DISCONNECTED } from "../nodepins/events";
+import { RandomIntNode } from "./RandomIntNode";
+import { NODE_RECEIVE_DATA } from "./events";
 
 export class MonochromeDisplayNode extends CommandNode {
     protected text: Optional<Phaser.GameObjects.Text>;
@@ -52,7 +54,18 @@ export class MonochromeDisplayNode extends CommandNode {
         ]
     }
 
-    public updateText(text: string) {
+    /**
+     * Receive data marker
+     */
+    public receiveData(fromPin: NodePin, data: any): void {
+        this.emit(NODE_RECEIVE_DATA);
+
+        if (fromPin.parentContainer instanceof RandomIntNode) {
+            this.updateText(String(data));
+        }
+    }
+
+    protected updateText(text: string) {
         this.text?.setText(text);
     }
 

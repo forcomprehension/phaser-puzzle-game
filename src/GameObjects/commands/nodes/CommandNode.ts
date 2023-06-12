@@ -2,6 +2,7 @@ import { DEFAULT_NODE_COLOR } from "@src/constants/colors";
 import { NodePin } from "../NodePin";
 import type { TestProgrammingScene } from "@src/scenes/TestProgrammingScene";
 import { ON_PIN_CONNECTED, ON_PIN_DISCONNECTED } from "../nodepins/events";
+import { INodeReceiveData } from "@interfaces/nodes/INodeReceiveData";
 
 type MainComponent = Phaser.GameObjects.GameObject & Phaser.GameObjects.Components.Origin & {
     height: number,
@@ -16,7 +17,7 @@ export type BaseComponentsFactoryResult = {
 /**
  * Base command node
  */
-export class CommandNode extends Phaser.GameObjects.Container {
+export class CommandNode extends Phaser.GameObjects.Container implements INodeReceiveData {
 
     public static readonly MIN_PIN_OFFSET = 20;
 
@@ -24,6 +25,19 @@ export class CommandNode extends Phaser.GameObjects.Container {
      * Use pin size size as its height, because it has square bounds
      */
     public static readonly PIN_SIDE_SIZE = NodePin.HEIGHT;
+
+    /**
+     * Calculates pin offset
+     *
+     * @param index
+     * @param offsetTop
+     */
+    public static calculateVerticalPinOffset(index: number, offsetTop: number) {
+        return index * this.PIN_SIDE_SIZE // Count of pins
+            + offsetTop // + offsetTop, which is mainComp height multiplied by originY
+            + (.5 * this.PIN_SIDE_SIZE) // @TODO: get original nodepin originY
+            + index + 1 * this.MIN_PIN_OFFSET; // Always add top offset
+    }
 
     /**
      * @deprecated
@@ -53,17 +67,9 @@ export class CommandNode extends Phaser.GameObjects.Container {
     }
 
     /**
-     * Calculates pin offset
-     *
-     * @param index
-     * @param offsetTop
+     * PinsContainer
      */
-    public static calculateVerticalPinOffset(index: number, offsetTop: number) {
-        return index * this.PIN_SIDE_SIZE // Count of pins
-            + offsetTop // + offsetTop, which is mainComp height multiplied by originY
-            + (.5 * this.PIN_SIDE_SIZE) // @TODO: get original nodepin originY
-            + index + 1 * this.MIN_PIN_OFFSET; // Always add top offset
-    }
+    protected readonly pinsList: NodePin[] = [];
 
     /**
      * Respect relative drag offset
@@ -115,6 +121,23 @@ export class CommandNode extends Phaser.GameObjects.Container {
         scene.add.existing(this);
     }
 
+    // region INodeReceiveData
+    /**
+     * Can this node receive data
+     */
+    canReceiveData(): boolean {
+        return this.pinsList.some((pin) => !pin.isRight);
+    }
+
+    /**
+     * Receive data marker
+     */
+    receiveData(fromPin: NodePin, data: any): void {
+
+    }
+
+    // endregion INodeReceiveData
+
     /**
      * Aux initializer
      */
@@ -139,7 +162,7 @@ export class CommandNode extends Phaser.GameObjects.Container {
             this.mainComponent.height = needHeight;
         }
 
-        const alignedPins: Phaser.GameObjects.GameObject[] = [];
+        const alignedPins: NodePin[] = [];
         const originOffset = mainComponentHeight * mainComponentOriginY * -1;
         for (let i = 0; i < pinsLength; i++) {
             if (pins[i]) {
@@ -166,6 +189,7 @@ export class CommandNode extends Phaser.GameObjects.Container {
         }
 
         this.add(alignedPins);
+        this.pinsList.push(...alignedPins);
     }
 
     protected getLeftPins(): NodePin[] {

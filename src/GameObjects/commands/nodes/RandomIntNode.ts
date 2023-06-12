@@ -33,7 +33,9 @@ export class RandomIntNode extends CommandNode {
             if (parentContainer instanceof MonochromeDisplayNode) {
 
                 const forwardRandUpdated = function(value: number) {
-                    parentContainer.updateText(String(value));
+                    if (parentContainer.canReceiveData()) {
+                        parentContainer.receiveData(other, String(value));
+                    }
                 };
 
                 this.on(RANDOM_INT_UPDATED, forwardRandUpdated, this);
@@ -131,8 +133,6 @@ export class RandomIntNode extends CommandNode {
     public destroy(fromScene?: boolean | undefined): void {
         this.tween?.remove();
 
-        this.text?.destroy(fromScene);
-        this.rect?.destroy(fromScene);
         this.text = this.rect = undefined;
 
         super.destroy(fromScene);
