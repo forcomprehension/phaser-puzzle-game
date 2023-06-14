@@ -4,6 +4,7 @@ import { BodyLabel } from "@src/constants/collision";
 import { INACTIVE_PIN_COLOR } from "@src/constants/colors";
 import type { TestProgrammingScene } from "@src/scenes/TestProgrammingScene";
 import { ON_PIN_CONNECTED, ON_PIN_DISCONNECTED } from "./nodepins/events";
+import type { CommandNode } from "./nodes/CommandNode";
 
 /**
  * Node Pin for commands
@@ -18,6 +19,11 @@ export class NodePin extends Phaser.GameObjects.Container implements IConnection
     protected circle: Optional<Phaser.GameObjects.Arc>;
 
     protected connectedObject: Nullable<IConnectedObject> = null;
+
+    /**
+     * Specify type
+     */
+    public parentContainer: CommandNode;
 
     /**
      * Ctor
@@ -54,6 +60,10 @@ export class NodePin extends Phaser.GameObjects.Container implements IConnection
         this.scene.add.existing(this);
     }
 
+    public getConnectedObject(): Nullable<IConnectedObject> {
+        return this.connectedObject;
+    }
+
     protected onClick() {
         if (!this.scene.hasActiveGameObject()) {
             this.scene.activateGameObject(this.scene.nodeConnectorDrawer);
@@ -81,9 +91,11 @@ export class NodePin extends Phaser.GameObjects.Container implements IConnection
     getSocketIsBusy(): boolean {
         return !!this.connectedObject;
     }
+
     getConnectorObject(): IConnectedObject {
         return this;
     }
+
     connectObject(targetObject: IConnectedObject, allConnected: boolean): void {
         this.connectedObject = targetObject;
 
@@ -94,6 +106,7 @@ export class NodePin extends Phaser.GameObjects.Container implements IConnection
             (this.connectedObject as NodePin).emit(ON_PIN_CONNECTED, targetObject, this);
         }
     }
+
     disconnectObject(targetObject: IConnectedObject): void {
         if (this.connectedObject === targetObject) { // @TODO: needed?
             this.emit(ON_PIN_DISCONNECTED);

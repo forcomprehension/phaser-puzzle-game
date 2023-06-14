@@ -74,6 +74,10 @@ export class Motor extends Phaser.Physics.Matter.Image implements IConnectionSoc
         });
     }
 
+    public getConnectedObject(): Nullable<IConnectedObject> {
+        return this.pulley.getConnectedObject();
+    }
+
     protected handleReturn() {
         this.scene.toolsDashboard
             .get(MotorDashboardPresenter.name)

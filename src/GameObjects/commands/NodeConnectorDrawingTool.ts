@@ -81,7 +81,7 @@ export class NodeConnectionDrawingTool extends Phaser.GameObjects.GameObject imp
                 color: 0xff0000,
                 alpha: 1
             }
-        });
+        }).setDepth(1000);
     }
 
     /**

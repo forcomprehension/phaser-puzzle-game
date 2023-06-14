@@ -86,6 +86,13 @@ export abstract class AbstractGear extends Phaser.Physics.Matter.Image implement
             })
     }
 
+    /**
+     * Get connected object
+     */
+    public getConnectedObject(): Nullable<IConnectedObject> {
+        return this.connectedObject;
+    }
+
     public getBodyLabel(): BodyLabel {
         return BodyLabel.GEAR;
     }

@@ -1,10 +1,11 @@
 import { NodePin } from "../NodePin";
 import { ON_PIN_CONNECTED, ON_PIN_DISCONNECTED } from "../nodepins/events";
 import { BaseComponentsFactoryResult, CommandNode } from "./CommandNode";
-import { MonochromeDisplayNode } from "./MonochromeDisplayNode";
 import { RANDOM_INT_UPDATED } from "./events";
 
 export class RandomIntNode extends CommandNode {
+    public static readonly ACTOR_KEY = 'RandomIntNode';
+
     protected rect: Optional<Phaser.GameObjects.Rectangle>;
     protected text: Optional<Phaser.GameObjects.Text>;
 
@@ -30,11 +31,11 @@ export class RandomIntNode extends CommandNode {
         valuesPin.on(ON_PIN_CONNECTED, (myPin: NodePin, other: NodePin) => {
             // @TODO: kostyl
             const { parentContainer } = other;
-            if (parentContainer instanceof MonochromeDisplayNode) {
-
+            if (parentContainer instanceof CommandNode) {
                 const forwardRandUpdated = function(value: number) {
+                    // @TODO: type
                     if (parentContainer.canReceiveData()) {
-                        parentContainer.receiveData(other, String(value));
+                        parentContainer.receiveData(myPin, String(value), other);
                     }
                 };
 
@@ -83,7 +84,7 @@ export class RandomIntNode extends CommandNode {
                 }
 
                 if (this.canUpdateValue) {
-                    this.text?.setText(this.getVoltageText(randomValue));
+                    this.text?.setText(this.getTemperatureText(randomValue));
                     this.emit(
                         RANDOM_INT_UPDATED,
                         randomValue
@@ -97,16 +98,16 @@ export class RandomIntNode extends CommandNode {
         return this;
     }
 
-    protected getVoltageText(randomValue: number) {
+    protected getTemperatureText(randomValue: number) {
         // @TODO: Argument name
-        return `Voltage(${String(randomValue).padStart(2, '0')})`;
+        return `Temperature(${String(randomValue).padStart(2, '0')}) F`;
     }
 
     protected createBaseComponents(): BaseComponentsFactoryResult {
         const rect = this.rect = this.scene.add.rectangle(
             0,
             0,
-            250,
+            330,
             100,
             Phaser.Display.Color.GetColor(...RandomIntNode.INITIAL_COLOR),
         );
@@ -114,7 +115,7 @@ export class RandomIntNode extends CommandNode {
         const text = this.text = this.scene.add.text(
             0,
             0,
-            this.getVoltageText(0),
+            this.getTemperatureText(0),
             {
                 fontSize: '24px',
                 fontFamily: 'RobotoRegular',

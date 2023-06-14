@@ -6,5 +6,5 @@ import { NodePin } from "@GameObjects/commands/NodePin";
 export interface INodeReceiveData {
     canReceiveData(): boolean;
 
-    receiveData(fromPin: NodePin, data: any): void;
+    receiveData(otherPin: NodePin, data: any, myPin: NodePin): void;
 }

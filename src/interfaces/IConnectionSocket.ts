@@ -19,6 +19,11 @@ export interface IConnectionSocket {
      */
     getConnectorObject(): IConnectedObject;
 
+    /**
+     * Get connected object
+     */
+    getConnectedObject(): Nullable<IConnectedObject>;
+
      /**
      * Connect other object to this object's socket
      */

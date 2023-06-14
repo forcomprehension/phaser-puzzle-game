@@ -1,11 +1,12 @@
 import { MonochromeDisplay } from "@GameObjects/displays/monochrome/MonochromeDisplay";
 import { CommandNode } from "./CommandNode";
 import { NodePin } from "../NodePin";
-import { ON_PIN_CONNECTED, ON_PIN_DISCONNECTED } from "../nodepins/events";
-import { RandomIntNode } from "./RandomIntNode";
-import { NODE_RECEIVE_DATA } from "./events";
+import { ON_PIN_DISCONNECTED } from "../nodepins/events";
 
 export class MonochromeDisplayNode extends CommandNode {
+
+    public static readonly ACTOR_KEY = 'MonochromeDisplayNode';
+
     protected text: Optional<Phaser.GameObjects.Text>;
 
     protected createBaseComponents() {
@@ -56,12 +57,20 @@ export class MonochromeDisplayNode extends CommandNode {
 
     /**
      * Receive data marker
+     *
+     * @param otherPin Sender pin
      */
-    public receiveData(fromPin: NodePin, data: any): void {
-        this.emit(NODE_RECEIVE_DATA);
+    public receiveData(otherPin: NodePin, data: any, myPin: NodePin): void {
+        super.receiveData(otherPin, data, myPin);
 
-        if (fromPin.parentContainer instanceof RandomIntNode) {
-            this.updateText(String(data));
+        // @todo: pin types
+        if (otherPin.parentContainer instanceof CommandNode) {
+            let dataCopy = data;
+            // @TODO: MOVE TO UTILS
+            if (typeof dataCopy === 'number' && String(dataCopy).includes('.')) {
+                dataCopy = dataCopy.toFixed(2);
+            }
+            this.updateText(dataCopy);
         }
     }
 

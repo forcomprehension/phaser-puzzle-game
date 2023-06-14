@@ -3,6 +3,7 @@ import { NodePin } from "../NodePin";
 import type { TestProgrammingScene } from "@src/scenes/TestProgrammingScene";
 import { ON_PIN_CONNECTED, ON_PIN_DISCONNECTED } from "../nodepins/events";
 import { INodeReceiveData } from "@interfaces/nodes/INodeReceiveData";
+import { NODE_RECEIVE_DATA } from "./events";
 
 type MainComponent = Phaser.GameObjects.GameObject & Phaser.GameObjects.Components.Origin & {
     height: number,
@@ -14,11 +15,14 @@ export type BaseComponentsFactoryResult = {
     mainComponent: MainComponent;
 }
 
+
 /**
  * Base command node
  */
 export class CommandNode extends Phaser.GameObjects.Container implements INodeReceiveData {
-
+    /**
+     * Pin vertical margin
+     */
     public static readonly MIN_PIN_OFFSET = 20;
 
     /**
@@ -37,6 +41,20 @@ export class CommandNode extends Phaser.GameObjects.Container implements INodeRe
             + offsetTop // + offsetTop, which is mainComp height multiplied by originY
             + (.5 * this.PIN_SIDE_SIZE) // @TODO: get original nodepin originY
             + index + 1 * this.MIN_PIN_OFFSET; // Always add top offset
+    }
+
+    /**
+     * Partial factory
+     */
+    public static spawnerFactory(
+        x: number,
+        y: number,
+        isDraggable: boolean = true
+    ) {
+        const ctor = this;
+        return function LevelFactory(scene: TestProgrammingScene) {
+            return new ctor(scene, x, y, isDraggable);
+        }
     }
 
     /**
@@ -67,9 +85,14 @@ export class CommandNode extends Phaser.GameObjects.Container implements INodeRe
     }
 
     /**
-     * PinsContainer
+     * Right pins container
      */
-    protected readonly pinsList: NodePin[] = [];
+    protected readonly rightPinsList: NodePin[] = [];
+
+    /**
+     * Left pins container
+     */
+    protected readonly leftPinsList: NodePin[] = [];
 
     /**
      * Respect relative drag offset
@@ -83,6 +106,11 @@ export class CommandNode extends Phaser.GameObjects.Container implements INodeRe
      * Main component pointer
      */
     protected mainComponent: Optional<MainComponent>;
+
+    /**
+     * Text component pointer
+     */
+    protected textComponent: Optional<Phaser.GameObjects.Text>;
 
     /**
      * Ctor
@@ -114,9 +142,12 @@ export class CommandNode extends Phaser.GameObjects.Container implements INodeRe
         // @TODO:
         this.setSize(200, 75);
         this.once(Phaser.GameObjects.Events.ADDED_TO_SCENE, () => {
+            // Order is important!
             this.addPins(true, this.getLeftPins());
             this.addPins(false, this.getRightPins());
         });
+
+        this.init();
 
         scene.add.existing(this);
     }
@@ -125,23 +156,22 @@ export class CommandNode extends Phaser.GameObjects.Container implements INodeRe
     /**
      * Can this node receive data
      */
-    canReceiveData(): boolean {
-        return this.pinsList.some((pin) => !pin.isRight);
+    public canReceiveData(): boolean {
+        return this.rightPinsList.length > 0;
     }
 
     /**
      * Receive data marker
      */
-    receiveData(fromPin: NodePin, data: any): void {
-
+    public receiveData(senderPin: NodePin, data: any, receiverPin: NodePin): void {
+        this.emit(NODE_RECEIVE_DATA, senderPin, data, receiverPin);
     }
-
     // endregion INodeReceiveData
 
     /**
      * Aux initializer
      */
-    public init(): this {
+    protected init(): this {
         return this;
     }
 
@@ -149,8 +179,8 @@ export class CommandNode extends Phaser.GameObjects.Container implements INodeRe
      * Add pins to this node
      */
     public addPins(isLeft: boolean, pins: NodePin[]) {
-        const mainComponentWidth = this.mainComponent?.width || 0;
-        const mainComponentHeight = this.mainComponent?.height || 0;
+        const mainComponentWidth = this.realWidth;
+        const mainComponentHeight = this.realHeight;
         const mainComponentOriginY = this.mainComponent?.originY || 0;
 
         const pinsLength = pins.length;
@@ -184,12 +214,17 @@ export class CommandNode extends Phaser.GameObjects.Container implements INodeRe
                     this.emit(ON_PIN_DISCONNECTED, pins[i]);
                 });
 
-                pins[i].once(ON_PIN_DISCONNECTED, forwardMessage, this);
+                pins[i].off(ON_PIN_DISCONNECTED, forwardMessage, this);
             }
         }
 
         this.add(alignedPins);
-        this.pinsList.push(...alignedPins);
+
+        if (isLeft) {
+            this.leftPinsList.push(...alignedPins);
+        } else {
+            this.rightPinsList.push(...alignedPins);
+        }
     }
 
     protected getLeftPins(): NodePin[] {
@@ -242,6 +277,10 @@ export class CommandNode extends Phaser.GameObjects.Container implements INodeRe
         return zone;
     }
 
+    protected getTextNode() {
+        return 'Node()';
+    }
+
     /**
      * Create base components needed for each command node
      */
@@ -254,10 +293,10 @@ export class CommandNode extends Phaser.GameObjects.Container implements INodeRe
             DEFAULT_NODE_COLOR,
         );
 
-        const text = this.scene.add.text(
+        const text = this.textComponent = this.scene.add.text(
             0,
             0,
-            'Node()',
+            this.getTextNode(),
             {
                 fontSize: '36px',
                 color: 'white',
