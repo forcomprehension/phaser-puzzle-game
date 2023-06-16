@@ -3,6 +3,9 @@ import { CommandNode } from "./CommandNode";
 import { NodePin } from "../NodePin";
 import { ON_PIN_DISCONNECTED } from "../nodepins/events";
 
+/**
+ * Monochrome display node
+ */
 export class MonochromeDisplayNode extends CommandNode {
 
     public static readonly ACTOR_KEY = 'MonochromeDisplayNode';

@@ -157,7 +157,7 @@ export class CommandNode extends Phaser.GameObjects.Container implements INodeRe
      * Can this node receive data
      */
     public canReceiveData(): boolean {
-        return this.rightPinsList.length > 0;
+        return this.leftPinsList.length > 0;
     }
 
     /**
@@ -205,15 +205,14 @@ export class CommandNode extends Phaser.GameObjects.Container implements INodeRe
                 this.scene.add.existing(pins[i]);
                 alignedPins.push(pins[i]);
 
+                // Forward ON_PIN_CONNECTED from NodePin to this
                 const forwardMessage = function forwardMessage(this: CommandNode, ...args: any[]) {
                     this.emit(ON_PIN_CONNECTED, ...args);
                 };
-
                 pins[i].on(ON_PIN_CONNECTED, forwardMessage, this);
                 pins[i].once(ON_PIN_DISCONNECTED, () => {
                     this.emit(ON_PIN_DISCONNECTED, pins[i]);
                 });
-
                 pins[i].off(ON_PIN_DISCONNECTED, forwardMessage, this);
             }
         }

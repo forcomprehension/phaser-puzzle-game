@@ -15,7 +15,7 @@ export type ProgrammingSceneData = {
     level?: number
 };
 
-const INEXISTENT_LEVEL_INDEX = -1;
+const START_INDEX_LEVEL = 0;
 
 export class TestProgrammingScene extends BaseGameScene {
 
@@ -23,7 +23,7 @@ export class TestProgrammingScene extends BaseGameScene {
 
     public nodeConnectorDrawer: NodeConnectionDrawingTool;
 
-    protected level: number = INEXISTENT_LEVEL_INDEX;
+    protected level: number = START_INDEX_LEVEL;
 
     protected levelsManager: LevelsManager = new LevelsManager([level1]);
 
@@ -35,7 +35,7 @@ export class TestProgrammingScene extends BaseGameScene {
      * Determine current level
      */
     public init(data: ProgrammingSceneData) {
-        this.level = typeof data.level === 'undefined' ? INEXISTENT_LEVEL_INDEX : data.level;
+        this.level = typeof data.level === 'undefined' ? START_INDEX_LEVEL : data.level;
     }
 
     public create() {

@@ -3,6 +3,9 @@ import { ON_PIN_CONNECTED, ON_PIN_DISCONNECTED } from "../nodepins/events";
 import { BaseComponentsFactoryResult, CommandNode } from "./CommandNode";
 import { RANDOM_INT_UPDATED } from "./events";
 
+/**
+ * Node which generate a random int value from range
+ */
 export class RandomIntNode extends CommandNode {
     public static readonly ACTOR_KEY = 'RandomIntNode';
 
@@ -25,6 +28,9 @@ export class RandomIntNode extends CommandNode {
      */
     protected canUpdateValue: boolean = false;
 
+    /**
+     * @inheritdoc
+     */
     protected getRightPins(): NodePin[] {
         const valuesPin = new NodePin(this.scene, true);
 
@@ -54,6 +60,9 @@ export class RandomIntNode extends CommandNode {
         ];
     }
 
+    /**
+     * @inheritdoc
+     */
     public init() {
         super.init();
 
