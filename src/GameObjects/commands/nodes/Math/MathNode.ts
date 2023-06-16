@@ -2,7 +2,6 @@ import { completeTo } from "@utils/array";
 import { NodePin } from "../../NodePin";
 import { CommandNode } from "../CommandNode";
 import { NODE_RECEIVE_DATA } from "../events";
-import { ON_PIN_CONNECTED } from "@GameObjects/commands/nodepins/events";
 
 /**
  * Abstract class for all simple math nodes
@@ -45,6 +44,9 @@ export abstract class MathNode extends CommandNode {
      */
     protected abstract performMathOperation(): void;
 
+    /**
+     * @inheritdoc
+     */
     protected getRightPins(): NodePin[] {
         const resultPin = new NodePin(this.scene, true);
 
@@ -53,9 +55,7 @@ export abstract class MathNode extends CommandNode {
             const connectedObject = resultPin.getConnectedObject();
             if (connectedObject instanceof NodePin) {
                 const { parentContainer } = connectedObject;
-                if (parentContainer instanceof CommandNode) {
-                    parentContainer.receiveData(resultPin, this.outResult, connectedObject);
-                }
+                parentContainer.receiveData(resultPin, this.outResult, connectedObject);
             }
         });
 
@@ -64,6 +64,9 @@ export abstract class MathNode extends CommandNode {
         ];
     }
 
+    /**
+     * @inheritdoc
+     */
     protected getLeftPins(): NodePin[] {
         const multiplierPin = new NodePin(this.scene, false);
         const multipliedPin = new NodePin(this.scene, false);

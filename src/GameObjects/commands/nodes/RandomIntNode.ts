@@ -9,12 +9,10 @@ import { RANDOM_INT_UPDATED } from "./events";
 export class RandomIntNode extends CommandNode {
     public static readonly ACTOR_KEY = 'RandomIntNode';
 
-    protected rect: Optional<Phaser.GameObjects.Rectangle>;
-    protected text: Optional<Phaser.GameObjects.Text>;
-
-    protected tween: Optional<Phaser.Tweens.Tween>;
-
     protected static readonly INITIAL_COLOR = [0, 91, 219] as const;
+
+    protected rect: Optional<Phaser.GameObjects.Rectangle>;
+    protected tween: Optional<Phaser.Tweens.Tween>;
 
     protected readonly color = new Phaser.Display.Color(...RandomIntNode.INITIAL_COLOR);
 
@@ -35,24 +33,20 @@ export class RandomIntNode extends CommandNode {
         const valuesPin = new NodePin(this.scene, true);
 
         valuesPin.on(ON_PIN_CONNECTED, (myPin: NodePin, other: NodePin) => {
-            // @TODO: kostyl
             const { parentContainer } = other;
-            if (parentContainer instanceof CommandNode) {
-                const forwardRandUpdated = function(value: number) {
-                    // @TODO: type
-                    if (parentContainer.canReceiveData()) {
-                        parentContainer.receiveData(myPin, String(value), other);
-                    }
-                };
+            const forwardRandUpdated = function(value: number) {
+                if (parentContainer.canReceiveData()) {
+                    parentContainer.receiveData(myPin, String(value), other);
+                }
+            };
 
-                this.on(RANDOM_INT_UPDATED, forwardRandUpdated, this);
-                this.on(ON_PIN_DISCONNECTED, function disconnectPin(this: RandomIntNode, disconnectedPin: NodePin) {
-                    if (disconnectedPin === myPin) {
-                        this.off(RANDOM_INT_UPDATED, forwardRandUpdated);
-                        this.off(ON_PIN_DISCONNECTED, disconnectPin);
-                    }
-                });
-            }
+            this.on(RANDOM_INT_UPDATED, forwardRandUpdated, this);
+            this.on(ON_PIN_DISCONNECTED, function disconnectPin(this: RandomIntNode, disconnectedPin: NodePin) {
+                if (disconnectedPin === myPin) {
+                    this.off(RANDOM_INT_UPDATED, forwardRandUpdated);
+                    this.off(ON_PIN_DISCONNECTED, disconnectPin);
+                }
+            });
         });
 
         return [
@@ -93,7 +87,7 @@ export class RandomIntNode extends CommandNode {
                 }
 
                 if (this.canUpdateValue) {
-                    this.text?.setText(this.getTemperatureText(randomValue));
+                    this.textComponent?.setText(this.getTemperatureText(randomValue));
                     this.emit(
                         RANDOM_INT_UPDATED,
                         randomValue
@@ -121,7 +115,7 @@ export class RandomIntNode extends CommandNode {
             Phaser.Display.Color.GetColor(...RandomIntNode.INITIAL_COLOR),
         );
 
-        const text = this.text = this.scene.add.text(
+        const text = this.textComponent = this.scene.add.text(
             0,
             0,
             this.getTemperatureText(0),
@@ -143,7 +137,7 @@ export class RandomIntNode extends CommandNode {
     public destroy(fromScene?: boolean | undefined): void {
         this.tween?.remove();
 
-        this.text = this.rect = undefined;
+        this.textComponent = this.rect = undefined;
 
         super.destroy(fromScene);
     }

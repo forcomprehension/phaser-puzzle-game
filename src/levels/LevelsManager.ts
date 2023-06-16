@@ -8,6 +8,7 @@ export type Actor = {
     id: ActorId,
     key: ActorKey,
     params: ActorParams<ActorKey>
+    data?: any[],
 };
 
 type WinCriteria = {
@@ -38,6 +39,51 @@ export const level1: Level = {
     }
 };
 
+export const level2: Level = {
+    actors: [{
+        id: 1,
+        key: "MonochromeDisplayNode",
+        params: [1480, 360]
+    },  {
+        id: 2,
+        key: "VarNode",
+        params: [80, 560],
+        data: [212],
+    }, {
+        id: 3,
+        key: "VarNode",
+        params: [150, 800],
+        data: [9],
+    }, {
+        id: 4,
+        key: "VarNode",
+        params: [450, 800],
+        data: [5],
+    }, {
+        id: 5,
+        key: "VarNode",
+        params: [700, 800],
+        data: [32],
+    }, {
+        id: 6,
+        key: "MultiplicationNode",
+        params: [650, 350],
+    }, {
+        id: 7,
+        key: "SubtractNode",
+        params: [650, 950],
+    }, {
+        id: 8,
+        key: "DivisionNode",
+        params: [650, 500],
+    }],
+    winCriteria: { // @TODO: MAKE WIN CRITERIA BASED ON NEEDED RESULT
+        type: 'actor-event',
+        actorId: 1,
+        event: NODE_RECEIVE_DATA
+    }
+};
+
 /**
  * Manage levels in current campaign. Load/unload levels and translate between them.
  */
@@ -54,6 +100,10 @@ export class LevelsManager {
         const actorObjects = actors.map((actor) => {
             const actorInstance = ActorsService.getInstance()
                 .getActorSpawner(actor.key, ...actor.params)(scene);
+
+                if (actor.data) {
+                    actorInstance.setDataWithValidation.apply(actorInstance, actor.data);
+                }
 
                 return {
                     actorInstance,

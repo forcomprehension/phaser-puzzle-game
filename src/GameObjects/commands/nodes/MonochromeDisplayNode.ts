@@ -7,10 +7,7 @@ import { ON_PIN_DISCONNECTED } from "../nodepins/events";
  * Monochrome display node
  */
 export class MonochromeDisplayNode extends CommandNode {
-
     public static readonly ACTOR_KEY = 'MonochromeDisplayNode';
-
-    protected text: Optional<Phaser.GameObjects.Text>;
 
     protected createBaseComponents() {
         const display = new MonochromeDisplay(
@@ -20,12 +17,12 @@ export class MonochromeDisplayNode extends CommandNode {
             400
         );
 
-        const text = this.text = this.scene.add.text(0, 0, '00', {
+        const text = this.textComponent = this.scene.add.text(0, 0, '00', {
             fontSize: '128px',
             color: 'rgba(192, 192, 192, 0.75)',
         })
             .setDepth(1)
-            .setOrigin(0.5);
+            .setOrigin(.5);
 
         // @todo:
         const height = display.height;
@@ -47,9 +44,12 @@ export class MonochromeDisplayNode extends CommandNode {
         }
     }
 
+    /**
+     * @inheritdoc
+     */
     public getLeftPins() {
         const pin = new NodePin(this.scene, false);
-        pin.once(ON_PIN_DISCONNECTED, (_: NodePin, other: NodePin) => {
+        pin.once(ON_PIN_DISCONNECTED, (_: NodePin) => {
             this.updateText('00');
         });
 
@@ -78,11 +78,11 @@ export class MonochromeDisplayNode extends CommandNode {
     }
 
     protected updateText(text: string) {
-        this.text?.setText(text);
+        this.textComponent?.setText(text);
     }
 
     public destroy(fromScene?: boolean | undefined): void {
-        this.text = undefined;
+        this.textComponent = undefined;
 
         super.destroy(fromScene);
     }

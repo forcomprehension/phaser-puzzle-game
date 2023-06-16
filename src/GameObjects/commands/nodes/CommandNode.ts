@@ -176,6 +176,13 @@ export class CommandNode extends Phaser.GameObjects.Container implements INodeRe
     }
 
     /**
+     * Sets extra data for actor with validation
+     */
+    public setDataWithValidation(...args: any[]): boolean {
+        return true;
+    }
+
+    /**
      * Add pins to this node
      */
     public addPins(isLeft: boolean, pins: NodePin[]) {

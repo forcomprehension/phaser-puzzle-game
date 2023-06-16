@@ -5,7 +5,7 @@ import { RandomIntNode } from "@GameObjects/commands/nodes/RandomIntNode";
 import { NodeConnectionDrawingTool } from "@GameObjects/commands/NodeConnectorDrawingTool";
 import { CustomTextBox } from "@GameObjects/Textbox/CustomTextBox";
 import { NODE_RECEIVE_DATA } from "@GameObjects/commands/nodes/events";
-import { LevelsManager, level1 } from "@src/levels/LevelsManager";
+import { LevelsManager, level1, level2 } from "@src/levels/LevelsManager";
 import { MultiplicationNode } from "@GameObjects/commands/nodes/Math/MultiplicationNode";
 import { DivisionNode } from "@GameObjects/commands/nodes/Math/DivisionNode";
 import { VarNode } from "@GameObjects/commands/nodes/VarNode";
@@ -25,7 +25,7 @@ export class TestProgrammingScene extends BaseGameScene {
 
     protected level: number = START_INDEX_LEVEL;
 
-    protected levelsManager: LevelsManager = new LevelsManager([level1]);
+    protected levelsManager: LevelsManager = new LevelsManager([level2, level1]);
 
     constructor() {
         super('ProgrammingScene');

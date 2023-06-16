@@ -1,6 +1,11 @@
 import { MathNode } from "./MathNode";
 
+/**
+ * Subtraction node
+ */
 export class SubtractNode extends MathNode {
+    public static readonly ACTOR_KEY = 'SubtractNode';
+
     protected getTextNode(): string {
         return '-';
     }
