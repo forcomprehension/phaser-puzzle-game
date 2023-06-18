@@ -28,7 +28,7 @@ export class VarNode extends CommandNode {
 
             // @TODO: SPIKE!!!
             interval = setInterval(() => {
-                if (connected) {
+                if (connected && other.parentContainer) {
                     other.parentContainer.receiveData(myPin, this.ourValue, other);
                 }
             }, 333);
@@ -36,6 +36,9 @@ export class VarNode extends CommandNode {
 
         this.once(ON_PIN_DISCONNECTED, () => {
             connected = false;
+            clearInterval(interval);
+        });
+        this.once(Phaser.GameObjects.Events.DESTROY, () => {
             clearInterval(interval);
         });
 

@@ -25,6 +25,8 @@ export class TestProgrammingScene extends BaseGameScene {
 
     protected level: number = START_INDEX_LEVEL;
 
+    protected winCurrentLevel: boolean = false;
+
     protected levelsManager: LevelsManager = new LevelsManager([level2, level1]);
 
     constructor() {
@@ -35,6 +37,7 @@ export class TestProgrammingScene extends BaseGameScene {
      * Determine current level
      */
     public init(data: ProgrammingSceneData) {
+        this.winCurrentLevel = false;
         this.level = typeof data.level === 'undefined' ? START_INDEX_LEVEL : data.level;
     }
 
@@ -69,22 +72,27 @@ export class TestProgrammingScene extends BaseGameScene {
     }
 
     protected win() {
-        const { canvasHeight, canvasWidth } = this.getCanvasSize();
-        new CustomTextBox(
-            this,
-            canvasWidth / 2,
-            canvasHeight / 10 * 9,
-            () => {
-                const nextLevelIndex = this.level + 1;
-                if (this.levelsManager.hasNextLevel(nextLevelIndex)) {
-                    this.scene.restart({
-                        level: nextLevelIndex
-                    })
-                } else {
-                    alert('You won!');
+        // @todo: do better condition
+        if (!this.winCurrentLevel) {
+            const { canvasHeight, canvasWidth } = this.getCanvasSize();
+            new CustomTextBox(
+                this,
+                canvasWidth / 2,
+                canvasHeight / 10 * 9,
+                () => {
+                    const nextLevelIndex = this.level + 1;
+                    if (this.levelsManager.hasNextLevel(nextLevelIndex)) {
+                        this.scene.restart({
+                            level: nextLevelIndex
+                        })
+                    } else {
+                        alert('You won!');
+                    }
                 }
-            }
-        ).start('Well done!\nProceed to next level!');
+            ).start('Well done!\nProceed to next level!');
+
+            this.winCurrentLevel = true;
+        }
     }
 
     protected testLevel() {

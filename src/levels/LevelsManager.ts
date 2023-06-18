@@ -1,6 +1,9 @@
 import { NODE_RECEIVE_DATA } from "@GameObjects/commands/nodes/events";
-import { TestProgrammingScene } from "@src/scenes/TestProgrammingScene";
+import type { TestProgrammingScene } from "@src/scenes/TestProgrammingScene";
 import { ActorsService, type ActorKey, type ActorParams } from "@src/services/ActorsService";
+import { ExpressionMap, ExpressionsContainer } from "./ExpressionsContainer";
+import type { CommandNode } from "@GameObjects/commands/nodes/CommandNode";
+import { NodePin } from "@GameObjects/commands/NodePin";
 
 type ActorId = number;
 
@@ -12,10 +15,16 @@ export type Actor = {
 };
 
 type WinCriteria = {
-    type: 'actor-event',
     actorId: ActorId,
+} & ({
+    type: 'actor-event',
     event: string,
-};
+} | {
+    type: 'actor-check-math-data',
+    mathExpression: string,
+    pinIndex: number,
+    expression: keyof typeof ExpressionMap
+});
 
 export type Level = {
     actors: Actor[]
@@ -77,12 +86,19 @@ export const level2: Level = {
         key: "DivisionNode",
         params: [650, 500],
     }],
-    winCriteria: { // @TODO: MAKE WIN CRITERIA BASED ON NEEDED RESULT
-        type: 'actor-event',
+    winCriteria: {
+        type: 'actor-check-math-data',
         actorId: 1,
-        event: NODE_RECEIVE_DATA
+        mathExpression: '$value 32 - 9 / 5 *',
+        pinIndex: 0,
+        expression: ExpressionsContainer.RPN.name
     }
 };
+
+type ActorObjectInfo = Readonly<{
+    actorInstance: CommandNode,
+    id: ActorId
+}>;
 
 /**
  * Manage levels in current campaign. Load/unload levels and translate between them.
@@ -94,10 +110,11 @@ export class LevelsManager {
 
     public async loadLevel(
         scene: TestProgrammingScene,
-        { actors, winCriteria }: Level,
-        winCallback: (this: typeof scene) => any
+        level: Level,
+        winCallback: (this: TestProgrammingScene) => any
     ) {
-        const actorObjects = actors.map((actor) => {
+        const { actors } = level;
+        const actorObjects = actors.map<ActorObjectInfo>((actor) => {
             const actorInstance = ActorsService.getInstance()
                 .getActorSpawner(actor.key, ...actor.params)(scene);
 
@@ -108,14 +125,45 @@ export class LevelsManager {
                 return {
                     actorInstance,
                     id: actor.id
-                } as const;
+                };
         });
 
-        const actorForWinCriteria = actorObjects.find(({ id }) => id === winCriteria.actorId);
+        this.configureWinCriteria(level, actorObjects, scene, winCallback); // if false?
+    }
 
-        if (actorForWinCriteria) {
-            actorForWinCriteria.actorInstance.once(winCriteria.event, winCallback, scene);
+    protected configureWinCriteria(
+        { winCriteria }: Level,
+        actorsInfo: ActorObjectInfo[],
+        scene: TestProgrammingScene,
+        winCallback: (this: TestProgrammingScene) => any
+    ): boolean {
+        const actorForWinCriteria = actorsInfo.find(({ id }) => id === winCriteria.actorId);
+        if (!actorForWinCriteria) {
+            return false;
         }
+
+        switch(winCriteria.type) {
+            case "actor-event": {
+                actorForWinCriteria.actorInstance.once(winCriteria.event, winCallback, scene);
+
+                return true;
+            }
+            case "actor-check-math-data": {
+                actorForWinCriteria.actorInstance.on(NODE_RECEIVE_DATA, (_: NodePin, data: any) => {
+                    const result = ExpressionMap[winCriteria.expression].func(
+                        winCriteria.mathExpression.replace('$value', '212'), // @TODO: kostyl
+                        Number(data)
+                    );
+
+                    if (result) {
+                        winCallback.call(scene);
+                    }
+                });
+                break;
+            }
+        }
+
+        return false;
     }
 
     public getLevel(index: number) {

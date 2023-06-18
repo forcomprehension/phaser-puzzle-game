@@ -15,7 +15,6 @@ export type BaseComponentsFactoryResult = {
     mainComponent: MainComponent;
 }
 
-
 /**
  * Base command node
  */
