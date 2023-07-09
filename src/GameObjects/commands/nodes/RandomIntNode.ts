@@ -1,5 +1,6 @@
 import { NodePin } from "../NodePin";
 import { ON_PIN_CONNECTED, ON_PIN_DISCONNECTED } from "../nodepins/events";
+import { PinPositionDescription } from "../pinPositionDescription";
 import { BaseComponentsFactoryResult, CommandNode } from "./CommandNode";
 import { RANDOM_INT_UPDATED } from "./events";
 
@@ -30,7 +31,7 @@ export class RandomIntNode extends CommandNode {
      * @inheritdoc
      */
     protected getRightPins(): NodePin[] {
-        const valuesPin = new NodePin(this.scene, true);
+        const valuesPin = new NodePin(this.scene, PinPositionDescription.RIGHT_PIN);
 
         valuesPin.on(ON_PIN_CONNECTED, (myPin: NodePin, other: NodePin) => {
             const { parentContainer } = other;

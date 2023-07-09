@@ -10,18 +10,24 @@ import { MultiplicationNode } from "@GameObjects/commands/nodes/Math/Multiplicat
 import { DivisionNode } from "@GameObjects/commands/nodes/Math/DivisionNode";
 import { VarNode } from "@GameObjects/commands/nodes/VarNode";
 import { SubtractNode } from "@GameObjects/commands/nodes/Math/SubtractNode";
+import { FrameGraph } from "@GameObjects/vm/FrameGraph";
+import { IfNode } from "@GameObjects/commands/nodes/IfNode";
+import { EnterNode } from "@GameObjects/commands/nodes/EnterNode";
+import { ReturnNode } from "@GameObjects/commands/nodes/ReturnNode";
 
 export type ProgrammingSceneData = {
     level?: number
 };
 
-const START_INDEX_LEVEL = 0;
+const START_INDEX_LEVEL = -1;
 
 export class TestProgrammingScene extends BaseGameScene {
 
     public enableDashboard: boolean = false;
 
     public nodeConnectorDrawer: NodeConnectionDrawingTool;
+
+    public readonly frameGraph = new FrameGraph();
 
     protected level: number = START_INDEX_LEVEL;
 
@@ -59,9 +65,6 @@ export class TestProgrammingScene extends BaseGameScene {
             this.nodeConnectorDrawer = undefined;
         })
 
-        /**
-         * @TODO: CHECK Y SECOND LEVEL DISPLAY DOESN'T GET INFO
-         */
         const level = this.levelsManager.getLevel(this.level);
         if (level) {
             this.levelsManager.loadLevel(this, level, this.win);
@@ -96,23 +99,13 @@ export class TestProgrammingScene extends BaseGameScene {
     }
 
     protected testLevel() {
-        const { canvasHeight } = this.getCanvasSize();
-        const monochromeDisplay = new MonochromeDisplayNode(this, 1480, 360);
-        const randomIntInput = new RandomIntNode(this, 0, 0, false);
-        new MultiplicationNode(this, 650, 350);
-        new SubtractNode(this, 650, 950);
-        new DivisionNode(this, 650, 500);
-        new VarNode(this, 150, 800).setVar(9);
-        new VarNode(this, 450, 800).setVar(5);
-        new VarNode(this, 700, 800).setVar(32);
-        // @TODO: MOVE TO ARGUMENTS
-        // Dock to left
-        randomIntInput.setPosition(
-            randomIntInput.realWidth * randomIntInput.originX,
-            canvasHeight / 2 - randomIntInput.realHeight * randomIntInput.originY
-        );
+        const { canvasHeight, canvasWidth } = this.getCanvasSize();
 
-        monochromeDisplay.once(NODE_RECEIVE_DATA, this.win, this);
+        const enterNode = new EnterNode(this, 100, canvasHeight / 2);
+        // const returnNode = new ReturnNode(this, canvasWidth - 100, canvasHeight / 2);
+
+        const ifNode = new IfNode(this, canvasWidth / 2, canvasHeight / 2);
+        const monochromeDisplay = new MonochromeDisplayNode(this, 1450, 600);
     }
 
     protected bootstrap() {

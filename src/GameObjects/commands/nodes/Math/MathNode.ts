@@ -2,6 +2,7 @@ import { completeTo } from "@utils/array";
 import { NodePin } from "../../NodePin";
 import { CommandNode } from "../CommandNode";
 import { NODE_RECEIVE_DATA } from "../events";
+import { PinPositionDescription } from "@GameObjects/commands/pinPositionDescription";
 
 /**
  * Abstract class for all simple math nodes
@@ -48,7 +49,7 @@ export abstract class MathNode extends CommandNode {
      * @inheritdoc
      */
     protected getRightPins(): NodePin[] {
-        const resultPin = new NodePin(this.scene, true);
+        const resultPin = new NodePin(this.scene, PinPositionDescription.RIGHT_PIN);
 
         // @TODO: better - on update data?
         this.on(NODE_RECEIVE_DATA, () => {
@@ -68,8 +69,8 @@ export abstract class MathNode extends CommandNode {
      * @inheritdoc
      */
     protected getLeftPins(): NodePin[] {
-        const multiplierPin = new NodePin(this.scene, false);
-        const multipliedPin = new NodePin(this.scene, false);
+        const multiplierPin = new NodePin(this.scene, PinPositionDescription.LEFT_PIN);
+        const multipliedPin = new NodePin(this.scene, PinPositionDescription.LEFT_PIN);
 
         return [
             multipliedPin,

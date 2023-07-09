@@ -2,6 +2,7 @@ import { MonochromeDisplay } from "@GameObjects/displays/monochrome/MonochromeDi
 import { CommandNode } from "./CommandNode";
 import { NodePin } from "../NodePin";
 import { ON_PIN_DISCONNECTED } from "../nodepins/events";
+import { PinPositionDescription } from "../pinPositionDescription";
 
 /**
  * Monochrome display node
@@ -48,13 +49,19 @@ export class MonochromeDisplayNode extends CommandNode {
      * @inheritdoc
      */
     public getLeftPins() {
-        const pin = new NodePin(this.scene, false);
+        const pin = new NodePin(this.scene, PinPositionDescription.LEFT_PIN);
         pin.once(ON_PIN_DISCONNECTED, (_: NodePin) => {
             this.updateText('00');
         });
 
         return [
             pin
+        ]
+    }
+
+    protected getLeftFlowPins(): NodePin[] {
+        return [
+            new NodePin(this.scene, PinPositionDescription.FLOW_LEFT_PIN)
         ]
     }
 

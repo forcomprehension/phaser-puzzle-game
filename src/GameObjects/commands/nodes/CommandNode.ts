@@ -4,6 +4,7 @@ import type { TestProgrammingScene } from "@src/scenes/TestProgrammingScene";
 import { ON_PIN_CONNECTED, ON_PIN_DISCONNECTED } from "../nodepins/events";
 import { INodeReceiveData } from "@interfaces/nodes/INodeReceiveData";
 import { NODE_RECEIVE_DATA } from "./events";
+import { PinPositionDescription } from "../pinPositionDescription";
 
 type MainComponent = Phaser.GameObjects.GameObject & Phaser.GameObjects.Components.Origin & {
     height: number,
@@ -34,12 +35,14 @@ export class CommandNode extends Phaser.GameObjects.Container implements INodeRe
      *
      * @param index
      * @param offsetTop
+     * @param flowPinsOffset
      */
-    public static calculateVerticalPinOffset(index: number, offsetTop: number) {
+    public static calculateVerticalPinOffset(index: number, offsetTop: number, flowPinsOffset: number) {
         return index * this.PIN_SIDE_SIZE // Count of pins
             + offsetTop // + offsetTop, which is mainComp height multiplied by originY
             + (.5 * this.PIN_SIDE_SIZE) // @TODO: get original nodepin originY
-            + index + 1 * this.MIN_PIN_OFFSET; // Always add top offset
+            + index + 1 * this.MIN_PIN_OFFSET
+            + flowPinsOffset; // Always add top offset
     }
 
     /**
@@ -83,6 +86,14 @@ export class CommandNode extends Phaser.GameObjects.Container implements INodeRe
         return this.mainComponent?.height || this.height;
     }
 
+    public set realHeight(newValue: number) {
+        if (this.mainComponent) {
+            this.mainComponent.height = newValue;
+        } else {
+            this.height = newValue;
+        }
+    }
+
     /**
      * Right pins container
      */
@@ -92,6 +103,16 @@ export class CommandNode extends Phaser.GameObjects.Container implements INodeRe
      * Left pins container
      */
     protected readonly leftPinsList: NodePin[] = [];
+
+    /**
+     * Flow pins count for left offset determination
+     */
+    protected maxLeftFlowPinsCount: number = 0;
+
+    /**
+     * Flow pins count for right offset determination
+     */
+    protected maxRightFlowPinsCount: number = 0;
 
     /**
      * Respect relative drag offset
@@ -141,9 +162,19 @@ export class CommandNode extends Phaser.GameObjects.Container implements INodeRe
         // @TODO:
         this.setSize(200, 75);
         this.once(Phaser.GameObjects.Events.ADDED_TO_SCENE, () => {
-            // Order is important!
-            this.addPins(true, this.getLeftPins());
-            this.addPins(false, this.getRightPins());
+            const leftFlowPins = this.getLeftFlowPins();
+            const rightFlowPins = this.getRightFlowPins();
+            this.maxLeftFlowPinsCount = leftFlowPins.length;
+            this.maxRightFlowPinsCount = rightFlowPins.length;
+
+            this.setupPins(PinPositionDescription.FLOW_LEFT_PIN, leftFlowPins);
+            this.setupPins(PinPositionDescription.FLOW_RIGHT_PIN, rightFlowPins);
+
+            this.add(leftFlowPins);
+            this.add(rightFlowPins);
+
+            this.addPins(PinPositionDescription.LEFT_PIN, this.getLeftPins());
+            this.addPins(PinPositionDescription.RIGHT_PIN, this.getRightPins());
         });
 
         this.init();
@@ -182,34 +213,43 @@ export class CommandNode extends Phaser.GameObjects.Container implements INodeRe
     }
 
     /**
-     * Add pins to this node
+     * Setup all pins
+     *
+     * @param position
+     * @param pins
      */
-    public addPins(isLeft: boolean, pins: NodePin[]) {
+    protected setupPins(
+        position: PinPositionDescription,
+        pins: NodePin[]
+    ) {
         const mainComponentWidth = this.realWidth;
         const mainComponentHeight = this.realHeight;
         const mainComponentOriginY = this.mainComponent?.originY || 0;
 
+        const isFlowPin = position === PinPositionDescription.FLOW_LEFT_PIN || position === PinPositionDescription.FLOW_RIGHT_PIN;
+        const isLeft = position === PinPositionDescription.LEFT_PIN || position === PinPositionDescription.FLOW_LEFT_PIN;
+        const flowPinsOffset = isFlowPin ?
+            0 :
+            (isLeft ? this.maxLeftFlowPinsCount : this.maxRightFlowPinsCount) * (CommandNode.PIN_SIDE_SIZE + CommandNode.MIN_PIN_OFFSET);
+
         const pinsLength = pins.length;
-        const needHeight = pinsLength *
-            CommandNode.PIN_SIDE_SIZE + CommandNode.MIN_PIN_OFFSET // Calculate Height + bottom offset
-            CommandNode.MIN_PIN_OFFSET; // Top offset
 
-        if (this.mainComponent && mainComponentHeight < needHeight) {
-            this.mainComponent.height = needHeight;
-        }
-
-        const alignedPins: NodePin[] = [];
         const originOffset = mainComponentHeight * mainComponentOriginY * -1;
         for (let i = 0; i < pinsLength; i++) {
             if (pins[i]) {
-                pins[i].setY(CommandNode.calculateVerticalPinOffset(i, originOffset));
+                const nextOffset = CommandNode.calculateVerticalPinOffset(i, originOffset, flowPinsOffset);
+                // @TODO:
+                if (mainComponentHeight < nextOffset + 75) {
+                    this.realHeight = nextOffset + 75 ;
+                }
+
+                pins[i].setY(nextOffset);
                 pins[i].setX(
                      // @TODO: Which origin gave .5?
                     (mainComponentWidth / 2 - CommandNode.PIN_SIDE_SIZE * .5) * (isLeft ? -1 : 1)
                 );
 
                 this.scene.add.existing(pins[i]);
-                alignedPins.push(pins[i]);
 
                 // Forward ON_PIN_CONNECTED from NodePin to this
                 const forwardMessage = function forwardMessage(this: CommandNode, ...args: any[]) {
@@ -220,16 +260,36 @@ export class CommandNode extends Phaser.GameObjects.Container implements INodeRe
                     this.emit(ON_PIN_DISCONNECTED, pins[i]);
                 });
                 pins[i].off(ON_PIN_DISCONNECTED, forwardMessage, this);
+
+                if (isFlowPin) {
+                    this.scene.frameGraph.registerNode(pins[i].id, pins[i]);
+                }
             }
         }
+    }
 
-        this.add(alignedPins);
+    /**
+     * Add pins to this node
+     */
+    protected addPins(position: PinPositionDescription, pins: NodePin[]) {
+        this.setupPins(position, pins);
+        this.add(pins);
+
+        const isLeft = position !== PinPositionDescription.RIGHT_PIN;
 
         if (isLeft) {
-            this.leftPinsList.push(...alignedPins);
+            this.leftPinsList.push(...pins);
         } else {
-            this.rightPinsList.push(...alignedPins);
+            this.rightPinsList.push(...pins);
         }
+    }
+
+    protected getLeftFlowPins(): NodePin[] {
+        return [];
+    }
+
+    protected getRightFlowPins(): NodePin[] {
+        return [];
     }
 
     protected getLeftPins(): NodePin[] {

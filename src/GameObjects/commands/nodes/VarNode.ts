@@ -2,23 +2,33 @@ import { checkNumberIsSuitable } from "@utils/number";
 import { NodePin } from "../NodePin";
 import { ON_PIN_CONNECTED, ON_PIN_DISCONNECTED } from "../nodepins/events";
 import { CommandNode } from "./CommandNode";
+import { PinPositionDescription } from "../pinPositionDescription";
 
 export class VarNode extends CommandNode {
     public static readonly ACTOR_KEY = 'VarNode';
 
     protected ourValue: number = 0;
 
+    /**
+     * @inheritdoc
+     */
     protected getTextNode(): string {
         return '0';
     }
 
+    /**
+     * @inheritdoc
+     */
     public setVar(value: number) {
         this.ourValue = value;
         this.textComponent?.setText(String(value));
     }
 
+    /**
+     * @inheritdoc
+     */
     protected getRightPins(): NodePin[] {
-        const rightPin = new NodePin(this.scene, true);
+        const rightPin = new NodePin(this.scene, PinPositionDescription.RIGHT_PIN);
 
         let interval: any = 0;
         let connected: boolean = false; // If callback already passed to the queue

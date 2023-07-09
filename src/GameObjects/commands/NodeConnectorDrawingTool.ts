@@ -100,14 +100,28 @@ export class NodeConnectionDrawingTool extends Phaser.GameObjects.GameObject imp
     }
 
     public connectSecond(pin: NodePin) {
-        if (this.drivingBeltSlots?.left === pin) {
+        const other = this.drivingBeltSlots?.left;
+        if (other === pin) {
             return;
         }
 
-        this.drivingBeltSlots!.right = pin;
-        this.tryToUseItem();
-    }
+        if (other instanceof NodePin) {
+            if (other.parentContainer === pin.parentContainer) {
+                return;
+            }
 
+            if (other.isFlow() !== pin.isFlow()) {
+                return;
+            }
+
+            if (other.isLeft() === pin.isLeft()) {
+                return;
+            }
+
+            this.drivingBeltSlots!.right = pin;
+            this.tryToUseItem();
+        }
+    }
 
     /**
      * Activate tool from IActiveTool
@@ -256,38 +270,6 @@ export class NodeConnectionDrawingTool extends Phaser.GameObjects.GameObject imp
      * @param pointer
      */
     public handleMakeConnection(pointer: Phaser.Input.Pointer) {
-        const connector = this.getConnectorFromPointer(pointer);
-
-        if (connector && !connector.getSocketIsBusy()) {
-            // Doesn't have first slot
-            if (!this.drivingBeltSlots?.left) {
-                this.drivingBeltSlots = {
-                    left: connector,
-                    right: null,
-                };
-
-                this.startPoint = connector.getSocketLocation();
-                // Have first slot but haven't second
-            } else if (
-                this.drivingBeltSlots.left && !this.drivingBeltSlots?.right &&
-                this.drivingBeltSlots.left !== connector
-            ) {
-                this.drivingBeltSlots.right = connector;
-
-                // Extra check, just in case
-                if (this.drivingBeltSlots.left.getSocketIsBusy() || this.drivingBeltSlots.right.getSocketIsBusy()) {
-                    console.warn('One of belt slots sockets already busy');
-                    return;
-                }
-
-                this.tryToUseItem();
-            }
-
-        // If we doesn't click on connector, but we already connected to at least one of connector
-        } else if (!this.drivingBeltSlots?.right) {
-            // Reset if already drawing
-            this.onResetValues();
-        }
     }
 
     /**
