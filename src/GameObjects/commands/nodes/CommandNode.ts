@@ -16,6 +16,14 @@ export type BaseComponentsFactoryResult = {
     mainComponent: MainComponent;
 }
 
+export enum InstructionType {
+    IF = 'IF',
+    BREAK = 'BREAK',
+    CONTINUE = 'CONTINUE',
+    LOOP = 'LOOP',
+    OTHER = 'OTHER',
+}
+
 /**
  * Base command node
  */
@@ -29,6 +37,11 @@ export class CommandNode extends Phaser.GameObjects.Container implements INodeRe
      * Use pin size size as its height, because it has square bounds
      */
     public static readonly PIN_SIDE_SIZE = NodePin.HEIGHT;
+
+    /**
+     *
+     */
+    public readonly instructionType: InstructionType = InstructionType.OTHER;
 
     /**
      * Calculates pin offset
@@ -204,6 +217,16 @@ export class CommandNode extends Phaser.GameObjects.Container implements INodeRe
     protected init(): this {
         return this;
     }
+
+    // region Stack Agent
+    public executeNode() {
+        // Get values of pure pins
+    }
+
+    public nextNode(): Optional<CommandNode> {
+        return undefined;
+    }
+    // endregion Stack Agent
 
     /**
      * Sets extra data for actor with validation

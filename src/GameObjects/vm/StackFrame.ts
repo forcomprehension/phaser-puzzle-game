@@ -1,24 +1,54 @@
 import type { CommandNode } from "@GameObjects/commands/nodes/CommandNode";
-import { Debugger } from "./Debugger";
 
+/**
+ * Stack frame representation
+ *
+ * @module vm
+ */
 export class StackFrame {
-    constructor(protected readonly entryPoint: CommandNode) {}
+    protected currentInstruction: CommandNode;
 
-    public attachDebugger(_debugger?: Debugger | undefined): void {
-        throw new Error("Method not implemented.");
+    protected overrideForNextInstruction: Optional<CommandNode>;
+
+    /**
+     * Getter for current
+     */
+    public get current() {
+        return this.currentInstruction;
     }
 
-    public detachDebugger(): void {
-        throw new Error("Method not implemented.");
-    }
+    // @TODO: Add breakpoint here?
 
+    // Entrypoint
+    constructor(
+        entryPoint: CommandNode,
+        public readonly functionName: string = 'Anonymous'
+    ) {
+        this.currentInstruction = entryPoint;
+    }
+    /**
+     * Next instruction
+     */
     public next(): Optional<CommandNode> {
-        throw new Error("Method not implemented.");
+        const overriddenInstruction = this.overrideForNextInstruction;
+        this.overrideForNextInstruction = undefined;
+        return overriddenInstruction || this.currentInstruction.nextNode();
     }
 
-    public executeCommand(): Promise<void> {
-        // Execute command
-        throw new Error("Method not implemented.");
+    /**
+     * @returns {Boolean} If next instruction is nil
+     */
+    public nextInstructionIsNil() {
+        return !(this.overrideForNextInstruction || this.currentInstruction.nextNode());
+    }
+
+    public async frameStep(): Promise<void> {
+       // @TODO: how to check breakpoint?
+       return this.currentInstruction.executeNode();
+    }
+
+    public setNextInstructionOverride(next: Optional<CommandNode>) {
+        this.overrideForNextInstruction = next;
     }
 }
 

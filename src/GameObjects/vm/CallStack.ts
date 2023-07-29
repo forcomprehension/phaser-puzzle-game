@@ -50,11 +50,29 @@ export class CallStack {
     }
 
     /**
+     * Get function names until frame, includes passed frame
+     *
+     * @param frame
+     */
+    public getFunctionNamesUntil(frame: StackFrame) {
+        const names: string[] = [];
+        for (let i = 0; i < this.stack.length; i++) {
+            names.push(this.stack[i].functionName);
+
+            if (this.stack[i] === frame) {
+                break;
+            }
+        }
+
+        return names;
+    }
+
+    /**
      * Make our stack overflow checker
      */
     protected checkStackOverflow() {
         if (this.stack.length > CallStack.MAX_STACK_SIZE) {
-            throw new Error('Stack overflow exceeded');
+            throw new Error('Stack overflow');
         }
     }
 }

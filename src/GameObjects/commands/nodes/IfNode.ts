@@ -1,11 +1,18 @@
 import { NodePin } from "../NodePin";
 import { PinPositionDescription } from "../pinPositionDescription";
-import { CommandNode } from "./CommandNode";
+import { CommandNode, InstructionType } from "./CommandNode";
 import { NODE_RECEIVE_DATA } from "./events";
 
 export class IfNode extends CommandNode {
+
+    protected truePin: NodePin;
+    protected falsePin: NodePin;
+
+    public readonly instructionType: InstructionType = InstructionType.IF;
+
     protected init(): this {
         super.init();
+
         this.on(NODE_RECEIVE_DATA, (senderPin: NodePin, data: any, receiverPin: NodePin) => {
             if (senderPin.isFlow()) { // Assume that we have only flow pins here
                 
@@ -38,8 +45,22 @@ export class IfNode extends CommandNode {
 
     protected getRightFlowPins(): NodePin[] {
         return [
-            new NodePin(this.scene, PinPositionDescription.FLOW_RIGHT_PIN),
-            new NodePin(this.scene, PinPositionDescription.FLOW_RIGHT_PIN),
+            this.truePin = new NodePin(this.scene, PinPositionDescription.FLOW_RIGHT_PIN),
+            this.falsePin = new NodePin(this.scene, PinPositionDescription.FLOW_RIGHT_PIN),
         ]
+    }
+
+    public nextNode() {
+        const value = false; // get value from left pin
+
+        const nextNode = value ?
+            this.truePin.getConnectedObject() :
+            this.falsePin.getConnectedObject();
+
+        if (nextNode instanceof NodePin) {
+            return nextNode.parentContainer;
+        } else {
+            return undefined;
+        }
     }
 }
