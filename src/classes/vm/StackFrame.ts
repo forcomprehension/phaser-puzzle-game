@@ -1,4 +1,5 @@
 import type { CommandNode } from "@GameObjects/commands/nodes/CommandNode";
+import { Scope } from "./Scope";
 
 /**
  * Stack frame representation
@@ -7,6 +8,9 @@ import type { CommandNode } from "@GameObjects/commands/nodes/CommandNode";
  */
 export class StackFrame {
     protected currentInstruction: CommandNode;
+    public readonly scope: Scope;
+    // @TODO:
+    public returnValue: () => any;
 
     protected overrideForNextInstruction: Optional<CommandNode>;
 
@@ -22,10 +26,13 @@ export class StackFrame {
     // Entrypoint
     constructor(
         entryPoint: CommandNode,
+        parentScope: Nullable<Scope>,
         public readonly functionName: string = 'Anonymous'
     ) {
         this.currentInstruction = entryPoint;
+        this.scope = new Scope(parentScope);
     }
+
     /**
      * Next instruction
      */

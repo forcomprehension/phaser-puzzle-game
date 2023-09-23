@@ -54,7 +54,7 @@ export class CallStack {
      *
      * @param frame
      */
-    public getFunctionNamesUntil(frame: StackFrame) {
+    public getFunctionNamesUntilIncluding(frame: StackFrame) {
         const names: string[] = [];
         for (let i = 0; i < this.stack.length; i++) {
             names.push(this.stack[i].functionName);

@@ -2,7 +2,7 @@ import { NodePin } from "../NodePin";
 import { PinPositionDescription } from "../pinPositionDescription";
 import { CommandNode } from "./CommandNode";
 
-export class EnterNode extends CommandNode {
+export class EntryNode extends CommandNode {
     protected getTextNode(): string {
         return 'Entry';
     }

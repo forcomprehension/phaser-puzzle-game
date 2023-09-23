@@ -3,12 +3,22 @@ import { PinPositionDescription } from "../pinPositionDescription";
 import { CommandNode, InstructionType } from "./CommandNode";
 import { NODE_RECEIVE_DATA } from "./events";
 
+export class BranchNodeConnectedBranches {
+    constructor(
+        public readonly trueNode: Optional<CommandNode>,
+        public readonly falseNode: Optional<CommandNode>
+    ) {}
+}
+
 export class IfNode extends CommandNode {
+    public static readonly ACTOR_KEY = 'IfNode';
 
     protected truePin: NodePin;
     protected falsePin: NodePin;
 
-    public readonly instructionType: InstructionType = InstructionType.IF;
+    protected conditionPin: NodePin;
+
+    public readonly instructionType: InstructionType = InstructionType.BRANCH;
 
     protected init(): this {
         super.init();
@@ -39,7 +49,7 @@ export class IfNode extends CommandNode {
 
     protected getLeftPins(): NodePin[] {
         return [
-            new NodePin(this.scene, PinPositionDescription.LEFT_PIN)
+            this.conditionPin = new NodePin(this.scene, PinPositionDescription.LEFT_PIN)
         ];
     }
 
@@ -63,4 +73,31 @@ export class IfNode extends CommandNode {
             return undefined;
         }
     }
+
+    /** region IGraphProcessorAgent **/
+    public getConditionRule(): Optional<CommandNode> {
+        const connectedObject = this.conditionPin.getConnectedObject();
+
+        if (connectedObject instanceof NodePin) {
+            return (connectedObject as NodePin).parentContainer;
+        }
+    }
+
+    public getBranchesStruct() {
+        const truePinObject = this.truePin.getConnectedObject();
+        const falsePinObject = this.falsePin.getConnectedObject();
+
+        let trueBranch: Optional<CommandNode>;
+        if (truePinObject instanceof NodePin) {
+            trueBranch = truePinObject.parentContainer;
+        }
+
+        let falseBranch: Optional<CommandNode>;
+        if (falsePinObject instanceof NodePin) {
+            falseBranch = falsePinObject.parentContainer;
+        }
+
+        return new BranchNodeConnectedBranches(trueBranch, falseBranch);
+    }
+    /** endregion IGraphProcessorAgent **/
 }

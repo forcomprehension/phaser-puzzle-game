@@ -22,10 +22,12 @@ export class RandomIntNode extends CommandNode {
         max: 90,
     };
 
+    protected ourValue: number = 0;
+
     /**
      * Update value after timer
      */
-    protected canUpdateValue: boolean = false;
+    // protected canUpdateValue: boolean = false;
 
     /**
      * @inheritdoc
@@ -61,45 +63,50 @@ export class RandomIntNode extends CommandNode {
     public init() {
         super.init();
 
-        const updateValueGuard = this.scene.time.addEvent({
-            loop: true,
-            delay: 500,
-            callback: () => {
-                this.canUpdateValue = true;
-            }
-        });
-        this.once(Phaser.GameObjects.Events.DESTROY, () => {
-            updateValueGuard.destroy();
-        });
+        // const updateValueGuard = this.scene.time.addEvent({
+        //     loop: true,
+        //     delay: 500,
+        //     callback: () => {
+        //         this.canUpdateValue = true;
+        //     }
+        // });
+        // this.once(Phaser.GameObjects.Events.DESTROY, () => {
+        //     updateValueGuard.destroy();
+        // });
 
-        this.tween = this.scene.tweens.addCounter({
-            useFrames: true,
-            from: 0,
-            to: 1,
-            duration: 500,
-            loop: -1,
-            onUpdateScope: this,
-            onUpdate(this: RandomIntNode, _, holder: { value: number }) {
-                const randomValue = Phaser.Math.Between(this.range.min, this.range.max);
+        // this.tween = this.scene.tweens.addCounter({
+        //     useFrames: true,
+        //     from: 0,
+        //     to: 1,
+        //     duration: 500,
+        //     loop: -1,
+        //     onUpdateScope: this,
+        //     onUpdate(this: RandomIntNode, _, holder: { value: number }) {
+        //         const randomValue = Phaser.Math.Between(this.range.min, this.range.max);
 
-                this.color.h = holder.value;
-                if (this.rect) {
-                    this.rect.fillColor = this.color.color;
-                }
+        //         this.color.h = holder.value;
+        //         if (this.rect) {
+        //             this.rect.fillColor = this.color.color;
+        //         }
 
-                if (this.canUpdateValue) {
-                    this.textComponent?.setText(this.getTemperatureText(randomValue));
-                    this.emit(
-                        RANDOM_INT_UPDATED,
-                        randomValue
-                    );
+        //         if (this.canUpdateValue) {
+        //             this.textComponent?.setText(this.getTemperatureText(randomValue));
+        //             this.emit(
+        //                 RANDOM_INT_UPDATED,
+        //                 randomValue
+        //             );
 
-                    this.canUpdateValue = false;
-                }
-            }
-        });
+        //             this.canUpdateValue = false;
+        //         }
+        //     }
+        // });
 
         return this;
+    }
+
+    public executeNode() {
+        super.executeNode();
+        this.ourValue = Phaser.Math.Between(this.range.min, this.range.max)
     }
 
     protected getTemperatureText(randomValue: number) {

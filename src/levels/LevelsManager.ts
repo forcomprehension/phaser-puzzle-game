@@ -31,7 +31,7 @@ export type Level = {
     winCriteria: WinCriteria
 };
 
-export const level1: Level = {
+const level1: Level = {
     actors: [{
         id: 1,
         key: "MonochromeDisplayNode",
@@ -48,7 +48,25 @@ export const level1: Level = {
     }
 };
 
-export const level2: Level = {
+const level2: Level = {
+    actors: [{
+        id: 1,
+        key: "MonochromeDisplayNode",
+        params: [1480, 580]
+    },{
+        id: 2,
+        key: "VarNode",
+        params: [80, 560],
+        data: [35],
+    }],
+    winCriteria: {
+        type: 'actor-event',
+        actorId: 1,
+        event: NODE_RECEIVE_DATA
+    }
+};
+
+const level3: Level = {
     actors: [{
         id: 1,
         key: "MonochromeDisplayNode",
@@ -94,6 +112,66 @@ export const level2: Level = {
         expression: ExpressionsContainer.RPN.name
     }
 };
+
+const level4: Level = {
+    actors: [{
+        id: 1,
+        key: "VarNode",
+        params: [80, 560],
+        data: [212],
+    },{
+        id: 2,
+        key: "MonochromeDisplayNode",
+        params: [1480, 160]
+    },{
+        id: 3,
+        key: "IfNode",
+        params: [400, 460]
+    },{
+        id: 4,
+        key: "MonochromeDisplayNode",
+        params: [1480, 760]
+    }],
+    winCriteria: {
+        type: 'actor-event',
+        actorId: 4,
+        event: NODE_RECEIVE_DATA
+    }
+};
+
+const level5: Level = {
+    actors: [{
+        id: 1,
+        key: "VarNode",
+        params: [80, 560],
+        data: [88],
+    },{
+        id: 2,
+        key: "MonochromeDisplayNode",
+        params: [1480, 160]
+    },{
+        id: 3,
+        key: "IfNode",
+        params: [400, 460]
+    },{
+        id: 4,
+        key: "MonochromeDisplayNode",
+        params: [1480, 760]
+    }],
+    winCriteria: {
+        type: 'actor-event',
+        actorId: 4,
+        event: NODE_RECEIVE_DATA
+    }
+};
+
+
+export const levels: Level[] = [
+    level1,
+    level2,
+    level3,
+    level4
+];
 
 type ActorObjectInfo = Readonly<{
     actorInstance: CommandNode,

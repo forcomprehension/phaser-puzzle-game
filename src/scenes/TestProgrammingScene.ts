@@ -5,21 +5,24 @@ import { RandomIntNode } from "@GameObjects/commands/nodes/RandomIntNode";
 import { NodeConnectionDrawingTool } from "@GameObjects/commands/NodeConnectorDrawingTool";
 import { CustomTextBox } from "@GameObjects/Textbox/CustomTextBox";
 import { NODE_RECEIVE_DATA } from "@GameObjects/commands/nodes/events";
-import { LevelsManager, level1, level2 } from "@src/levels/LevelsManager";
+import { LevelsManager, levels } from "@src/levels/LevelsManager";
 import { MultiplicationNode } from "@GameObjects/commands/nodes/Math/MultiplicationNode";
 import { DivisionNode } from "@GameObjects/commands/nodes/Math/DivisionNode";
 import { VarNode } from "@GameObjects/commands/nodes/VarNode";
 import { SubtractNode } from "@GameObjects/commands/nodes/Math/SubtractNode";
-import { FrameGraph } from "@GameObjects/vm/FrameGraph";
+import { FrameGraph } from "@src/classes/vm/FrameGraph";
 import { IfNode } from "@GameObjects/commands/nodes/IfNode";
-import { EnterNode } from "@GameObjects/commands/nodes/EnterNode";
+import { EntryNode } from "@GameObjects/commands/nodes/EntryNode";
 import { ReturnNode } from "@GameObjects/commands/nodes/ReturnNode";
+import { Interpreter } from "@src/classes/vm/Interpreter";
+import { StackFrame } from "@src/classes/vm/StackFrame";
+import { CallStack } from "@src/classes/vm/CallStack";
 
 export type ProgrammingSceneData = {
     level?: number
 };
 
-const START_INDEX_LEVEL = -1;
+const START_INDEX_LEVEL = 3;
 
 export class TestProgrammingScene extends BaseGameScene {
 
@@ -29,11 +32,13 @@ export class TestProgrammingScene extends BaseGameScene {
 
     public readonly frameGraph = new FrameGraph();
 
+    protected readonly interpreter = new Interpreter();
+
     protected level: number = START_INDEX_LEVEL;
 
     protected winCurrentLevel: boolean = false;
 
-    protected levelsManager: LevelsManager = new LevelsManager([level2, level1]);
+    protected levelsManager: LevelsManager = new LevelsManager(levels);
 
     constructor() {
         super('ProgrammingScene');
@@ -101,7 +106,11 @@ export class TestProgrammingScene extends BaseGameScene {
     protected testLevel() {
         const { canvasHeight, canvasWidth } = this.getCanvasSize();
 
-        const enterNode = new EnterNode(this, 100, canvasHeight / 2);
+        const callStack = new CallStack();
+        // callStack.push(new StackFrame())
+        this.interpreter.executeStack(callStack);
+
+        const enterNode = new EntryNode(this, 100, canvasHeight / 2);
         // const returnNode = new ReturnNode(this, canvasWidth - 100, canvasHeight / 2);
 
         const ifNode = new IfNode(this, canvasWidth / 2, canvasHeight / 2);

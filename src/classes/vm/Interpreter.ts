@@ -1,10 +1,11 @@
-import { InstructionType } from "@GameObjects/commands/nodes/CommandNode";
+import { CommandNode, InstructionType } from "@GameObjects/commands/nodes/CommandNode";
 import type { CallStack } from "./CallStack";
 import type { Debugger } from "./Debugger";
-import type { StackFrame } from "./StackFrame";
+import { StackFrame } from "./StackFrame";
 import { ForNode } from "@GameObjects/commands/nodes/ForNode";
+import { VarNode } from "@GameObjects/commands/nodes/VarNode";
 
-type PossibleException = Optional<{
+export type PossibleException = Optional<{
     nativeException: unknown,
     errorStack: string[],
 }>
@@ -30,7 +31,7 @@ export class Interpreter {
                 exception = this.stackStep(frame, _debugger);
 
                 if (exception) {
-                    exception.errorStack = stack.getFunctionNamesUntil(frame);
+                    exception.errorStack = stack.getFunctionNamesUntilIncluding(frame);
                     break;
                 }
             }
@@ -48,9 +49,9 @@ export class Interpreter {
         let caughtException: PossibleException;
 
         type BlockEntry = {
-            nextInstruction: Optional<any>,
-            currentInstruction: any,
-            isLoop: boolean
+            nextInstruction: Optional<CommandNode>,
+            currentInstruction: CommandNode,
+            isLoop: boolean,
         };
 
         /**
@@ -65,7 +66,16 @@ export class Interpreter {
                 const instructionType = instruction.instructionType;
 
                 switch (instructionType) {
-                    case InstructionType.IF: {
+                    case InstructionType.VARIABLE: {
+                        // @TODO: VALUE PIN?
+                        // How to execute?
+                        (instruction as VarNode).assign(
+                            (instruction as VarNode).name,
+                            frame,
+                            (instruction as VarNode).ourValue
+                        );
+                    }
+                    case InstructionType.BRANCH: {
                         // If instruction will be regulated by frame.next()
                     }
                     case InstructionType.BREAK: {
@@ -104,6 +114,13 @@ export class Interpreter {
                                 });
                             } // Just ignore the loop if switch returns false.
                             // This means we must just proceed to next node after loop
+                        }
+                    }
+                    case InstructionType.VARIABLE: {
+                        const value = instruction.executeValue();
+                        if (value instanceof StackFrame) {
+                            // @TODO:
+                            frame.setNextInstructionOverride(value.current);
                         }
                     }
                     default: {

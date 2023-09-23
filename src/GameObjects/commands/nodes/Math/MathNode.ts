@@ -1,13 +1,20 @@
 import { completeTo } from "@utils/array";
 import { NodePin } from "../../NodePin";
-import { CommandNode } from "../CommandNode";
+import { CommandNode, InstructionType } from "../CommandNode";
 import { NODE_RECEIVE_DATA } from "../events";
 import { PinPositionDescription } from "@GameObjects/commands/pinPositionDescription";
+import { MathOp } from "@src/classes/vm/Interpreter3";
 
 /**
  * Abstract class for all simple math nodes
  */
 export abstract class MathNode extends CommandNode {
+
+    /**
+     * Artithmetic operation type
+     */
+    abstract readonly mathOperationType: MathOp;
+
     /**
      * Gets left pins arguments in their order, for math operations
      */
@@ -17,6 +24,8 @@ export abstract class MathNode extends CommandNode {
      * Out result for math operation
      */
     protected outResult: number = 0;
+
+    public readonly instructionType: InstructionType = InstructionType.ARITHMETIC;
 
     /**
      * Aux initializer
@@ -69,12 +78,16 @@ export abstract class MathNode extends CommandNode {
      * @inheritdoc
      */
     protected getLeftPins(): NodePin[] {
-        const multiplierPin = new NodePin(this.scene, PinPositionDescription.LEFT_PIN);
-        const multipliedPin = new NodePin(this.scene, PinPositionDescription.LEFT_PIN);
+        const lhsPin = new NodePin(this.scene, PinPositionDescription.LEFT_PIN);
+        const rhsPin = new NodePin(this.scene, PinPositionDescription.LEFT_PIN);
 
-        return [
-            multipliedPin,
-            multiplierPin
+        return [ // @TODO: why in reversed order?
+            rhsPin,
+            lhsPin
         ]
+    }
+
+    public getEmptyValue() {
+        return 0;
     }
 }

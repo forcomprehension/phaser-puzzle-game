@@ -5,6 +5,8 @@ import { ON_PIN_CONNECTED, ON_PIN_DISCONNECTED } from "../nodepins/events";
 import { INodeReceiveData } from "@interfaces/nodes/INodeReceiveData";
 import { NODE_RECEIVE_DATA } from "./events";
 import { PinPositionDescription } from "../pinPositionDescription";
+import { StackFrame } from "@src/classes/vm/StackFrame";
+import { IGameplayFunctionAgent } from "@src/classes/functions/IGameplayFunctionAgent";
 
 type MainComponent = Phaser.GameObjects.GameObject & Phaser.GameObjects.Components.Origin & {
     height: number,
@@ -17,17 +19,20 @@ export type BaseComponentsFactoryResult = {
 }
 
 export enum InstructionType {
-    IF = 'IF',
+    ARITHMETIC = 'ARITHMETIC',
+    BRANCH = 'IF',
     BREAK = 'BREAK',
     CONTINUE = 'CONTINUE',
     LOOP = 'LOOP',
+    VARIABLE = 'VARIABLE',
     OTHER = 'OTHER',
+    CALL = 'CALL'
 }
 
 /**
  * Base command node
  */
-export class CommandNode extends Phaser.GameObjects.Container implements INodeReceiveData {
+export class CommandNode extends Phaser.GameObjects.Container implements INodeReceiveData, IGameplayFunctionAgent {
     /**
      * Pin vertical margin
      */
@@ -195,6 +200,16 @@ export class CommandNode extends Phaser.GameObjects.Container implements INodeRe
         scene.add.existing(this);
     }
 
+    // region IGameplayFunctionAgent
+    public gameplayCall() {
+        throw new Error("Method not implemented.");
+    }
+
+    public functionLength(): number {
+        return this.leftPinsList.length;
+    }
+    // endregion IGameplayFunctionAgent
+
     // region INodeReceiveData
     /**
      * Can this node receive data
@@ -216,6 +231,10 @@ export class CommandNode extends Phaser.GameObjects.Container implements INodeRe
      */
     protected init(): this {
         return this;
+    }
+
+    public executeValue(): Optional<StackFrame> | any {
+        return {}
     }
 
     // region Stack Agent
@@ -411,5 +430,16 @@ export class CommandNode extends Phaser.GameObjects.Container implements INodeRe
         this.mainComponent = undefined;
 
         super.destroy(fromScene);
+    }
+
+    public collectArgs(): Array<Optional<CommandNode>> {
+        return this.leftPinsList.map((pin: NodePin) => {
+            const otherPin = pin.getConnectedObject();
+            if (otherPin instanceof NodePin) {
+                return otherPin.parentContainer;
+            }
+
+            return undefined;
+        });
     }
 }

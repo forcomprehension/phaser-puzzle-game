@@ -16,6 +16,9 @@ export class ForNode extends CommandNode {
     protected startValuePin: NodePin;
     protected endValuePin: NodePin;
 
+    protected startLiteralValue: Optional<number>;
+    protected endLiteralValue: Optional<number>;
+
     protected mustStepIntoBody: boolean = false;
 
     public readonly instructionType: InstructionType = InstructionType.LOOP;
@@ -51,6 +54,7 @@ export class ForNode extends CommandNode {
        
     }
 
+    // @TODO:
     protected startValue: number = 0;
     protected endValue: number = 0;
     protected currentIterationValue: number = 0;
@@ -84,6 +88,13 @@ export class ForNode extends CommandNode {
         this.currentIterationValue++;
     }
 
+    public nextNode(): Optional<CommandNode> {
+        if (this.mustStepIntoBody) {
+            return this.nextInstruction();
+        } else {
+            return this.getEndNode()
+        }
+    }
     public nextInstruction() {
         const otherPin = this.nextExecutionPin.getConnectedObject();
 
@@ -94,11 +105,14 @@ export class ForNode extends CommandNode {
         }
     }
 
-    public nextNode(): Optional<CommandNode> {
-        if (this.mustStepIntoBody) {
-            return this.nextInstruction();
+    /** region IGraphProcessorAgent **/
+    public getFirstInstruction() {
+        const otherPin = this.nextExecutionPin.getConnectedObject();
+
+        if (otherPin instanceof NodePin) {
+            return otherPin.parentContainer
         } else {
-            return this.getEndNode()
+            return undefined
         }
     }
 
@@ -110,4 +124,30 @@ export class ForNode extends CommandNode {
             return undefined;
         }
     }
+
+    public getStartEntity(): Optional<number | CommandNode> {
+        if (Number.isInteger(this.startLiteralValue)) {
+            return this.startLiteralValue;
+        }
+
+        const connectedPin = this.startValuePin.getConnectedObject();
+
+        if (connectedPin instanceof NodePin) {
+            return connectedPin.parentContainer;
+        }
+    }
+
+    public getEndEntity(): Optional<number | CommandNode> {
+        if (Number.isInteger(this.endLiteralValue)) {
+            return this.endLiteralValue;
+        }
+
+        const connectedPin = this.endValuePin.getConnectedObject();
+
+        if (connectedPin instanceof NodePin) {
+            return connectedPin.parentContainer;
+        }
+    }
+
+    /** endregion IGraphProcessorAgent **/
 }
