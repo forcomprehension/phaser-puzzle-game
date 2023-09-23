@@ -3,11 +3,13 @@ import { CommandNode } from "./CommandNode";
 import { NodePin } from "../NodePin";
 import { ON_PIN_DISCONNECTED } from "../nodepins/events";
 import { PinPositionDescription } from "../pinPositionDescription";
+import { CallNode } from "./CallNode";
+import { IArgument } from "@src/classes/vm/ICallable";
 
 /**
  * Monochrome display node
  */
-export class MonochromeDisplayNode extends CommandNode {
+export class MonochromeDisplayNode extends CallNode {
     public static readonly ACTOR_KEY = 'MonochromeDisplayNode';
 
     protected createBaseComponents() {
@@ -92,5 +94,15 @@ export class MonochromeDisplayNode extends CommandNode {
         this.textComponent = undefined;
 
         super.destroy(fromScene);
+    }
+
+    public gameplayCall(...args: IArgument[]) {
+        let dataCopy = args[0].value;
+
+        if (typeof dataCopy === 'number' && String(dataCopy).includes('.')) {
+            dataCopy = dataCopy.toFixed(2);
+        }
+
+        this.updateText(dataCopy);
     }
 }

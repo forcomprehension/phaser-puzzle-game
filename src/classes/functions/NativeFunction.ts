@@ -16,7 +16,7 @@ export class NativeFunction implements ICallable {
         return this.nativeFunctionSignature.func.length;
     }
 
-    public callFunction(...args: IArgument[]): void {
+    public callFunction(...args: IArgument[]) {
         return this.nativeFunctionSignature.func.apply(
             this.nativeFunctionSignature.that,
             args.map((o) => o.value)

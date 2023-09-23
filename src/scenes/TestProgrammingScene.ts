@@ -8,7 +8,7 @@ import { NODE_RECEIVE_DATA } from "@GameObjects/commands/nodes/events";
 import { LevelsManager, levels } from "@src/levels/LevelsManager";
 import { MultiplicationNode } from "@GameObjects/commands/nodes/Math/MultiplicationNode";
 import { DivisionNode } from "@GameObjects/commands/nodes/Math/DivisionNode";
-import { VarNode } from "@GameObjects/commands/nodes/VarNode";
+import { LiteralNode } from "@GameObjects/commands/nodes/LiteralNode";
 import { SubtractNode } from "@GameObjects/commands/nodes/Math/SubtractNode";
 import { FrameGraph } from "@src/classes/vm/FrameGraph";
 import { IfNode } from "@GameObjects/commands/nodes/IfNode";
@@ -17,12 +17,15 @@ import { ReturnNode } from "@GameObjects/commands/nodes/ReturnNode";
 import { Interpreter } from "@src/classes/vm/Interpreter";
 import { StackFrame } from "@src/classes/vm/StackFrame";
 import { CallStack } from "@src/classes/vm/CallStack";
+import { CompileButton } from "@GameObjects/ui/CompileButton";
+import { GraphProcessor } from "@src/classes/GraphProcessor";
+import { CommandNode } from "@GameObjects/commands/nodes/CommandNode";
 
 export type ProgrammingSceneData = {
     level?: number
 };
 
-const START_INDEX_LEVEL = 3;
+const START_INDEX_LEVEL = 2;
 
 export class TestProgrammingScene extends BaseGameScene {
 
@@ -68,7 +71,25 @@ export class TestProgrammingScene extends BaseGameScene {
         this.events.once(Phaser.Scenes.Events.DESTROY, () => {
             // @ts-ignore
             this.nodeConnectorDrawer = undefined;
-        })
+        });
+
+        const { canvasWidth } = this.getCanvasSize();
+
+        const compileButton = new CompileButton(
+            this,
+            canvasWidth - 100,
+            100
+        );
+        compileButton.tint = 0x6622AA;
+
+        compileButton.addClickHandler(() => {
+            const entryNode = this.children.list.find((gameObject) => gameObject instanceof LiteralNode && gameObject.ourValue === 212);
+            if (entryNode instanceof CommandNode) {
+                const statementsList = new GraphProcessor().convertFrom(entryNode);
+            }
+
+            debugger;
+        });
 
         const level = this.levelsManager.getLevel(this.level);
         if (level) {
@@ -115,6 +136,8 @@ export class TestProgrammingScene extends BaseGameScene {
 
         const ifNode = new IfNode(this, canvasWidth / 2, canvasHeight / 2);
         const monochromeDisplay = new MonochromeDisplayNode(this, 1450, 600);
+
+        
     }
 
     protected bootstrap() {

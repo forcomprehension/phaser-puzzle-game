@@ -5,6 +5,6 @@ export interface IArgument {
 }
 
 export interface ICallable {
-    callFunction(...args: IArgument[]): void;
+    callFunction(...args: IArgument[]): any;
     functionLength(): number;
 }

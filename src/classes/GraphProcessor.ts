@@ -1,12 +1,12 @@
 import { CommandNode, InstructionType } from "@GameObjects/commands/nodes/CommandNode";
-import { OpType } from "./Interpreter2";
+import { OpType } from "./vm/Interpreter2";
 import { IfNode } from "@GameObjects/commands/nodes/IfNode";
 import { nextString } from "@utils/serialGenerator";
 import { ForNode } from "@GameObjects/commands/nodes/ForNode";
 import { CallNode } from "@GameObjects/commands/nodes/CallNode";
 import { FunctionType } from '@src/classes/functions/F';
 import { MathNode } from "@GameObjects/commands/nodes/Math/MathNode";
-
+import { LiteralNode } from "@GameObjects/commands/nodes/LiteralNode";
 
 export type ListStatement = {
     opType: OpType;
@@ -103,20 +103,7 @@ export class GraphProcessor {
 
         // Calculate start entity
         if (startEntity instanceof CommandNode) {
-            // @TODO: how to get value?
             this.stepInto(startEntity, outPtr);
-
-            // @TODO: what if it is won't be pushed?
-            // @TODO: redundant variable exchange
-            const startVar = outPtr[outPtr.length - 1]  ;
-
-            outPtr.push({
-                opType: OpType.ASSIGN,
-                arg: [
-                    currentVariableName,
-                    startVar
-                ]
-            });
         } else {
             // in other case we will assign literal value or default 0
             outPtr.push({
@@ -134,21 +121,7 @@ export class GraphProcessor {
 
          // Calculate end entity
          if (endEntity instanceof CommandNode) {
-            // @TODO: how to get value?
             this.stepInto(endEntity, outPtr);
-
-            // @TODO: what if it is won't be pushed?
-            // @TODO: redundant variable exchange
-            const endVar = outPtr[outPtr.length - 1];
-
-            outPtr.push({
-                // @TODO: PUSH?
-                opType: OpType.ASSIGN,
-                arg: [
-                    endVariableName,
-                    endVar
-                ]
-            });
         } else {
             // in other case we will assign literal value or default 0
             outPtr.push({
@@ -223,7 +196,6 @@ export class GraphProcessor {
         // Evaluate them
         // Create stack frame
         // Pop into function
-
         node.collectArgs().forEach((arg: Optional<CommandNode>) => {
             if (arg) {
                 this.stepInto(arg, outPtr);
@@ -269,6 +241,14 @@ export class GraphProcessor {
         });
     }
 
+    protected processLiteral(nextNode: LiteralNode, outPtr: ListStatement[]) {
+        outPtr.push({
+            opType: OpType.PUSH,
+            arg: nextNode.ourValue, // @TODO:
+        });
+    }
+
+    // @TODO: STEP INTO MUST GO THROUGH CHAIN
     protected stepInto(nextNode: CommandNode, outPtr: ListStatement[]) {
         const { instructionType } = nextNode;
         switch (instructionType) {
@@ -303,6 +283,15 @@ export class GraphProcessor {
                 if (nextNode instanceof MathNode) {
                     this.processMath(nextNode, outPtr);
                     break
+                }
+
+                GraphProcessor.throwNodeIsCorrupted(nextNode);
+            }
+
+            case InstructionType.LITERAL: {
+                if (nextNode instanceof LiteralNode) {
+                    this.processLiteral(nextNode, outPtr);
+                    break;
                 }
 
                 GraphProcessor.throwNodeIsCorrupted(nextNode);

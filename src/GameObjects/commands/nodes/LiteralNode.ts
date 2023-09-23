@@ -6,7 +6,7 @@ import { PinPositionDescription } from "../pinPositionDescription";
 import { StackFrame } from "@src/classes/vm/StackFrame";
 import { Scope } from "@src/classes/vm/Scope";
 
-export class VarNode extends CommandNode {
+export class LiteralNode extends CommandNode {
     public static readonly ACTOR_KEY = 'VarNode';
 
     public ourValue: number = 0;
@@ -17,7 +17,7 @@ export class VarNode extends CommandNode {
     // @TODO: SPIKE
     protected scope: Scope;
 
-    public readonly instructionType: InstructionType = InstructionType.VARIABLE;
+    public readonly instructionType: InstructionType = InstructionType.LITERAL;
 
     /**
      * @inheritdoc

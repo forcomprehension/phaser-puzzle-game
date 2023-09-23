@@ -1,4 +1,4 @@
-import { ListStatement } from "./GraphProcessor";
+import { ListStatement } from "../GraphProcessor";
 import { IArgument, ICallable } from "./ICallable";
 import { OpType } from "./Interpreter2";
 

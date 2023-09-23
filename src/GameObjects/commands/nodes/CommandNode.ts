@@ -6,7 +6,7 @@ import { INodeReceiveData } from "@interfaces/nodes/INodeReceiveData";
 import { NODE_RECEIVE_DATA } from "./events";
 import { PinPositionDescription } from "../pinPositionDescription";
 import { StackFrame } from "@src/classes/vm/StackFrame";
-import { IGameplayFunctionAgent } from "@src/classes/functions/IGameplayFunctionAgent";
+
 
 type MainComponent = Phaser.GameObjects.GameObject & Phaser.GameObjects.Components.Origin & {
     height: number,
@@ -24,7 +24,7 @@ export enum InstructionType {
     BREAK = 'BREAK',
     CONTINUE = 'CONTINUE',
     LOOP = 'LOOP',
-    VARIABLE = 'VARIABLE',
+    LITERAL = 'LITERAL',
     OTHER = 'OTHER',
     CALL = 'CALL'
 }
@@ -32,7 +32,7 @@ export enum InstructionType {
 /**
  * Base command node
  */
-export class CommandNode extends Phaser.GameObjects.Container implements INodeReceiveData, IGameplayFunctionAgent {
+export class CommandNode extends Phaser.GameObjects.Container implements INodeReceiveData {
     /**
      * Pin vertical margin
      */
@@ -199,16 +199,6 @@ export class CommandNode extends Phaser.GameObjects.Container implements INodeRe
 
         scene.add.existing(this);
     }
-
-    // region IGameplayFunctionAgent
-    public gameplayCall() {
-        throw new Error("Method not implemented.");
-    }
-
-    public functionLength(): number {
-        return this.leftPinsList.length;
-    }
-    // endregion IGameplayFunctionAgent
 
     // region INodeReceiveData
     /**

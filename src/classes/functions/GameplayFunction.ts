@@ -8,12 +8,11 @@ export class GameplayFunction implements ICallable {
         this.gameplayObject = gameplayObject;
     }
 
-    public callFunction(...args: IArgument[]): void {
-        return this.gameplayObject.gameplayCall();
+    public callFunction(...args: IArgument[]) {
+        return this.gameplayObject.gameplayCall(...args);
     }
 
     public functionLength(): number {
         return this.gameplayObject.functionLength();
     }
 }
-

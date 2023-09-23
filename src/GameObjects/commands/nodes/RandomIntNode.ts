@@ -1,13 +1,15 @@
 import { NodePin } from "../NodePin";
 import { ON_PIN_CONNECTED, ON_PIN_DISCONNECTED } from "../nodepins/events";
 import { PinPositionDescription } from "../pinPositionDescription";
-import { BaseComponentsFactoryResult, CommandNode } from "./CommandNode";
+import { CallNode } from "./CallNode";
+import { BaseComponentsFactoryResult } from "./CommandNode";
 import { RANDOM_INT_UPDATED } from "./events";
+import type { IArgument } from "@src/classes/vm/ICallable";
 
 /**
  * Node which generate a random int value from range
  */
-export class RandomIntNode extends CommandNode {
+export class RandomIntNode extends CallNode {
     public static readonly ACTOR_KEY = 'RandomIntNode';
 
     protected static readonly INITIAL_COLOR = [0, 91, 219] as const;
@@ -140,6 +142,10 @@ export class RandomIntNode extends CommandNode {
             ],
             mainComponent: rect
         }
+    }
+
+    public gameplayCall(...args: IArgument[]) {
+        return Phaser.Math.Between(this.range.min, this.range.max);
     }
 
     public destroy(fromScene?: boolean | undefined): void {

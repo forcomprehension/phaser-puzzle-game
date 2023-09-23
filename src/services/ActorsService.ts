@@ -4,7 +4,7 @@ import { MultiplicationNode } from "@GameObjects/commands/nodes/Math/Multiplicat
 import { SubtractNode } from "@GameObjects/commands/nodes/Math/SubtractNode";
 import { MonochromeDisplayNode } from "@GameObjects/commands/nodes/MonochromeDisplayNode";
 import { RandomIntNode } from "@GameObjects/commands/nodes/RandomIntNode";
-import { VarNode } from "@GameObjects/commands/nodes/VarNode";
+import { LiteralNode } from "@GameObjects/commands/nodes/LiteralNode";
 
 const actorsMap = {
     [MonochromeDisplayNode.ACTOR_KEY]: {
@@ -27,9 +27,9 @@ const actorsMap = {
         factory: SubtractNode.spawnerFactory,
         clazz: SubtractNode,
     },
-    [VarNode.ACTOR_KEY]: {
-        factory: VarNode.spawnerFactory,
-        clazz: VarNode
+    [LiteralNode.ACTOR_KEY]: {
+        factory: LiteralNode.spawnerFactory,
+        clazz: LiteralNode
     },
     [IfNode.ACTOR_KEY]: {
         factory: IfNode.spawnerFactory,

@@ -3,7 +3,7 @@ import type { CallStack } from "./CallStack";
 import type { Debugger } from "./Debugger";
 import { StackFrame } from "./StackFrame";
 import { ForNode } from "@GameObjects/commands/nodes/ForNode";
-import { VarNode } from "@GameObjects/commands/nodes/VarNode";
+import { LiteralNode } from "@GameObjects/commands/nodes/LiteralNode";
 
 export type PossibleException = Optional<{
     nativeException: unknown,
@@ -66,13 +66,13 @@ export class Interpreter {
                 const instructionType = instruction.instructionType;
 
                 switch (instructionType) {
-                    case InstructionType.VARIABLE: {
+                    case InstructionType.LITERAL: {
                         // @TODO: VALUE PIN?
                         // How to execute?
-                        (instruction as VarNode).assign(
-                            (instruction as VarNode).name,
+                        (instruction as LiteralNode).assign(
+                            (instruction as LiteralNode).name,
                             frame,
-                            (instruction as VarNode).ourValue
+                            (instruction as LiteralNode).ourValue
                         );
                     }
                     case InstructionType.BRANCH: {
@@ -116,7 +116,7 @@ export class Interpreter {
                             // This means we must just proceed to next node after loop
                         }
                     }
-                    case InstructionType.VARIABLE: {
+                    case InstructionType.LITERAL: {
                         const value = instruction.executeValue();
                         if (value instanceof StackFrame) {
                             // @TODO:
