@@ -19,11 +19,15 @@ export class RandomIntNode extends CallNode {
 
     protected readonly color = new Phaser.Display.Color(...RandomIntNode.INITIAL_COLOR);
 
+    // @TODO: how to set range
     protected readonly range = {
         min: 70,
         max: 90,
     };
 
+    /**
+     * @deprecated
+     */
     protected ourValue: number = 0;
 
     /**
@@ -111,8 +115,8 @@ export class RandomIntNode extends CallNode {
         this.ourValue = Phaser.Math.Between(this.range.min, this.range.max)
     }
 
-    protected getTemperatureText(randomValue: number) {
-        // @TODO: Argument name
+    protected getLabeledText(randomValue: number) {
+        // @TODO: Label name
         return `Temperature(${String(randomValue).padStart(2, '0')}) F`;
     }
 
@@ -128,7 +132,7 @@ export class RandomIntNode extends CallNode {
         const text = this.textComponent = this.scene.add.text(
             0,
             0,
-            this.getTemperatureText(0),
+            this.getLabeledText(0),
             {
                 fontSize: '24px',
                 fontFamily: 'RobotoRegular',
@@ -145,7 +149,10 @@ export class RandomIntNode extends CallNode {
     }
 
     public gameplayCall(...args: IArgument[]) {
-        return Phaser.Math.Between(this.range.min, this.range.max);
+        const value = Phaser.Math.Between(this.range.min, this.range.max);
+        this.textComponent?.setText(this.getLabeledText(value));
+
+        return value;
     }
 
     public destroy(fromScene?: boolean | undefined): void {

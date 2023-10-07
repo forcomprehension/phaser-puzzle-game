@@ -36,22 +36,6 @@ class Stack3 {
     }
 }
 
-class LabelsHolder {
-    protected statementsIndex: Map<string, number> = new Map();
-
-    public set(label: string, statementIndex: number) {
-        if (this.statementsIndex.has(label)) {
-            throw new Error(`Stack already have label ${label}`);
-        }
-
-        this.statementsIndex.set(label, statementIndex);
-    }
-
-    public getIndexByLabel(label: string) {
-        return this.statementsIndex.get(label);
-    }
-}
-
 class Scope3 {
     protected readonly variables: Map<string, any> = new Map();
 
@@ -66,17 +50,20 @@ class Scope3 {
 
 class State3 {
     public readonly stack: Stack3 = new Stack3();
-    public readonly labels: LabelsHolder = new LabelsHolder();
     public readonly scope: Scope3 = new Scope3();
 }
 
 enum StepReturnReason {
     SUCCESS,
     MOVE_TO_LABEL,
+    BACK_TO_LABEL,
 }
 
 type StepReturnValue = {
     type: StepReturnReason.MOVE_TO_LABEL,
+    label: string,
+} | {
+    type: StepReturnReason.BACK_TO_LABEL,
     label: string,
 } | {
     type: StepReturnReason.SUCCESS
@@ -99,23 +86,68 @@ export class Interpreter3 {
         protected readonly statements: Readonly<ListStatement[]>
     ) {}
 
+    /**
+     * Run through commands list
+     */
     public continue() {
-    loop:
         for (let i = this.statementCursor; i < this.statements.length; i++) {
             const result = this.step(this.statements[i], i, this.state);
 
             switch (result.type) {
                 case StepReturnReason.MOVE_TO_LABEL: {
-                    const index = this.state.labels.getIndexByLabel(result.label);
+                    const index = this.lookForwardForIndex(i, result.label);
 
                     if (index === undefined) {
                         throw new Error(`Cannot find label ${result.label}`);
                     }
 
-                    this.statementCursor = index;
-
-                    continue loop;
+                    i = index;
+                    break;
                 }
+
+                case StepReturnReason.BACK_TO_LABEL: {
+                    const index = this.lookBackwardForIndex(i, result.label);
+
+                    if (index === undefined) {
+                        throw new Error(`Cannot find label ${result.label}`);
+                    }
+
+                    i = index;
+                    break;
+                }
+            }
+
+            this.statementCursor = i;
+        }
+    }
+
+    /**
+     * Search label forward in list of statements
+     *
+     * @param currentIteration
+     * @param searchLabel
+     */
+    protected lookForwardForIndex(currentIteration: number, searchLabel: string) {
+        for (let j = currentIteration + 1; j < this.statements.length; j++) {
+            const currentStatement = this.statements[j];
+            if (currentStatement.arg === searchLabel) {
+                return j;
+            }
+        }
+    }
+
+    /**
+     * Search label backward in list of statements
+     *
+     * @param currentIteration
+     * @param searchLabel
+     */
+    protected lookBackwardForIndex(currentIteration: number, searchLabel: string) {
+        for (let j = currentIteration - 1; j >= 0; j--) {
+            // Search backward
+            const currentStatement = this.statements[j];
+            if (currentStatement.arg === searchLabel) {
+                return j;
             }
         }
     }
@@ -169,29 +201,35 @@ export class Interpreter3 {
                 break;
             }
 
-            case OpType.GOTO:
+            case OpType.JUMP: {
+                return {
+                    type: StepReturnReason.MOVE_TO_LABEL,
+                    label: statement.arg as string,
+                };
+            }
             case OpType.PUSH: {
                 stack.push(statement.arg);
                 break;
             }
             case OpType.JUMP_IF_FALSE: {
-                return {
-                    type: StepReturnReason.MOVE_TO_LABEL,
-                    label: statement.arg as string,
-                };
+                const result = stack.pop();
+                if (!result) {
+                    return {
+                        type: StepReturnReason.MOVE_TO_LABEL,
+                        label: statement.arg as string,
+                    };
+                }
+
+                break;
             }
             case OpType.BACK_TO_LABEL: {
                 return {
-                    type: StepReturnReason.MOVE_TO_LABEL,
+                    type: StepReturnReason.BACK_TO_LABEL,
                     label: statement.arg as string,
                 };
             }
             case OpType.LITERAL:
-            case OpType.LABEL: {
-                // @TODO:
-                state.labels.set(statement.arg as string, statementIndex);
-                break;
-            }
+            case OpType.LABEL:
             case OpType.RETURN:
             case OpType.ENTRY:
             case OpType.WHILE:

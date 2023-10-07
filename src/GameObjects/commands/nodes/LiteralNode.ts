@@ -7,7 +7,7 @@ import { StackFrame } from "@src/classes/vm/StackFrame";
 import { Scope } from "@src/classes/vm/Scope";
 
 export class LiteralNode extends CommandNode {
-    public static readonly ACTOR_KEY = 'VarNode';
+    public static readonly ACTOR_KEY = 'LiteralNode';
 
     public ourValue: number = 0;
 
@@ -66,13 +66,13 @@ export class LiteralNode extends CommandNode {
         const rightPin = new NodePin(this.scene, PinPositionDescription.RIGHT_PIN);
         this.outPin = rightPin;
 
-        let interval: any = 0;
+        // let interval: any = 0;
         let connected: boolean = false; // If callback already passed to the queue
         this.on(ON_PIN_CONNECTED, (myPin: NodePin, other: NodePin) => {
             if (!this.scope) {
                 throw new ReferenceError(`Identifier ${this.varName} is not defined`);
             }
-            other.parentContainer.receiveData(myPin, this.scope, other);
+            // other.parentContainer.receiveData(myPin, this.scope, other);
             connected = true;
 
             // @TODO: SPIKE!!!
@@ -92,10 +92,10 @@ export class LiteralNode extends CommandNode {
 
         this.once(ON_PIN_DISCONNECTED, () => {
             connected = false;
-            clearInterval(interval);
+            // clearInterval(interval);
         });
         this.once(Phaser.GameObjects.Events.DESTROY, () => {
-            clearInterval(interval);
+            // clearInterval(interval);
         });
 
         return [

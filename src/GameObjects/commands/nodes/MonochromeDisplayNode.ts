@@ -96,6 +96,9 @@ export class MonochromeDisplayNode extends CallNode {
         super.destroy(fromScene);
     }
 
+    /**
+     * @param args
+     */
     public gameplayCall(...args: IArgument[]) {
         let dataCopy = args[0].value;
 

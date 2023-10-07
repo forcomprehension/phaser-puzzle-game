@@ -1,7 +1,6 @@
 import { NodePin } from "../NodePin";
 import { PinPositionDescription } from "../pinPositionDescription";
 import { CommandNode, InstructionType } from "./CommandNode";
-import { NODE_RECEIVE_DATA } from "./events";
 
 export class BranchNodeConnectedBranches {
     constructor(
@@ -10,8 +9,8 @@ export class BranchNodeConnectedBranches {
     ) {}
 }
 
-export class IfNode extends CommandNode {
-    public static readonly ACTOR_KEY = 'IfNode';
+export class BranchNode extends CommandNode {
+    public static readonly ACTOR_KEY = 'BranchNode';
 
     protected truePin: NodePin;
     protected falsePin: NodePin;
@@ -20,17 +19,6 @@ export class IfNode extends CommandNode {
 
     public readonly instructionType: InstructionType = InstructionType.BRANCH;
 
-    protected init(): this {
-        super.init();
-
-        this.on(NODE_RECEIVE_DATA, (senderPin: NodePin, data: any, receiverPin: NodePin) => {
-            if (senderPin.isFlow()) { // Assume that we have only flow pins here
-                
-            }
-        });
-
-        return this;
-    }
     /**
      * @inheritdoc
      */

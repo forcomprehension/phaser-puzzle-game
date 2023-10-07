@@ -1,6 +1,6 @@
 import { CommandNode, InstructionType } from "@GameObjects/commands/nodes/CommandNode";
 import { OpType } from "./vm/Interpreter2";
-import { IfNode } from "@GameObjects/commands/nodes/IfNode";
+import { BranchNode } from "@GameObjects/commands/nodes/BranchNode";
 import { nextString } from "@utils/serialGenerator";
 import { ForNode } from "@GameObjects/commands/nodes/ForNode";
 import { CallNode } from "@GameObjects/commands/nodes/CallNode";
@@ -52,7 +52,7 @@ export class GraphProcessor {
         return list;
     }
 
-    protected processBranch(node: IfNode, outPtr: ListStatement[]) {
+    protected processBranch(node: BranchNode, outPtr: ListStatement[]) {
         const conditionNode = node.getConditionRule();
         const { trueNode, falseNode } = node.getBranchesStruct();
 
@@ -88,8 +88,8 @@ export class GraphProcessor {
             });
         }
 
-        const falseNodeLabelId = nextString();
-        const endLabel = nextString();
+        const falseNodeLabelId = `@@branch_${nextString()}`;
+        const endLabel = `@@branch_${nextString()}`;
 
         if (falseNode) {
             outPtr.push({
@@ -102,8 +102,8 @@ export class GraphProcessor {
             this.stepInto(trueNode, outPtr);
 
             outPtr.push({
-                opType: OpType.LABEL,
-                arg: endLabel
+                opType: OpType.JUMP,
+                arg: endLabel,
             });
         }
 
@@ -281,7 +281,6 @@ export class GraphProcessor {
         this.stepIntoNextInstruction(thisNode, outPtr);
     }
 
-    // @TODO: STEP INTO MUST GO THROUGH CHAIN
     protected stepInto(nextNode: CommandNode, outPtr: ListStatement[]) {
         // Do not step into already processed nodes
         if (this.processedNodes.has(nextNode.$id)) {
@@ -293,7 +292,7 @@ export class GraphProcessor {
         const { instructionType } = nextNode;
         switch (instructionType) {
             case InstructionType.BRANCH: {
-                if (nextNode instanceof IfNode) {
+                if (nextNode instanceof BranchNode) {
                     this.processBranch(nextNode, outPtr);
                     break;
                 }

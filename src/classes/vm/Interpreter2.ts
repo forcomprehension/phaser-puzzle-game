@@ -217,7 +217,7 @@ export enum OpType {
     LT = 'LT',
     LOAD = 'LOAD',
     CALL = 'CALL',
-    GOTO = 'GOTO',
+    JUMP = 'JUMP',
     PUSH = 'PUSH',
     JUMP_IF_FALSE = 'JUMP_IF_FALSE',
     BACK_TO_LABEL = 'BACK_TO_LABEL',
@@ -252,7 +252,7 @@ export class Interpreter2 {
                     case OpType.BRANCH:
                     case OpType.BREAK:
                     case OpType.CALL:
-                    case OpType.GOTO:
+                    case OpType.JUMP:
                     case OpType.RETURN: {
                         this.returnInstruction(stack, currentInstruction as Return);
                     }

@@ -1,4 +1,4 @@
-import { IfNode } from "@GameObjects/commands/nodes/IfNode";
+import { BranchNode } from "@GameObjects/commands/nodes/BranchNode";
 import { DivisionNode } from "@GameObjects/commands/nodes/Math/DivisionNode";
 import { MultiplicationNode } from "@GameObjects/commands/nodes/Math/MultiplicationNode";
 import { SubtractNode } from "@GameObjects/commands/nodes/Math/SubtractNode";
@@ -31,9 +31,9 @@ const actorsMap = {
         factory: LiteralNode.spawnerFactory,
         clazz: LiteralNode
     },
-    [IfNode.ACTOR_KEY]: {
-        factory: IfNode.spawnerFactory,
-        clazz: IfNode
+    [BranchNode.ACTOR_KEY]: {
+        factory: BranchNode.spawnerFactory,
+        clazz: BranchNode
     }
 } as const;
 

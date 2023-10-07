@@ -33,13 +33,14 @@ export type Level = {
 
 const level1: Level = {
     actors: [{
+        id: 2,
+        key: "RandomIntNode",
+        params: [80, 560, true],
+    },
+    {
         id: 1,
         key: "MonochromeDisplayNode",
         params: [1480, 580]
-    }, {
-        id: 2,
-        key: "RandomIntNode",
-        params: [80, 560, true]
     }],
     winCriteria: {
         type: 'actor-event',
@@ -50,14 +51,14 @@ const level1: Level = {
 
 const level2: Level = {
     actors: [{
+        id: 2,
+        key: "LiteralNode",
+        params: [80, 560],
+        data: [35],
+    }, {
         id: 1,
         key: "MonochromeDisplayNode",
         params: [1480, 580]
-    },{
-        id: 2,
-        key: "VarNode",
-        params: [80, 560],
-        data: [35],
     }],
     winCriteria: {
         type: 'actor-event',
@@ -73,22 +74,22 @@ const level3: Level = {
         params: [1480, 360]
     },  {
         id: 2,
-        key: "VarNode",
+        key: "LiteralNode",
         params: [80, 560],
         data: [212],
     }, {
         id: 3,
-        key: "VarNode",
+        key: "LiteralNode",
         params: [150, 800],
         data: [9],
     }, {
         id: 4,
-        key: "VarNode",
+        key: "LiteralNode",
         params: [450, 800],
         data: [5],
     }, {
         id: 5,
-        key: "VarNode",
+        key: "LiteralNode",
         params: [700, 800],
         data: [32],
     }, {
@@ -115,20 +116,30 @@ const level3: Level = {
 
 const level4: Level = {
     actors: [{
+        id: 0,
+        key: "LiteralNode",
+        params: [100, 460],
+        data: [0]
+    },{
         id: 1,
-        key: "VarNode",
-        params: [80, 560],
-        data: [212],
+        key: "BranchNode",
+        params: [400, 460]
     },{
         id: 2,
+        key: "LiteralNode",
+        params: [80, 160],
+        data: [212],
+    },{
+        id: 3,
+        key: "LiteralNode",
+        params: [80, 760],
+        data: [124],
+    },{
+        id: 4,
         key: "MonochromeDisplayNode",
         params: [1480, 160]
     },{
-        id: 3,
-        key: "IfNode",
-        params: [400, 460]
-    },{
-        id: 4,
+        id: 5,
         key: "MonochromeDisplayNode",
         params: [1480, 760]
     }],
@@ -142,7 +153,7 @@ const level4: Level = {
 const level5: Level = {
     actors: [{
         id: 1,
-        key: "VarNode",
+        key: "LiteralNode",
         params: [80, 560],
         data: [88],
     },{
@@ -151,7 +162,7 @@ const level5: Level = {
         params: [1480, 160]
     },{
         id: 3,
-        key: "IfNode",
+        key: "BranchNode",
         params: [400, 460]
     },{
         id: 4,
@@ -170,7 +181,8 @@ export const levels: Level[] = [
     level1,
     level2,
     level3,
-    level4
+    level4,
+    level5,
 ];
 
 type ActorObjectInfo = Readonly<{
@@ -182,6 +194,8 @@ type ActorObjectInfo = Readonly<{
  * Manage levels in current campaign. Load/unload levels and translate between them.
  */
 export class LevelsManager {
+    public firstActorOfCurrentLevel: Optional<CommandNode>;
+
     constructor(
         protected readonly levels: Level[]
     ) {}
@@ -192,12 +206,16 @@ export class LevelsManager {
         winCallback: (this: TestProgrammingScene) => any
     ) {
         const { actors } = level;
-        const actorObjects = actors.map<ActorObjectInfo>((actor) => {
+        const actorObjects = actors.map<ActorObjectInfo>((actor, index) => {
             const actorInstance = ActorsService.getInstance()
                 .getActorSpawner(actor.key, ...actor.params)(scene);
 
                 if (actor.data) {
                     actorInstance.setDataWithValidation.apply(actorInstance, actor.data);
+                }
+
+                if (index === 0) {
+                    this.firstActorOfCurrentLevel = actorInstance;
                 }
 
                 return {

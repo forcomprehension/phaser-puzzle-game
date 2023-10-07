@@ -11,7 +11,7 @@ import { DivisionNode } from "@GameObjects/commands/nodes/Math/DivisionNode";
 import { LiteralNode } from "@GameObjects/commands/nodes/LiteralNode";
 import { SubtractNode } from "@GameObjects/commands/nodes/Math/SubtractNode";
 import { FrameGraph } from "@src/classes/vm/FrameGraph";
-import { IfNode } from "@GameObjects/commands/nodes/IfNode";
+import { BranchNode } from "@GameObjects/commands/nodes/BranchNode";
 import { EntryNode } from "@GameObjects/commands/nodes/EntryNode";
 import { ReturnNode } from "@GameObjects/commands/nodes/ReturnNode";
 import { Interpreter } from "@src/classes/vm/Interpreter";
@@ -26,7 +26,7 @@ export type ProgrammingSceneData = {
     level?: number
 };
 
-const START_INDEX_LEVEL = 2;
+const START_INDEX_LEVEL = 3;
 
 export class TestProgrammingScene extends BaseGameScene {
 
@@ -84,11 +84,12 @@ export class TestProgrammingScene extends BaseGameScene {
         compileButton.tint = 0x6622AA;
 
         compileButton.addClickHandler(() => {
-            const entryNode = this.children.list.find((gameObject) => gameObject instanceof LiteralNode && gameObject.ourValue === 212);
+            const entryNode = this.levelsManager.firstActorOfCurrentLevel;
             if (entryNode instanceof CommandNode) {
+                debugger;
                 const instructionsList = new GraphProcessor().convertFrom(entryNode);
                 const interpreter = new Interpreter3(instructionsList);
-
+debugger
                 interpreter.continue();
             }
         });
@@ -136,7 +137,7 @@ export class TestProgrammingScene extends BaseGameScene {
         const enterNode = new EntryNode(this, 100, canvasHeight / 2);
         // const returnNode = new ReturnNode(this, canvasWidth - 100, canvasHeight / 2);
 
-        const ifNode = new IfNode(this, canvasWidth / 2, canvasHeight / 2);
+        const ifNode = new BranchNode(this, canvasWidth / 2, canvasHeight / 2);
         const monochromeDisplay = new MonochromeDisplayNode(this, 1450, 600);
 
         
