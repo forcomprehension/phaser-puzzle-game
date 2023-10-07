@@ -216,6 +216,8 @@ export class CommandNode extends Phaser.GameObjects.Container implements INodeRe
 
     /**
      * Receive data marker
+     * 
+     * @deprecated
      */
     public receiveData(senderPin: NodePin, data: any, receiverPin: NodePin): void {
         this.emit(NODE_RECEIVE_DATA, senderPin, data, receiverPin);

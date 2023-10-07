@@ -29,7 +29,7 @@ class Stack3 {
     }
 
     public popFew(count: number) {
-        const tmp = this.stack.slice(0, (-count));
+        const tmp = this.stack.slice(-count);
         this.stack.length -= count;
 
         return tmp;
@@ -251,27 +251,44 @@ export class Interpreter3 {
     }
 
     protected stepArithmetic(operandsCount: number, mathOp: MathOp) {
-        // Multiplication ops must have 1 as start value, another ops must have 0
-        const startValue = Number(mathOp === MathOp.MULTIPLY || mathOp === MathOp.DIVIDE);
+        const operands = this.state.stack.popFew(operandsCount);
 
-        // @TODO: How to control overflow?
-        const result = this.state.stack.popFew(operandsCount).reduce((acc, next) => {
-            switch (mathOp) {
-                case MathOp.ADD: {
-                    return acc + next;
-                }
-                case MathOp.DIVIDE: { // @TODO: Int / float?
-                    return acc / next;
-                }
-                case MathOp.MULTIPLY: {
-                    return acc * next;
-                }
-                case MathOp.SUBTRACT: {
-                    return acc - next;
-                }
-            }
+         // @TODO: How to control overflow?
+         if (operandsCount == 2) {
+            const simpleResult = this.performMathOperation(operands[0], operands[1], mathOp);
+            this.state.stack.push(simpleResult);
+            return;
+        }
+
+        // Multiplication ops must have 1 as start value, another ops must have first value
+        const startValue = mathOp === MathOp.ADD || mathOp === MathOp.SUBTRACT ?
+            operands[0]
+            : 1;
+
+        const result = operands.slice(1).reduce((acc, next) => {
+            return this.performMathOperation(acc, next, mathOp);
         }, startValue);
 
         this.state.stack.push(result);
+    }
+
+    /**
+     * Perform math operation by op type
+     */
+    protected performMathOperation(prev: number, next: number, mathOp: MathOp) {
+        switch (mathOp) {
+            case MathOp.ADD: {
+                return prev + next;
+            }
+            case MathOp.DIVIDE: { // @TODO: Int / float?
+                return prev / next;
+            }
+            case MathOp.MULTIPLY: {
+                return prev * next;
+            }
+            case MathOp.SUBTRACT: {
+                return prev - next;
+            }
+        }
     }
 }

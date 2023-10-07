@@ -20,6 +20,7 @@ import { CallStack } from "@src/classes/vm/CallStack";
 import { CompileButton } from "@GameObjects/ui/CompileButton";
 import { GraphProcessor } from "@src/classes/GraphProcessor";
 import { CommandNode } from "@GameObjects/commands/nodes/CommandNode";
+import { Interpreter3 } from "@src/classes/vm/Interpreter3";
 
 export type ProgrammingSceneData = {
     level?: number
@@ -85,7 +86,10 @@ export class TestProgrammingScene extends BaseGameScene {
         compileButton.addClickHandler(() => {
             const entryNode = this.children.list.find((gameObject) => gameObject instanceof LiteralNode && gameObject.ourValue === 212);
             if (entryNode instanceof CommandNode) {
-                new GraphProcessor().convertFrom(entryNode);
+                const instructionsList = new GraphProcessor().convertFrom(entryNode);
+                const interpreter = new Interpreter3(instructionsList);
+
+                interpreter.continue();
             }
         });
 

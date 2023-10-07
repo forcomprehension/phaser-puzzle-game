@@ -45,9 +45,9 @@ export class GraphProcessor {
 
     public convertFrom(entryNode: CommandNode): ListStatement[] {
         const list: ListStatement[] = [];
-debugger;
+
         this.stepInto(entryNode, list);
-debugger;
+
         this.processedNodes.clear();
         return list;
     }

@@ -76,18 +76,18 @@ export class LiteralNode extends CommandNode {
             connected = true;
 
             // @TODO: SPIKE!!!
-            interval = setInterval(() => {
-                if (connected && other.parentContainer) {
-                    if (!this.scope) {
-                        throw new ReferenceError(`Identifier ${this.varName} is not defined`);
-                    }
-                    other.parentContainer.receiveData(
-                        myPin,
-                        this.scope.get(this.varName),
-                        other
-                    );
-                }
-            }, 333);
+            // interval = setInterval(() => {
+            //     if (connected && other.parentContainer) {
+            //         if (!this.scope) {
+            //             throw new ReferenceError(`Identifier ${this.varName} is not defined`);
+            //         }
+            //         other.parentContainer.receiveData(
+            //             myPin,
+            //             this.scope.get(this.varName),
+            //             other
+            //         );
+            //     }
+            // }, 333);
         });
 
         this.once(ON_PIN_DISCONNECTED, () => {
