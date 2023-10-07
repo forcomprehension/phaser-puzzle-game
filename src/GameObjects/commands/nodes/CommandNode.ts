@@ -6,6 +6,7 @@ import { INodeReceiveData } from "@interfaces/nodes/INodeReceiveData";
 import { NODE_RECEIVE_DATA } from "./events";
 import { PinPositionDescription } from "../pinPositionDescription";
 import { StackFrame } from "@src/classes/vm/StackFrame";
+import { nextInt } from "@utils/serialGenerator";
 
 
 type MainComponent = Phaser.GameObjects.GameObject & Phaser.GameObjects.Components.Origin & {
@@ -33,6 +34,11 @@ export enum InstructionType {
  * Base command node
  */
 export class CommandNode extends Phaser.GameObjects.Container implements INodeReceiveData {
+    /**
+     * Get id of object
+     */
+    public readonly $id: number = nextInt();
+
     /**
      * Pin vertical margin
      */
@@ -432,4 +438,10 @@ export class CommandNode extends Phaser.GameObjects.Container implements INodeRe
             return undefined;
         });
     }
+
+     /** region IGraphProcessorAgent **/
+     public getNextInstruction(): Optional<CommandNode> {
+        return undefined;
+    }
+    /** endregion IGraphProcessorAgent **/
 }

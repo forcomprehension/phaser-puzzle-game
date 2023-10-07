@@ -7,21 +7,48 @@ import { CallNode } from "@GameObjects/commands/nodes/CallNode";
 import { FunctionType } from '@src/classes/functions/F';
 import { MathNode } from "@GameObjects/commands/nodes/Math/MathNode";
 import { LiteralNode } from "@GameObjects/commands/nodes/LiteralNode";
+import { MathOp } from "./vm/Interpreter3";
+import { ICallable } from "./vm/ICallable";
+import { GameplayFunction } from "./functions/GameplayFunction";
 
 export type ListStatement = {
     opType: OpType;
     arg: unknown
 };
 
+export class StatementMathArg {
+    constructor(
+        public readonly operandsCount: number,
+        public readonly operationType: MathOp,
+    ) {}
+}
+
+export class StatementCallArg {
+    constructor(
+        public readonly functionType: FunctionType,
+        public readonly functionPointer: ICallable,
+    ) {}
+}
+
+export class StatementAssignArg {
+    constructor(
+        public readonly variableName: string,
+        public readonly value: any
+    ) {}
+}
+
 /**
  * Convert connected nodes graph to statements list
  */
 export class GraphProcessor {
+    protected processedNodes: Set<number> = new Set();
+
     public convertFrom(entryNode: CommandNode): ListStatement[] {
         const list: ListStatement[] = [];
-
+debugger;
         this.stepInto(entryNode, list);
-
+debugger;
+        this.processedNodes.clear();
         return list;
     }
 
@@ -108,10 +135,10 @@ export class GraphProcessor {
             // in other case we will assign literal value or default 0
             outPtr.push({
                 opType: OpType.ASSIGN,
-                arg: [
+                arg: new StatementAssignArg(
                     currentVariableName,
                     typeof startEntity === 'number' ? startEntity : 0
-                ]
+                )
             });
         }
 
@@ -127,10 +154,10 @@ export class GraphProcessor {
             outPtr.push({
                 // @TODO: PUSH?
                 opType: OpType.ASSIGN,
-                arg: [
+                arg: new StatementAssignArg(
                     endVariableName,
                     typeof endEntity === 'number' ? endEntity : 0
-                ]
+                )
             });
         }
 
@@ -210,22 +237,24 @@ export class GraphProcessor {
 
         outPtr.push({
             opType: OpType.CALL,
-            arg: [
+            arg: new StatementCallArg(
                 FunctionType.GAMEPLAY, // @TODO
-                undefined  // @TODO: FQN
-            ]
+                new GameplayFunction().setGameplayObject(node)
+            )
         });
+
+        this.stepIntoNextInstruction(node, outPtr);
     }
 
-    protected processMath(nextNode: MathNode, outPtr: ListStatement[]) {
+    protected processMath(thisNode: MathNode, outPtr: ListStatement[]) {
         let operandsCount = 0;
-        nextNode.collectArgs().forEach((arg) => {
+        thisNode.collectArgs().forEach((arg) => {
             if (arg) {
                 this.stepInto(arg, outPtr);
             } else {
                 outPtr.push({
                     opType: OpType.PUSH,
-                    arg: nextNode.getEmptyValue()
+                    arg: thisNode.getEmptyValue()
                 })
             }
 
@@ -234,22 +263,33 @@ export class GraphProcessor {
 
         outPtr.push({
             opType: OpType.ARITHMETIC,
-            arg: [
+            arg: new StatementMathArg(
                 operandsCount,
-                nextNode.mathOperationType
-            ]
+                thisNode.mathOperationType
+            )
         });
+
+        this.stepIntoNextInstruction(thisNode, outPtr);
     }
 
-    protected processLiteral(nextNode: LiteralNode, outPtr: ListStatement[]) {
+    protected processLiteral(thisNode: LiteralNode, outPtr: ListStatement[]) {
         outPtr.push({
             opType: OpType.PUSH,
-            arg: nextNode.ourValue, // @TODO:
+            arg: thisNode.ourValue, // @TODO:
         });
+
+        this.stepIntoNextInstruction(thisNode, outPtr);
     }
 
     // @TODO: STEP INTO MUST GO THROUGH CHAIN
     protected stepInto(nextNode: CommandNode, outPtr: ListStatement[]) {
+        // Do not step into already processed nodes
+        if (this.processedNodes.has(nextNode.$id)) {
+            return;
+        }
+
+        this.processedNodes.add(nextNode.$id);
+
         const { instructionType } = nextNode;
         switch (instructionType) {
             case InstructionType.BRANCH: {
@@ -258,7 +298,7 @@ export class GraphProcessor {
                     break;
                 }
 
-                GraphProcessor.throwNodeIsCorrupted(nextNode);
+                this.throwNodeIsCorrupted(nextNode);
             }
 
             case InstructionType.LOOP: {
@@ -267,7 +307,7 @@ export class GraphProcessor {
                     break;
                 }
 
-                GraphProcessor.throwNodeIsCorrupted(nextNode);
+                this.throwNodeIsCorrupted(nextNode);
             }
 
             case InstructionType.CALL: {
@@ -276,7 +316,7 @@ export class GraphProcessor {
                     break;
                 }
 
-                GraphProcessor.throwNodeIsCorrupted(nextNode);
+                this.throwNodeIsCorrupted(nextNode);
             }
 
             case InstructionType.ARITHMETIC: {
@@ -285,7 +325,7 @@ export class GraphProcessor {
                     break
                 }
 
-                GraphProcessor.throwNodeIsCorrupted(nextNode);
+                this.throwNodeIsCorrupted(nextNode);
             }
 
             case InstructionType.LITERAL: {
@@ -294,12 +334,19 @@ export class GraphProcessor {
                     break;
                 }
 
-                GraphProcessor.throwNodeIsCorrupted(nextNode);
+                this.throwNodeIsCorrupted(nextNode);
             }
         }
     }
 
-    protected static throwNodeIsCorrupted(node: CommandNode) {
+    protected stepIntoNextInstruction(thisInstruction: CommandNode, outPtr: ListStatement[]) {
+        const nextInstruction = thisInstruction.getNextInstruction();
+        if (nextInstruction) {
+            this.stepInto(nextInstruction, outPtr);
+        }
+    }
+
+    protected throwNodeIsCorrupted(node: CommandNode) {
         const name = Object.getPrototypeOf(node)?.constructor?.name || 'unknown';
         throw new Error(`Node ${name} of type "${node.instructionType}" is corrupted`);
     }

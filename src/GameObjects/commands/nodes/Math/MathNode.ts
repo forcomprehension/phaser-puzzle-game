@@ -25,6 +25,8 @@ export abstract class MathNode extends CommandNode {
      */
     protected outResult: number = 0;
 
+    protected outPin: NodePin;
+
     public readonly instructionType: InstructionType = InstructionType.ARITHMETIC;
 
     /**
@@ -59,6 +61,7 @@ export abstract class MathNode extends CommandNode {
      */
     protected getRightPins(): NodePin[] {
         const resultPin = new NodePin(this.scene, PinPositionDescription.RIGHT_PIN);
+        this.outPin = resultPin;
 
         // @TODO: better - on update data?
         this.on(NODE_RECEIVE_DATA, () => {
@@ -90,4 +93,13 @@ export abstract class MathNode extends CommandNode {
     public getEmptyValue() {
         return 0;
     }
+
+     /** region IGraphProcessorAgent **/
+     public getNextInstruction(): Optional<CommandNode> {
+        const connectedObject = this.outPin.getConnectedObject();
+        if (connectedObject instanceof NodePin) {
+            return connectedObject.parentContainer;
+        }
+    }
+    /** endregion IGraphProcessorAgent **/
 }

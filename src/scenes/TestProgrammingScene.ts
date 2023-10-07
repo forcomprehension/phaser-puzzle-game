@@ -85,10 +85,8 @@ export class TestProgrammingScene extends BaseGameScene {
         compileButton.addClickHandler(() => {
             const entryNode = this.children.list.find((gameObject) => gameObject instanceof LiteralNode && gameObject.ourValue === 212);
             if (entryNode instanceof CommandNode) {
-                const statementsList = new GraphProcessor().convertFrom(entryNode);
+                new GraphProcessor().convertFrom(entryNode);
             }
-
-            debugger;
         });
 
         const level = this.levelsManager.getLevel(this.level);

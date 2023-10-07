@@ -1,20 +1,20 @@
-import { ListStatement } from "../GraphProcessor";
+import { ListStatement, StatementAssignArg, StatementCallArg, StatementMathArg } from "../GraphProcessor";
 import { IArgument, ICallable } from "./ICallable";
 import { OpType } from "./Interpreter2";
 
 export enum ComparisonOp {
-    LT,
-    LE,
-    GT,
-    GE,
-    EQ
+    LT = "<",
+    LE = "<=",
+    GT = ">",
+    GE = ">=",
+    EQ = "=="
 }
 
 export enum MathOp {
-    ADD,
-    DIVIDE,
-    MULTIPLY,
-    SUBTRACT
+    ADD = "+",
+    DIVIDE = "/",
+    MULTIPLY = "*",
+    SUBTRACT = "-"
 }
 
 class Stack3 {
@@ -129,13 +129,13 @@ export class Interpreter3 {
         const { stack } = state;
         switch (statement.opType) {
             case OpType.ARITHMETIC: {
-                const [ operandsCount, mathOp ] = statement.arg as any;
-                this.stepArithmetic(operandsCount, mathOp);
+                const { operandsCount, operationType } = statement.arg as StatementMathArg;
+                this.stepArithmetic(operandsCount, operationType);
                 break;
             }
             case OpType.ASSIGN: {
-                const [ varName, value ] = statement.arg as any;
-                this.state.scope.assign(varName, value);
+                const { variableName, value }= statement.arg as StatementAssignArg;
+                this.state.scope.assign(variableName, value);
                 break;
             }
             case OpType.BLOCK:
@@ -201,7 +201,7 @@ export class Interpreter3 {
     }
 
     protected stepCall(statement: ListStatement, stack: Stack3) {
-        const { type, functionPointer } = statement.arg as any;
+        const { functionType, functionPointer } = statement.arg as StatementCallArg;
         // @TODO: use the type
         const fp = (functionPointer as ICallable);
         const args: IArgument[] = [];
@@ -215,6 +215,7 @@ export class Interpreter3 {
         }
 
         const result = fp.callFunction(...args);
+        // @todo: need to push undefined?
         stack.push(result);
     }
 
@@ -246,7 +247,7 @@ export class Interpreter3 {
 
     protected stepIncrement() {
         let value = this.state.stack.pop();
-        this.state.stack.push(++value);
+        this.state.stack.push(value + 1);
     }
 
     protected stepArithmetic(operandsCount: number, mathOp: MathOp) {

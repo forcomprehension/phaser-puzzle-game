@@ -20,6 +20,11 @@ export class LiteralNode extends CommandNode {
     public readonly instructionType: InstructionType = InstructionType.LITERAL;
 
     /**
+     * Out pin for current value
+     */
+    protected outPin: NodePin;
+
+    /**
      * @inheritdoc
      */
     protected getTextNode(): string {
@@ -59,6 +64,7 @@ export class LiteralNode extends CommandNode {
      */
     protected getRightPins(): NodePin[] {
         const rightPin = new NodePin(this.scene, PinPositionDescription.RIGHT_PIN);
+        this.outPin = rightPin;
 
         let interval: any = 0;
         let connected: boolean = false; // If callback already passed to the queue
@@ -124,7 +130,12 @@ export class LiteralNode extends CommandNode {
     }
 
     /** region IGraphProcessorAgent **/
- 
+    public getNextInstruction(): Optional<CommandNode> {
+        const connectedObject = this.outPin.getConnectedObject();
+        if (connectedObject instanceof NodePin) {
+            return connectedObject.parentContainer;
+        }
+    }
 
     /** endregion IGraphProcessorAgent **/
 }
