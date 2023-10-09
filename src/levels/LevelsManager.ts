@@ -65,21 +65,20 @@ export class LevelsManager {
 
                 return true;
             }
-            case "actor-check-math-data": {
-                const { mathExpression, expression, expectedValue } = winCriteria;
+            case "call-actor-check-math-data": {
+                const { mathExpression, expression } = winCriteria;
                 // @TODO: do we need expression map?
                 const rpnFunction = ExpressionMap[expression].func;
 
                 function subscribeOnCallActorCalledWith(args: Readonly<IArgument>[]) {
-                    const matched = rpnFunction(
-                        mathExpression.replace('$value', String(expectedValue)),
-                        args[0].value
-                    );
+                    const matched = rpnFunction(mathExpression, args[0].value);
 
                     if (matched) {
                         // @TODO: Y it might be undefined?
                         actorForWinCriteria?.actorInstance.off(CALL_ACTOR_CALLED_WITH, subscribeOnCallActorCalledWith);
                         winCallback.call(scene);
+                    } else {
+                        console.warn(`Incorrect solution of RPN: "${mathExpression}."`);
                     }
                 }
                 // @TODO: Check success call!

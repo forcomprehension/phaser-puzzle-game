@@ -7,6 +7,7 @@ import { LiteralNode } from "@GameObjects/commands/nodes/LiteralNode";
 import { MultiplicationNode } from "@GameObjects/commands/nodes/Math/MultiplicationNode";
 import { SubtractNode } from "@GameObjects/commands/nodes/Math/SubtractNode";
 import { DivisionNode } from "@GameObjects/commands/nodes/Math/DivisionNode";
+import { ModuloNode } from "@GameObjects/commands/nodes/Math/ModuloNode";
 
 /// Internal types
 
@@ -44,9 +45,8 @@ type WinCriteria = {
     type: 'actor-event',
     event: string,
 } | {
-    type: 'actor-check-math-data',
+    type: 'call-actor-check-math-data',
     mathExpression: string,
-    expectedValue: number, // Do we need separate expected value and expression?
     expression: keyof typeof ExpressionMap
 });
 
@@ -76,13 +76,11 @@ function buildActorEventWinCriteria(actorIndex: number, event: string): WinCrite
 function buildActorEventCheckArgsWinCriteria(
     actorIndex: number,
     mathExpression: string,
-    expectedValue: number
 ): WinCriteria {
     return {
-        type: 'actor-check-math-data',
+        type: 'call-actor-check-math-data',
         actorId: actorIndex + 1,
         mathExpression,
-        expectedValue,
         expression: ExpressionsContainer.RPN.name
     }
 }
@@ -157,8 +155,30 @@ export const levels: Level[] = prepareLevels([
         }],
         winCriteria: buildActorEventCheckArgsWinCriteria(
             1,
-            '$value 32 - 9 / 5 *',
-            212
+            '212 32 - 9 / 5 *',
+        )
+    },
+
+    // Уровень: Математические операторы (часть 3) - находим остаток от деления
+    {
+        actors: [{
+            key: LiteralNode.ACTOR_KEY,
+            params: [100, 360],
+            data: [10]
+        }, {
+            key: MonochromeDisplayNode.ACTOR_KEY,
+            params: [1500, 560]
+        }, {
+            key: LiteralNode.ACTOR_KEY,
+            params: [100, 760],
+            data: [4]
+        }, {
+            key: ModuloNode.ACTOR_KEY,
+            params: [500, 560]
+        }],
+        winCriteria: buildActorEventCheckArgsWinCriteria(
+            1,
+            '10 4 %'
         )
     }
 ]);

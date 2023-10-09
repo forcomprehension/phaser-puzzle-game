@@ -19,40 +19,44 @@ export function evaluateRPN(rpn: string): number {
     for (let i = 0; i < tokens.length; i++) {
         switch (tokens[i]) {
             case "+": {
-                if (stack.length === 0) {
+                const addend = stack.pop();
+                if (addend === undefined) {
                     throw new InvalidRPNException(InvalidRPNErrorCodes.INVALID_ADDITION);
                 }
 
                 // @TODO: check overflow?
-                result += stack.pop()!;
+                result += addend;
                 break;
             }
 
             case "-": {
-                if (stack.length === 0) {
+                const subtrahend = stack.pop();
+                if (subtrahend === undefined) {
                     throw new InvalidRPNException(InvalidRPNErrorCodes.INVALID_SUBTRACTION);
                 }
 
-                result -= stack.pop()!;
+                result -= subtrahend;
                 break;
             }
 
             case "*": {
-                if (stack.length === 0) {
+                const multiplier = stack.pop();
+                if (multiplier === undefined) {
                     throw new InvalidRPNException(InvalidRPNErrorCodes.INVALID_MULTIPLICATION);
                 }
+
                 // @TODO: check overflow?
 
-                result *= stack.pop()!;
+                result *= multiplier;
                 break;
             }
 
             case "/": {
-                if (stack.length === 0) {
+                const divider = stack.pop();
+
+                if (divider === undefined) {
                     throw new InvalidRPNException(InvalidRPNErrorCodes.INVALID_DIVISION);
                 }
-
-                const divider = stack.pop()!;
 
                 if (divider === 0) {
                     throw new MathException(MathErrorCodes.DIVISION_BY_ZERO);
@@ -62,9 +66,24 @@ export function evaluateRPN(rpn: string): number {
                 break;
             }
 
+            case "%": {
+                const modulo = stack.pop();
+
+                if (!modulo) {
+                    throw new InvalidRPNException(InvalidRPNErrorCodes.INVALID_DIVISION_REMAINDER);
+                }
+
+                if (modulo === 0) {
+                    throw new MathException(MathErrorCodes.MODULO_FROM_ZERO);
+                }
+
+                result %= modulo;
+                break;
+            }
+
             default: {
                 const number = Number(tokens[i]);
-                if (isDecimal(tokens[i]) && !checkNumberIsSuitable(number)) {
+                if (!isDecimal(tokens[i]) || !checkNumberIsSuitable(number)) {
                     throw new MathException(MathErrorCodes.OTHER);
                 }
 

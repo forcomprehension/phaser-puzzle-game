@@ -50,4 +50,11 @@ describe('Tests for reverse polish notation evaluation', () => {
         expect(checker).toThrow(MathException);
         expect(checker).toThrow(MathErrorCodes.OTHER);
     });
+
+    test.each([
+        ['10 4 %', 2],
+        ['100 17 % 6 * 3 / 5 + 1 -', 34]
+    ])('Complex expression with modulo "%s" must be equal to %d', (rpn, expectedValue) => {
+        expect(evaluateRPN(rpn)).toEqual(expectedValue);
+    });
 });

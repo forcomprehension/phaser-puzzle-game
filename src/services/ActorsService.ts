@@ -2,6 +2,7 @@ import { BranchNode } from "@GameObjects/commands/nodes/BranchNode";
 import { DivisionNode } from "@GameObjects/commands/nodes/Math/DivisionNode";
 import { MultiplicationNode } from "@GameObjects/commands/nodes/Math/MultiplicationNode";
 import { SubtractNode } from "@GameObjects/commands/nodes/Math/SubtractNode";
+import { ModuloNode } from "@GameObjects/commands/nodes/Math/ModuloNode";
 import { MonochromeDisplayNode } from "@GameObjects/commands/nodes/MonochromeDisplayNode";
 import { RandomIntNode } from "@GameObjects/commands/nodes/RandomIntNode";
 import { LiteralNode } from "@GameObjects/commands/nodes/LiteralNode";
@@ -18,6 +19,10 @@ const actorsMap = {
     [DivisionNode.ACTOR_KEY]: {
         factory: DivisionNode.spawnerFactory,
         clazz: DivisionNode,
+    },
+    [ModuloNode.ACTOR_KEY]: {
+        factory: ModuloNode.spawnerFactory,
+        clazz: ModuloNode,
     },
     [MultiplicationNode.ACTOR_KEY]: {
         factory: MultiplicationNode.spawnerFactory,

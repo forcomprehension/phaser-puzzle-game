@@ -15,7 +15,8 @@ export enum MathOp {
     ADD = "+",
     DIVIDE = "/",
     MULTIPLY = "*",
-    SUBTRACT = "-"
+    SUBTRACT = "-",
+    MODULO = '%',
 }
 
 class Stack3 {
@@ -300,14 +301,11 @@ export class Interpreter3 {
             return;
         }
 
-        // Multiplication ops must have 1 as start value, another ops must have first value
-        const startValue = mathOp === MathOp.ADD || mathOp === MathOp.SUBTRACT ?
-            operands[0]
-            : 1;
+        const firstOperand = operands[0];
 
         const result = operands.slice(1).reduce((acc, next) => {
             return this.performMathOperation(acc, next, mathOp);
-        }, startValue);
+        }, firstOperand);
 
         this.state.stack.push(result);
     }
@@ -331,6 +329,9 @@ export class Interpreter3 {
             }
             case MathOp.SUBTRACT: {
                 return prev - next;
+            }
+            case MathOp.MODULO: {
+                return prev % next;
             }
         }
     }
