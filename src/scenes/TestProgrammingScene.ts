@@ -1,32 +1,21 @@
 import { BaseGameScene } from "./BaseGameScene";
 import { addBackgroundImageCover } from "@utils/images";
-import { MonochromeDisplayNode } from "@GameObjects/commands/nodes/MonochromeDisplayNode";
-import { RandomIntNode } from "@GameObjects/commands/nodes/RandomIntNode";
 import { NodeConnectionDrawingTool } from "@GameObjects/commands/NodeConnectorDrawingTool";
 import { CustomTextBox } from "@GameObjects/Textbox/CustomTextBox";
-import { NODE_RECEIVE_DATA } from "@GameObjects/commands/nodes/events";
-import { LevelsManager, levels } from "@src/levels/LevelsManager";
-import { MultiplicationNode } from "@GameObjects/commands/nodes/Math/MultiplicationNode";
-import { DivisionNode } from "@GameObjects/commands/nodes/Math/DivisionNode";
-import { LiteralNode } from "@GameObjects/commands/nodes/LiteralNode";
-import { SubtractNode } from "@GameObjects/commands/nodes/Math/SubtractNode";
+import { LevelsManager } from "@src/levels/LevelsManager";
 import { FrameGraph } from "@src/classes/vm/FrameGraph";
-import { BranchNode } from "@GameObjects/commands/nodes/BranchNode";
 import { EntryNode } from "@GameObjects/commands/nodes/EntryNode";
-import { ReturnNode } from "@GameObjects/commands/nodes/ReturnNode";
-import { Interpreter } from "@src/classes/vm/Interpreter";
-import { StackFrame } from "@src/classes/vm/StackFrame";
-import { CallStack } from "@src/classes/vm/CallStack";
 import { CompileButton } from "@GameObjects/ui/CompileButton";
 import { GraphProcessor } from "@src/classes/GraphProcessor";
 import { CommandNode } from "@GameObjects/commands/nodes/CommandNode";
 import { Interpreter3 } from "@src/classes/vm/Interpreter3";
+import { levels } from "@src/levels/levelsList";
 
 export type ProgrammingSceneData = {
     level?: number
 };
 
-const START_INDEX_LEVEL = 3;
+const START_INDEX_LEVEL = 0;
 
 export class TestProgrammingScene extends BaseGameScene {
 
@@ -35,8 +24,6 @@ export class TestProgrammingScene extends BaseGameScene {
     public nodeConnectorDrawer: NodeConnectionDrawingTool;
 
     public readonly frameGraph = new FrameGraph();
-
-    protected readonly interpreter = new Interpreter();
 
     protected level: number = START_INDEX_LEVEL;
 
@@ -86,10 +73,9 @@ export class TestProgrammingScene extends BaseGameScene {
         compileButton.addClickHandler(() => {
             const entryNode = this.levelsManager.firstActorOfCurrentLevel;
             if (entryNode instanceof CommandNode) {
-                debugger;
                 const instructionsList = new GraphProcessor().convertFrom(entryNode);
                 const interpreter = new Interpreter3(instructionsList);
-debugger
+
                 interpreter.continue();
             }
         });
@@ -130,17 +116,8 @@ debugger
     protected testLevel() {
         const { canvasHeight, canvasWidth } = this.getCanvasSize();
 
-        const callStack = new CallStack();
-        // callStack.push(new StackFrame())
-        this.interpreter.executeStack(callStack);
 
         const enterNode = new EntryNode(this, 100, canvasHeight / 2);
-        // const returnNode = new ReturnNode(this, canvasWidth - 100, canvasHeight / 2);
-
-        const ifNode = new BranchNode(this, canvasWidth / 2, canvasHeight / 2);
-        const monochromeDisplay = new MonochromeDisplayNode(this, 1450, 600);
-
-        
     }
 
     protected bootstrap() {

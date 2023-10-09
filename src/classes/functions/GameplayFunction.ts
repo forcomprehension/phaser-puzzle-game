@@ -1,5 +1,5 @@
-import { IArgument, ICallable } from "../vm/ICallable";
-import { IGameplayFunctionAgent } from "./IGameplayFunctionAgent";
+import type { IArgument, ICallable } from "../vm/ICallable";
+import type { IGameplayFunctionAgent } from "./IGameplayFunctionAgent";
 
 export class GameplayFunction implements ICallable {
     // @TODO: use weakmap outside or set this in constructor?
@@ -10,7 +10,10 @@ export class GameplayFunction implements ICallable {
     }
 
     public callFunction(...args: IArgument[]) {
-        return this.gameplayObject.gameplayCall(...args);
+        this.gameplayObject.callWasPerformedWith(args)
+        const result = this.gameplayObject.gameplayCall(...args);
+        this.gameplayObject.notifySuccessfulCall();
+        return result;
     }
 
     public functionLength(): number {

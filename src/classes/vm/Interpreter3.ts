@@ -1,4 +1,5 @@
 import { ListStatement, StatementAssignArg, StatementCallArg, StatementMathArg } from "../GraphProcessor";
+import { MathErrorCodes, MathException } from "../exceptions/math/MathException";
 import { IArgument, ICallable } from "./ICallable";
 import { OpType } from "./Interpreter2";
 
@@ -253,6 +254,7 @@ export class Interpreter3 {
         }
 
         const result = fp.callFunction(...args);
+
         // @todo: need to push undefined?
         stack.push(result);
     }
@@ -319,6 +321,9 @@ export class Interpreter3 {
                 return prev + next;
             }
             case MathOp.DIVIDE: { // @TODO: Int / float?
+                if (next === 0) {
+                    throw new MathException(MathErrorCodes.DIVISION_BY_ZERO);
+                }
                 return prev / next;
             }
             case MathOp.MULTIPLY: {
