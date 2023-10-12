@@ -19,15 +19,20 @@ export type BaseComponentsFactoryResult = {
     mainComponent: MainComponent;
 }
 
-export enum InstructionType {
+/**
+ * Class, bounded to node. Each class will be processed individually.
+ * Each class can have simple variations for node. Example: ARITHMETIC, COMPARISON
+ */
+export enum InstructionClass {
     ARITHMETIC = 'ARITHMETIC',
     BRANCH = 'IF',
     BREAK = 'BREAK',
+    CALL = 'CALL',
+    COMPARISON = 'COMPARISON',
     CONTINUE = 'CONTINUE',
-    LOOP = 'LOOP',
     LITERAL = 'LITERAL',
+    LOOP = 'LOOP',
     OTHER = 'OTHER',
-    CALL = 'CALL'
 }
 
 /**
@@ -50,9 +55,9 @@ export class CommandNode extends Phaser.GameObjects.Container implements INodeRe
     public static readonly PIN_SIDE_SIZE = NodePin.HEIGHT;
 
     /**
-     *
+     * Class of instruction. How this node must be processed
      */
-    public readonly instructionType: InstructionType = InstructionType.OTHER;
+    public readonly instructionClass: InstructionClass = InstructionClass.OTHER;
 
     /**
      * Calculates pin offset
@@ -442,7 +447,7 @@ export class CommandNode extends Phaser.GameObjects.Container implements INodeRe
     }
 
      /** region IGraphProcessorAgent **/
-     public getNextInstruction(): Optional<CommandNode> {
+    public getNextInstruction(): Optional<CommandNode> {
         return undefined;
     }
     /** endregion IGraphProcessorAgent **/

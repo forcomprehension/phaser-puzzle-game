@@ -1,7 +1,7 @@
 import { checkNumberIsSuitable } from "@utils/number";
 import { NodePin } from "../NodePin";
 import { ON_PIN_CONNECTED, ON_PIN_DISCONNECTED } from "../nodepins/events";
-import { CommandNode, InstructionType } from "./CommandNode";
+import { CommandNode, InstructionClass } from "./CommandNode";
 import { PinPositionDescription } from "../pinPositionDescription";
 import { StackFrame } from "@src/classes/vm/StackFrame";
 import { Scope } from "@src/classes/vm/Scope";
@@ -17,7 +17,7 @@ export class LiteralNode extends CommandNode {
     // @TODO: SPIKE
     protected scope: Scope;
 
-    public readonly instructionType: InstructionType = InstructionType.LITERAL;
+    public readonly instructionClass: InstructionClass = InstructionClass.LITERAL;
 
     /**
      * Out pin for current value

@@ -1,11 +1,11 @@
 import type { IGameplayFunctionAgent } from "@src/classes/functions/IGameplayFunctionAgent";
-import { CommandNode, InstructionType } from "./CommandNode";
+import { CommandNode, InstructionClass } from "./CommandNode";
 import type { IArgument } from "@src/classes/vm/ICallable";
 import { NodePin } from "../NodePin";
 import { CALL_ACTOR_CALLED, CALL_ACTOR_CALLED_WITH } from "./events";
 
 export class CallNode extends CommandNode implements IGameplayFunctionAgent {
-    public instructionType: InstructionType = InstructionType.CALL;
+    public instructionClass: InstructionClass = InstructionClass.CALL;
 
     // region IGameplayFunctionAgent
     public gameplayCall(...args: IArgument[]) {
@@ -16,7 +16,7 @@ export class CallNode extends CommandNode implements IGameplayFunctionAgent {
         return this.leftPinsList.length;
     }
 
-    public callWasPerformedWith(args: Readonly<IArgument>[]): void {
+    public callWillBePerformedWith(args: Readonly<IArgument>[]): void {
         this.emit(CALL_ACTOR_CALLED_WITH, args);
     }
 

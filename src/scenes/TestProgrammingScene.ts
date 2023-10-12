@@ -15,7 +15,7 @@ export type ProgrammingSceneData = {
     level?: number
 };
 
-const START_INDEX_LEVEL = 0;
+const START_INDEX_LEVEL = 3;
 
 export class TestProgrammingScene extends BaseGameScene {
 
@@ -115,8 +115,6 @@ export class TestProgrammingScene extends BaseGameScene {
 
     protected testLevel() {
         const { canvasHeight, canvasWidth } = this.getCanvasSize();
-
-
         const enterNode = new EntryNode(this, 100, canvasHeight / 2);
     }
 

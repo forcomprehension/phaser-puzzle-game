@@ -1,5 +1,5 @@
 import { NodePin } from "../../NodePin";
-import { CommandNode, InstructionType } from "../CommandNode";
+import { CommandNode, InstructionClass } from "../CommandNode";
 import { PinPositionDescription } from "@GameObjects/commands/pinPositionDescription";
 import { MathOp } from "@src/classes/vm/Interpreter3";
 
@@ -25,7 +25,10 @@ export abstract class MathNode extends CommandNode {
 
     protected outPin: NodePin;
 
-    public readonly instructionType: InstructionType = InstructionType.ARITHMETIC;
+    /**
+     * @inheritdoc
+     */
+    public readonly instructionClass: InstructionClass = InstructionClass.ARITHMETIC;
 
     /**
      * @inheritdoc
@@ -62,8 +65,8 @@ export abstract class MathNode extends CommandNode {
         return 0;
     }
 
-     /** region IGraphProcessorAgent **/
-     public getNextInstruction(): Optional<CommandNode> {
+    /** region IGraphProcessorAgent **/
+    public getNextInstruction(): Optional<CommandNode> {
         const connectedObject = this.outPin.getConnectedObject();
         if (connectedObject instanceof NodePin) {
             return connectedObject.parentContainer;

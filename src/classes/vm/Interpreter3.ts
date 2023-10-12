@@ -1,6 +1,6 @@
 import { ListStatement, StatementAssignArg, StatementCallArg, StatementMathArg } from "../GraphProcessor";
 import { MathErrorCodes, MathException } from "../exceptions/math/MathException";
-import { IArgument, ICallable } from "./ICallable";
+import type { IArgument, ICallable } from "./ICallable";
 import { OpType } from "./Interpreter2";
 
 export enum ComparisonOp {
@@ -71,7 +71,7 @@ type StepReturnValue = {
     type: StepReturnReason.SUCCESS
 };
 
-const returnSuccess = {
+const returnSuccess: StepReturnValue = {
     type: StepReturnReason.SUCCESS
 } as const;
 
@@ -181,23 +181,17 @@ export class Interpreter3 {
                 this.stepIncrement();
                 break;
             }
-            case OpType.LE: {
-                this.stepComparison(stack.pop(), stack.pop(), ComparisonOp.LE, stack);
+            case OpType.COMPARISON: {
+                const op = statement.arg as ComparisonOp;
+                this.stepComparison(op);
                 break;
             }
-
-            case OpType.LT: {
-                this.stepComparison(stack.pop(), stack.pop(), ComparisonOp.LT, stack);
-                break;
-            }
-
             case OpType.LOAD: {
                 stack.push(
                     state.scope.get(statement.arg as string)
                 );
                 break;
             }
-
             case OpType.CALL: {
                 this.stepCall(statement, stack);
                 break;
@@ -260,27 +254,30 @@ export class Interpreter3 {
         stack.push(result);
     }
 
-    protected stepComparison(lhs: number, rhs: number, opType: ComparisonOp, stack: Stack3) {
+    protected stepComparison(opType: ComparisonOp) {
+        // Args will pop's in reverse order
+        const [rhs, lhs] = this.state.stack.popFew(2);
+
         switch (opType) {
             case ComparisonOp.LT: {
-                stack.push(lhs < rhs);
+                this.state.stack.push(lhs < rhs);
                 break;
             }
             case ComparisonOp.LE: {
-                stack.push(lhs <= rhs);
+                this.state.stack.push(lhs <= rhs);
                 break;
             }
             case ComparisonOp.GT: {
-                stack.push(lhs > rhs);
+                this.state.stack.push(lhs > rhs);
                 break;
             }
             case ComparisonOp.GE: {
-                stack.push(lhs >= rhs);
+                this.state.stack.push(lhs >= rhs);
                 break;
             }
             // @TODO: STRICT COMPARISON?
             case ComparisonOp.EQ: {
-                stack.push(lhs === rhs);
+                this.state.stack.push(lhs === rhs);
                 break;
             }
         }

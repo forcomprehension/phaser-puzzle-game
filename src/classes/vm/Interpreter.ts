@@ -1,4 +1,4 @@
-import { CommandNode, InstructionType } from "@GameObjects/commands/nodes/CommandNode";
+import { CommandNode, InstructionClass } from "@GameObjects/commands/nodes/CommandNode";
 import type { CallStack } from "./CallStack";
 import type { Debugger } from "./Debugger";
 import { StackFrame } from "./StackFrame";
@@ -63,10 +63,10 @@ export class Interpreter {
         do {
             try {
                 const instruction = frame.current;
-                const instructionType = instruction.instructionType;
+                const instructionType = instruction.instructionClass;
 
                 switch (instructionType) {
-                    case InstructionType.LITERAL: {
+                    case InstructionClass.LITERAL: {
                         // @TODO: VALUE PIN?
                         // How to execute?
                         (instruction as LiteralNode).assign(
@@ -75,10 +75,10 @@ export class Interpreter {
                             (instruction as LiteralNode).ourValue
                         );
                     }
-                    case InstructionType.BRANCH: {
+                    case InstructionClass.BRANCH: {
                         // If instruction will be regulated by frame.next()
                     }
-                    case InstructionType.BREAK: {
+                    case InstructionClass.BREAK: {
                         // Loop
                         if (blocksStack.length > 0 && blocksStack[blocksStack.length - 1].isLoop) {
                             // Move out from loop and set instruction after loop as next instruction
@@ -88,7 +88,7 @@ export class Interpreter {
                             throw new Error('Cannot use "break" nowhere but loop direct child block');
                         }
                     }
-                    case InstructionType.CONTINUE: {
+                    case InstructionClass.CONTINUE: {
                         // Loop
                         if (blocksStack.length > 0 && blocksStack[blocksStack.length - 1].isLoop) {
                             frame.setNextInstructionOverride(undefined);
@@ -96,7 +96,7 @@ export class Interpreter {
                             throw new Error('Cannot use "continue" nowhere but loop direct child block');
                         }
                     }
-                    case InstructionType.LOOP: {
+                    case InstructionClass.LOOP: {
                         /**
                          * In loop, we push loop level block into blocks stack
                          *
@@ -116,7 +116,7 @@ export class Interpreter {
                             // This means we must just proceed to next node after loop
                         }
                     }
-                    case InstructionType.LITERAL: {
+                    case InstructionClass.LITERAL: {
                         const value = instruction.executeValue();
                         if (value instanceof StackFrame) {
                             // @TODO:

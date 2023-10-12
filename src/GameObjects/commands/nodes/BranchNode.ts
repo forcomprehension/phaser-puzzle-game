@@ -1,6 +1,6 @@
 import { NodePin } from "../NodePin";
 import { PinPositionDescription } from "../pinPositionDescription";
-import { CommandNode, InstructionType } from "./CommandNode";
+import { CommandNode, InstructionClass } from "./CommandNode";
 
 export class BranchNodeConnectedBranches {
     constructor(
@@ -17,7 +17,7 @@ export class BranchNode extends CommandNode {
 
     protected conditionPin: NodePin;
 
-    public readonly instructionType: InstructionType = InstructionType.BRANCH;
+    public readonly instructionClass: InstructionClass = InstructionClass.BRANCH;
 
     /**
      * @inheritdoc

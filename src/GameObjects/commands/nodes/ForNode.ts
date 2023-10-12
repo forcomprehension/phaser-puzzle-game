@@ -1,6 +1,6 @@
 import { NodePin } from "../NodePin";
 import { PinPositionDescription } from "../pinPositionDescription";
-import { CommandNode, InstructionType } from "./CommandNode";
+import { CommandNode, InstructionClass } from "./CommandNode";
 
 /**
  * Simply "for loop" node
@@ -21,7 +21,7 @@ export class ForNode extends CommandNode {
 
     protected mustStepIntoBody: boolean = false;
 
-    public readonly instructionType: InstructionType = InstructionType.LOOP;
+    public readonly instructionClass: InstructionClass = InstructionClass.LOOP;
 
     protected getTextNode() {
         return 'FOR';

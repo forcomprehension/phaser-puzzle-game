@@ -10,7 +10,7 @@ export class GameplayFunction implements ICallable {
     }
 
     public callFunction(...args: IArgument[]) {
-        this.gameplayObject.callWasPerformedWith(args)
+        this.gameplayObject.callWillBePerformedWith(args)
         const result = this.gameplayObject.gameplayCall(...args);
         this.gameplayObject.notifySuccessfulCall();
         return result;

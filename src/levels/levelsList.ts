@@ -8,6 +8,8 @@ import { MultiplicationNode } from "@GameObjects/commands/nodes/Math/Multiplicat
 import { SubtractNode } from "@GameObjects/commands/nodes/Math/SubtractNode";
 import { DivisionNode } from "@GameObjects/commands/nodes/Math/DivisionNode";
 import { ModuloNode } from "@GameObjects/commands/nodes/Math/ModuloNode";
+import { BranchNode } from "@GameObjects/commands/nodes/BranchNode";
+import { GreaterNode } from "@GameObjects/commands/nodes/Comparison/GreaterNode";
 
 /// Internal types
 
@@ -50,6 +52,14 @@ type WinCriteria = {
     expression: keyof typeof ExpressionMap
 });
 
+type Connection = {
+    fromActorIndex: number
+    toActorIndex: number
+    fromActorPinIndex: number,
+    toActorPinIndex: number,
+    isSealed: boolean,
+};
+
 /**
  * Actor type
  */
@@ -62,6 +72,7 @@ export type Actor = ActorIncompleteType & {
  */
 export type Level = {
     actors: Actor[]
+    connections?: Connection[],
     winCriteria: WinCriteria
 };
 
@@ -92,8 +103,8 @@ function buildActorEventCheckArgsWinCriteria(
  */
 function prepareActors(incompleteActors: ActorIncompleteType[]): Actor[] {
     return incompleteActors.map<Actor>((incompleteActor, index) => ({
-        id: index + 1,
-        ...incompleteActor
+        ...incompleteActor,
+        id: index + 1
     }))
 }
 
@@ -104,8 +115,8 @@ function prepareActors(incompleteActors: ActorIncompleteType[]): Actor[] {
  */
 function prepareLevels(incompleteLevels: LevelIncompleteType[]): Level[] {
     return incompleteLevels.map<Level>((incompleteLevel) => ({
+        ...incompleteLevel,
         actors: prepareActors(incompleteLevel.actors),
-        winCriteria: incompleteLevel.winCriteria,
     }));
 }
 
@@ -180,5 +191,39 @@ export const levels: Level[] = prepareLevels([
             1,
             '10 4 %'
         )
+    },
+
+    // Уровень: Знакомимся с оператором ветвления – if + операторы сравнения
+    {
+        actors: [{
+            key: LiteralNode.ACTOR_KEY,
+            params: [150, 360],
+            data: [185]
+        }, {
+            key: BranchNode.ACTOR_KEY,
+            params: [750, 560]
+        }, {
+            key: LiteralNode.ACTOR_KEY,
+            params: [150, 760],
+            data: [135]
+        }, {
+            key: GreaterNode.ACTOR_KEY,
+            params: [350, 560],
+        }, {
+            key: LiteralNode.ACTOR_KEY,
+            params: [1100, 360],
+            data: [100]
+        }, {
+            key: LiteralNode.ACTOR_KEY,
+            params: [1100, 760],
+            data: [200]
+        }, {
+            key: MonochromeDisplayNode.ACTOR_KEY,
+            params: [1500, 360]
+        }, {
+            key: MonochromeDisplayNode.ACTOR_KEY,
+            params: [1500, 760]
+        }],
+        winCriteria: buildActorEventWinCriteria(6, CALL_ACTOR_CALLED)
     }
 ]);

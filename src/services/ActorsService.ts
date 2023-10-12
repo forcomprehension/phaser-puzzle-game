@@ -6,6 +6,11 @@ import { ModuloNode } from "@GameObjects/commands/nodes/Math/ModuloNode";
 import { MonochromeDisplayNode } from "@GameObjects/commands/nodes/MonochromeDisplayNode";
 import { RandomIntNode } from "@GameObjects/commands/nodes/RandomIntNode";
 import { LiteralNode } from "@GameObjects/commands/nodes/LiteralNode";
+import { GreaterNode } from "@GameObjects/commands/nodes/Comparison/GreaterNode";
+import { EqualNode } from "@GameObjects/commands/nodes/Comparison/EqualNode";
+import { GreaterOrEqualNode } from "@GameObjects/commands/nodes/Comparison/GreaterOrEqualNode";
+import { LessNode } from "@GameObjects/commands/nodes/Comparison/LessNode";
+import { LessOrEqualNode } from "@GameObjects/commands/nodes/Comparison/LessOrEqualNode";
 
 const actorsMap = {
     [MonochromeDisplayNode.ACTOR_KEY]: {
@@ -39,7 +44,27 @@ const actorsMap = {
     [BranchNode.ACTOR_KEY]: {
         factory: BranchNode.spawnerFactory,
         clazz: BranchNode
-    }
+    },
+    [GreaterNode.ACTOR_KEY]: {
+        factory: GreaterNode.spawnerFactory,
+        clazz: GreaterNode,
+    },
+    [EqualNode.ACTOR_KEY]: {
+        factory: EqualNode.spawnerFactory,
+        clazz: EqualNode,
+    },
+    [GreaterOrEqualNode.ACTOR_KEY]: {
+        factory: GreaterOrEqualNode.spawnerFactory,
+        clazz: GreaterOrEqualNode,
+    },
+    [LessNode.ACTOR_KEY]: {
+        factory: LessNode.spawnerFactory,
+        clazz: LessNode,
+    },
+    [LessOrEqualNode.ACTOR_KEY]: {
+        factory: LessOrEqualNode.spawnerFactory,
+        clazz: LessOrEqualNode,
+    },
 } as const;
 
 type ActorsMap = typeof actorsMap;

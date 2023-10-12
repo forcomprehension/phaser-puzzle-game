@@ -1,4 +1,4 @@
-import { CommandNode, InstructionType } from "@GameObjects/commands/nodes/CommandNode";
+import { CommandNode, InstructionClass } from "@GameObjects/commands/nodes/CommandNode";
 import { OpType } from "./vm/Interpreter2";
 import { BranchNode } from "@GameObjects/commands/nodes/BranchNode";
 import { nextString } from "@utils/serialGenerator";
@@ -7,13 +7,14 @@ import { CallNode } from "@GameObjects/commands/nodes/CallNode";
 import { FunctionType } from '@src/classes/functions/F';
 import { MathNode } from "@GameObjects/commands/nodes/Math/MathNode";
 import { LiteralNode } from "@GameObjects/commands/nodes/LiteralNode";
-import { MathOp } from "./vm/Interpreter3";
+import { ComparisonOp, MathOp } from "./vm/Interpreter3";
 import { ICallable } from "./vm/ICallable";
 import { GameplayFunction } from "./functions/GameplayFunction";
+import { ComparisonNode } from "@GameObjects/commands/nodes/Comparison/ComparisonNode";
 
 export type ListStatement = {
     opType: OpType;
-    arg: unknown
+    arg?: unknown
 };
 
 export class StatementMathArg {
@@ -182,8 +183,8 @@ export class GraphProcessor {
 
         // Condition check
         outPtr.push({
-            opType: OpType.LT,
-            arg: undefined // taken from stack
+            opType: OpType.COMPARISON,
+            arg: ComparisonOp.LT
         });
 
         // Doing with out label
@@ -281,59 +282,84 @@ export class GraphProcessor {
         this.stepIntoNextInstruction(thisNode, outPtr);
     }
 
-    protected stepInto(nextNode: CommandNode, outPtr: ListStatement[]) {
+    protected processComparison(thisNode: ComparisonNode, outPtr: ListStatement[]) {
+        // @TODO: In this configuration we do not know exactly which one will be lhs or rhs
+        thisNode.collectArgs().forEach((arg: Optional<CommandNode>) => {
+            if (arg) {
+                this.stepInto(arg, outPtr);
+            }
+        });
+
+        outPtr.push({
+            opType: OpType.COMPARISON,
+            arg: thisNode.comparisonType
+        });
+
+        this.stepIntoNextInstruction(thisNode, outPtr);
+    }
+
+    protected stepInto(currentNode: CommandNode, outPtr: ListStatement[]) {
         // Do not step into already processed nodes
-        if (this.processedNodes.has(nextNode.$id)) {
+        if (this.processedNodes.has(currentNode.$id)) {
             return;
         }
 
-        this.processedNodes.add(nextNode.$id);
+        this.processedNodes.add(currentNode.$id);
 
-        const { instructionType } = nextNode;
+        const { instructionClass: instructionType } = currentNode;
         switch (instructionType) {
-            case InstructionType.BRANCH: {
-                if (nextNode instanceof BranchNode) {
-                    this.processBranch(nextNode, outPtr);
+            case InstructionClass.BRANCH: {
+                if (currentNode instanceof BranchNode) {
+                    this.processBranch(currentNode, outPtr);
                     break;
                 }
 
-                this.throwNodeIsCorrupted(nextNode);
+                this.throwNodeIsCorrupted(currentNode);
             }
 
-            case InstructionType.LOOP: {
-                if (nextNode instanceof ForNode) {
-                    this.processLoop(nextNode, outPtr);
+            case InstructionClass.LOOP: {
+                if (currentNode instanceof ForNode) {
+                    this.processLoop(currentNode, outPtr);
                     break;
                 }
 
-                this.throwNodeIsCorrupted(nextNode);
+                this.throwNodeIsCorrupted(currentNode);
             }
 
-            case InstructionType.CALL: {
-                if (nextNode instanceof CallNode) {
-                    this.processCall(nextNode, outPtr);
+            case InstructionClass.CALL: {
+                if (currentNode instanceof CallNode) {
+                    this.processCall(currentNode, outPtr);
                     break;
                 }
 
-                this.throwNodeIsCorrupted(nextNode);
+                this.throwNodeIsCorrupted(currentNode);
             }
 
-            case InstructionType.ARITHMETIC: {
-                if (nextNode instanceof MathNode) {
-                    this.processMath(nextNode, outPtr);
+            case InstructionClass.ARITHMETIC: {
+                if (currentNode instanceof MathNode) {
+                    this.processMath(currentNode, outPtr);
                     break
                 }
 
-                this.throwNodeIsCorrupted(nextNode);
+                this.throwNodeIsCorrupted(currentNode);
             }
 
-            case InstructionType.LITERAL: {
-                if (nextNode instanceof LiteralNode) {
-                    this.processLiteral(nextNode, outPtr);
+            case InstructionClass.LITERAL: {
+                if (currentNode instanceof LiteralNode) {
+                    this.processLiteral(currentNode, outPtr);
                     break;
                 }
 
-                this.throwNodeIsCorrupted(nextNode);
+                this.throwNodeIsCorrupted(currentNode);
+            }
+
+            case InstructionClass.COMPARISON: {
+                if (currentNode instanceof ComparisonNode) {
+                    this.processComparison(currentNode, outPtr);
+                    break;
+                }
+
+                this.throwNodeIsCorrupted(currentNode);
             }
         }
     }
@@ -347,6 +373,6 @@ export class GraphProcessor {
 
     protected throwNodeIsCorrupted(node: CommandNode) {
         const name = Object.getPrototypeOf(node)?.constructor?.name || 'unknown';
-        throw new Error(`Node ${name} of type "${node.instructionType}" is corrupted`);
+        throw new Error(`Node ${name} of type "${node.instructionClass}" is corrupted`);
     }
 }
