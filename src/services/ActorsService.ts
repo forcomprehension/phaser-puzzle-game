@@ -77,6 +77,8 @@ export type ActorParams<Key extends keyof ActorsMap> = Parameters<ActorsMap[Key]
 export class ActorsService {
     protected static $_instance: ActorsService;
 
+    public readonly actorsMap = actorsMap;
+
     public static getInstance() {
         if (!this.$_instance) {
             this.$_instance = new ActorsService();

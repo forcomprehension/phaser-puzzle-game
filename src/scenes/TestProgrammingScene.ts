@@ -10,6 +10,8 @@ import { GraphProcessor } from "@src/classes/GraphProcessor";
 import { CommandNode } from "@GameObjects/commands/nodes/CommandNode";
 import { Interpreter3 } from "@src/classes/vm/Interpreter3";
 import { levels } from "@src/levels/levelsList";
+import { ActorKey, ActorsService } from "@src/services/ActorsService";
+import type { Label, RoundRectangle } from "phaser3-rex-plugins/templates/ui/ui-components";
 
 export type ProgrammingSceneData = {
     level?: number
@@ -28,6 +30,8 @@ export class TestProgrammingScene extends BaseGameScene {
     protected level: number = START_INDEX_LEVEL;
 
     protected winCurrentLevel: boolean = false;
+
+    protected sceneActionsZone: Phaser.GameObjects.Zone;
 
     protected levelsManager: LevelsManager = new LevelsManager(levels);
 
@@ -119,7 +123,62 @@ export class TestProgrammingScene extends BaseGameScene {
     }
 
     protected bootstrap() {
+        const { canvasHeight, canvasWidth } = this.getCanvasSize();
         addBackgroundImageCover(this, 'bg-controlPanel');
+
+        this.sceneActionsZone = this.add.zone(0, 0, canvasWidth, canvasHeight)
+            .setInteractive()
+            .on(Phaser.Input.Events.POINTER_UP, (pointer: Phaser.Input.Pointer) => {
+                if (!pointer.rightButtonReleased()) {
+                    return;
+                }
+
+                const menu = this.rexUI.add.menu({
+                    x: pointer.x,
+                    y: pointer.y,
+                    orientation: 'y',
+                    items: [{
+                        name: 'Add',
+                        children: Object.keys(ActorsService.getInstance().actorsMap).map((actorKey: string) => ({
+                            name: actorKey,
+                            isSpawner: true,
+                        })),
+                    }],
+                    createButtonCallback: (item) => {
+                        const label = this.rexUI.add.label({
+                            background: this.rexUI.add.roundRectangle(0, 0, 2, 2, 0, CustomTextBox.BG_COLOR),
+                            text: this.add.text(0, 0, item.name, {
+                                fontSize: '20px'
+                            }),
+                            icon: this.rexUI.add.roundRectangle(0, 0, 0, 0, 10, CustomTextBox.STROKE_STYLE),
+                            space: {
+                                left: 10,
+                                right: 10,
+                                top: 10,
+                                bottom: 10,
+                                icon: 10
+                            }
+                        });
+
+                        if (item.isSpawner) {
+                            label.setData('actor', item.name);
+                        }
+
+                        return label;
+                    }
+                }).on('button.click', (button: Label) => {
+                    const actorName: ActorKey | undefined = button.data?.get('actor');
+
+                    if (actorName) {
+                        ActorsService.getInstance().getActorSpawner(actorName, menu.x, menu.y)(this)
+                        menu.destroy();
+                    }
+                }).on('button.out', (button: Label) => {
+                    (button.getElement('background') as RoundRectangle).fillColor = CustomTextBox.BG_COLOR
+                }).on('button.over', (button: Label) => {
+                    (button.getElement('background') as RoundRectangle).fillColor = CustomTextBox.BG_COLOR - 0x444444
+                })
+            });
     }
 }
 
