@@ -13,13 +13,13 @@ export function getGameObjectForConnectorsByBody(body: Phaser.Types.Physics.Matt
     const castedBody = unsafeCastBody(body);
 
     if (castedBody.label === BodyLabel.MOTOR) {
-        connector = castedBody.gameObject as IConnectionSocket;
+        connector = castedBody.gameObject as unknown as IConnectionSocket;
     } else if (castedBody.label === BodyLabel.MOTOR_PULLEY) {
-        connector = (castedBody.gameObject as MotorPulley).getMotor();
+        connector = (castedBody.gameObject  as unknown as MotorPulley).getMotor();
     } else if (castedBody.label === BodyLabel.GEAR) {
-        connector = (castedBody.gameObject as IConnectionSocket);
+        connector = (castedBody.gameObject as unknown as IConnectionSocket);
     } else if (castedBody.label === BodyLabel.NODE_PIN) {
-        connector = (castedBody.gameObject as IConnectionSocket);
+        connector = (castedBody.gameObject as unknown as IConnectionSocket);
     }
 
     return connector;

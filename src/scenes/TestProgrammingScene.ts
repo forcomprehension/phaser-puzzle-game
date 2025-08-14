@@ -17,7 +17,7 @@ export type ProgrammingSceneData = {
     level?: number
 };
 
-const START_INDEX_LEVEL = 3;
+const START_INDEX_LEVEL = 0;
 
 export class TestProgrammingScene extends BaseGameScene {
 
